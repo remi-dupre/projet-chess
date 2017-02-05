@@ -1,7 +1,19 @@
-abstract class Cell
-case class Some(t : Piece)
-case class Void
+case class Pos(x : Int, y : Int)
 
 class Game {
-	var grid = Array.ofDim[Cell](8, 8)
+	var pieces : List[Piece] = List()
+
+	/* Initialisation of the game */
+	for(i <- 0 to 7) {
+		pieces = new Pawn(this, 0, Pos(1, i)) :: pieces
+		pieces = new Pawn(this, 1, Pos(5, i)) :: pieces
+	}
+
+	def empty_cell(x : Int, y : Int) : Boolean = {
+		for(c <- pieces) c match {
+			case Piece(_, _, Pos(x, y)) => return false
+			case _ => ()
+		}
+		return true
+	}
 }
