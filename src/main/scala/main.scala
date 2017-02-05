@@ -4,3 +4,4 @@ object Main {
 		menu.visible = true
 	}
 }
+

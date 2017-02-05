@@ -10,3 +10,4 @@ class MenuWin extends MainFrame {
 		fen.visible = true
 	})
 }
+

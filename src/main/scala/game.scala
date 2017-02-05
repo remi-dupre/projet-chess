@@ -16,3 +16,4 @@ class Game {
 		return true
 	}
 }
+

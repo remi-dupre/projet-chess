@@ -9,3 +9,4 @@ class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos
 class Pawn(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "Pawn"
 }
+
