@@ -1,5 +1,4 @@
 abstract case class Piece(game : Game, player : Int, pos : Pos) {
-	var m_game : Game = game
 	def role : String
 }
 
