@@ -3,10 +3,26 @@ abstract case class Piece(game : Game, player : Int, pos : Pos) {
 }
 
 class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
-	override def role = "King"
+	override def role = "king"
+}
+
+class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
+	override def role = "queen"
+}
+
+class Rook(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
+	override def role = "rook"
+}
+
+class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
+	override def role = "bishop"
+}
+
+class Knight(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
+	override def role = "knight"
 }
 
 class Pawn(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
-	override def role = "Pawn"
+	override def role = "pawn"
 }
 

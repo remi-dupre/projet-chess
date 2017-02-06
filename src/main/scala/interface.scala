@@ -1,5 +1,6 @@
 import swing._
 import java.awt.Color
+import javax.swing.ImageIcon
 
 class GameWin(game : Game) extends MainFrame {
 	title = "Chess"
@@ -9,7 +10,7 @@ class GameWin(game : Game) extends MainFrame {
 	contents = new GridPanel(8, 8) {
 		for(j <- 0 to 7) {
 			for(i <- 0 to 7) {
-				grid(i)(j) = new CellBtn(i, j)
+				grid(i)(j) = new CellBtn(i, j, game)
 				contents += grid(i)(j)
 			}
 		}
@@ -18,10 +19,7 @@ class GameWin(game : Game) extends MainFrame {
 	def refresh = {
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
-				if(!game.empty_cell(i, j))
-					grid(i)(j).text = "X"
-				else
-					grid(i)(j).text = ""
+				
 			}
 		}
 	}
@@ -29,7 +27,16 @@ class GameWin(game : Game) extends MainFrame {
 	refresh
 }
 
-class CellBtn(x : Int, y : Int) extends Button {
-	background = if((x+y) % 2 == 0) Color.white else Color.black
+class CellBtn(x : Int, y : Int, game : Game) extends Button {
+	background = if((x+y) % 2 == 0) Color.white else Color.darkGray
+	refresh
+
+	def refresh = {
+		val player = if(game.cell_player(x, y) == 0) "white" else "black"
+		game.cell_role(x, y) match {
+			case "empty" => icon = null 
+			case role => icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png")
+		}
+	}
 }
 
