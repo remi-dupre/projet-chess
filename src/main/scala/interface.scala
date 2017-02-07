@@ -4,6 +4,7 @@ import javax.swing.ImageIcon
 
 class GameWin(game : Game) extends MainFrame {
 	title = "Chess"
+	minimumSize = new Dimension(500, 500)
 	preferredSize = new Dimension(600, 600)
 
 	val grid = Array.ofDim[Button](8, 8)
