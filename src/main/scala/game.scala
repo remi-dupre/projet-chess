@@ -2,6 +2,7 @@ case class Pos(x : Int, y : Int)
 
 class Game {
 	/* Initialisation of the game */
+	var grid = Array.ofDim[Piece](8, 8) // Vaut soit null soit une pièce
 	var pieces : List[Piece] = List()
 	for(i <- 0 to 7) {
 		pieces = new Pawn(this, 0, Pos(i, 6)) :: pieces
