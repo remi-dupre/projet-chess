@@ -2,6 +2,7 @@ case class Pos(x : Int, y : Int)
 
 class Game {
 	/* Initialisation of the game */
+	var grid = Array.ofDim[Piece](8, 8) // Vaut soit null soit une pièce
 	var pieces : List[Piece] = List()
 	val players : Array[Player] = Array(null, null)
 	var changed = () => {}
