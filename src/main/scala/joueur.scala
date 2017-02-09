@@ -1,6 +1,5 @@
-abstract class Player(color : Int, game : Game) {
+abstract class Player(val color : Int, game : Game) {
 	def wait_play : Unit
-	
 }
 
 class Human(color : Int, interface : GameWin, game : Game) extends Player(color, game) {
