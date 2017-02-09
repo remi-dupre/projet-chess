@@ -108,17 +108,33 @@ class Pawn(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos
 		var x = pos.x
 		var y = pos.y
 		var pos_move: List[Pos] = List()
-		if(In_board(x+1,y)&&game.empty_cell(x+1, y)) {
-			pos_move = Pos(x+1,y)::pos_move
+		if( player == 0) {
+			if(In_board(x,y+1)&&game.empty_cell(x, y+1)) {
+				pos_move = Pos(x,y+1)::pos_move
+			}
+			if(In_board(x+1,y+1) && (game.cell_player(x+1,y+1) == 1-player)) {
+				pos_move = Pos(x+1,y+1)::pos_move
+			}
+			if(In_board(x-1,y+1) && (game.cell_player(x-1,y+1) == 1-player)) {
+				pos_move = Pos(x-1,y+1)::pos_move
+			}
+			if(!already_moved && In_board(x,y+2) && game.empty_cell(x,y+2)) {
+				pos_move = Pos(x,y+2)::pos_move
+			}
 		}
-		if(In_board(x-1,y+1) && (game.cell_player(x-1,y+1) == 1-player)) {
-			pos_move = Pos(x-1,y+1)::pos_move
-		}
-		if(In_board(x+1,y+1) && (game.cell_player(x+1,y+1) == 1-player)) {
-			pos_move = Pos(x+1,y+1)::pos_move
-		}
-		if(!already_moved && In_board(x+2,y) && game.empty_cell(x+2,y)) {
-			pos_move = Pos(x+2,y)::pos_move
+		if( player == 1) {
+			if(In_board(x,y-1)&&game.empty_cell(x, y-1)) {
+				pos_move = Pos(x,y-1)::pos_move
+			}
+			if(In_board(x+1,y-1) && (game.cell_player(x+1,y-1) == 1-player)) {
+				pos_move = Pos(x+1,y-1)::pos_move
+			}
+			if(In_board(x-1,y-1) && (game.cell_player(x-1,y-1) == 1-player)) {
+				pos_move = Pos(x-1,y-1)::pos_move
+			}
+			if(!already_moved && In_board(x,y-2) && game.empty_cell(x,y-2)) {
+				pos_move = Pos(x,y-2)::pos_move
+			}
 		}
 		return pos_move
 	}
