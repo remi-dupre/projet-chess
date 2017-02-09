@@ -1,5 +1,14 @@
 abstract case class Piece(game : Game, player : Int, pos : Pos) {
 	def role : String
+	def possible_moves : List[Pos] = {
+		var ret : List[Pos] = List()
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				ret = (Pos(i, j)) :: ret
+			}
+		}
+		return ret
+	}
 }
 
 class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
