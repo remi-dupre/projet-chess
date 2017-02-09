@@ -87,12 +87,14 @@ class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, p
 class Knight(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "knight"
 	override def possible_move : List[Pos] = {
+		var x = pos.x
+		var y = pos.y
 		var pos_move: List[Pos] = List()
 		var list_move = List((2,1),(1,2),(2,-1),(-1,2),(-2,1),(1,-2),(-2,-1),(-1,-2))
 		for(moves <- list_move) {
-			var (x,y) = moves
-			if(In_board(x,y) && game.cell_player(x,y) != player ) {
-				pos_move = Pos(x,y)::pos_move
+			var (i,j) = moves
+			if(In_board(x+i,y+j) && game.cell_player(x+i,y+j) != player ) {
+				pos_move = Pos(x+i,y+j)::pos_move
 			}
 		}
 		return pos_move
@@ -106,17 +108,33 @@ class Pawn(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos
 		var x = pos.x
 		var y = pos.y
 		var pos_move: List[Pos] = List()
-		if(In_board(x+1,y)&&game.empty_cell(x+1, y)) {
-			pos_move = Pos(x+1,y)::pos_move
+		if( player == 0) {
+			if(In_board(x,y+1)&&game.empty_cell(x, y+1)) {
+				pos_move = Pos(x,y+1)::pos_move
+			}
+			if(In_board(x+1,y+1) && (game.cell_player(x+1,y+1) == 1-player)) {
+				pos_move = Pos(x+1,y+1)::pos_move
+			}
+			if(In_board(x-1,y+1) && (game.cell_player(x-1,y+1) == 1-player)) {
+				pos_move = Pos(x-1,y+1)::pos_move
+			}
+			if(!already_moved && In_board(x,y+2) && game.empty_cell(x,y+2)) {
+				pos_move = Pos(x,y+2)::pos_move
+			}
 		}
-		if(In_board(x-1,y+1) && (game.cell_player(x-1,y+1) == 1-player)) {
-			pos_move = Pos(x-1,y+1)::pos_move
-		}
-		if(In_board(x+1,y+1) && (game.cell_player(x+1,y+1) == 1-player)) {
-			pos_move = Pos(x+1,y+1)::pos_move
-		}
-		if(!already_moved && In_board(x+2,y) && game.empty_cell(x+2,y)) {
-			pos_move = Pos(x+2,y)::pos_move
+		if( player == 1) {
+			if(In_board(x,y-1)&&game.empty_cell(x, y-1)) {
+				pos_move = Pos(x,y-1)::pos_move
+			}
+			if(In_board(x+1,y-1) && (game.cell_player(x+1,y-1) == 1-player)) {
+				pos_move = Pos(x+1,y-1)::pos_move
+			}
+			if(In_board(x-1,y-1) && (game.cell_player(x-1,y-1) == 1-player)) {
+				pos_move = Pos(x-1,y-1)::pos_move
+			}
+			if(!already_moved && In_board(x,y-2) && game.empty_cell(x,y-2)) {
+				pos_move = Pos(x,y-2)::pos_move
+			}
 		}
 		return pos_move
 	}
