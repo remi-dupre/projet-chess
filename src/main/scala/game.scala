@@ -2,7 +2,6 @@ case class Pos(x : Int, y : Int)
 
 class Game {
 	/* Initialisation of the game */
-	var grid = Array.ofDim[Piece](8, 8) // Vaut soit null soit une pièce
 	var pieces : List[Piece] = List()
 	for(i <- 0 to 7) {
 		pieces = new Pawn(this, 0, Pos(i, 6)) :: pieces
@@ -49,6 +48,42 @@ class Game {
 			case _ => ()
 		}
 		return true
+	}
+
+	def remove(p : Piece, pieces : List[Piece]) : List[Piece] = pieces match {
+		case piece :: subpieces => if (piece.pos == p.pos) {return subpieces} else { piece :: (remove(p, subpieces)) }
+		case _ => pieces
+	}
+
+	def move(p : Piece, pos : Pos) : Unit = {
+		val possibleMoves : List[Pos] = p.possible_move
+		for(position <- possibleMoves) position match {
+			case position if position == pos => p.pos = pos
+			case _ => Nil
+		}
+	}
+
+	def every_possible_move(player : Int) : List[Pos] = { 
+		var pos_move : List[Pos] = List()
+		for(c <- pieces) c match {
+			case piece if (piece.player == player) => pos_move = pos_move ++ piece.possible_move
+			case _ => ()
+		}
+		return pos_move
+	}
+
+	def inCheck(player : Int) : Boolean = {
+		var pos_move : List[Pos] = every_possible_move(1 - player)
+		var pos : Pos = Pos(-1,-1)
+		for(c <- pieces) c match {
+			case piece if ( (piece.role == "king") && (piece.player == player) ) => var pos = piece.pos
+			case _ => ()
+		}
+		for(position <- pos_move) position match {
+			case position if (position == pos) => return true
+			case _ => ()
+		}
+		return false
 	}
 }
 
