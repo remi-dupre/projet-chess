@@ -93,14 +93,5 @@ class Game {
 		}
 		return false
 	}
-
-	def getPiece(i : Int, j : Int) : Piece = {
-		for(c <- pieces) c match {
-			case piece if (piece.pos == Pos(i,j)) => piece
-			case _ => ()
-		}
-		return null
-	}
-
 }
 

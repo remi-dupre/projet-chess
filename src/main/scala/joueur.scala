@@ -7,11 +7,19 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 		interface.state = SelectPiece(this)
 	}
 
+	var selected = (-1, -1)
 	def select(x : Int, y : Int) {
 		if(game.cell_player(x, y) == color) {
+			selected = (x, y)
 			println("selected " + x + "," + y)
-			interface.state = Wait()
+			interface.state = WaitDirection(this)
 		}
+	}
+
+	def move(x : Int, y : Int) {
+		var (i, j) = selected
+		val piece = game.get_piece(i, j)
+		game.move(piece, x, y)
 	}
 }
 

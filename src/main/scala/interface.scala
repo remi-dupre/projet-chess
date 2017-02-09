@@ -4,6 +4,7 @@ import javax.swing.ImageIcon
 
 class InterfaceState
 case class SelectPiece(p : Human) extends InterfaceState
+case class WaitDirection(p : Human) extends InterfaceState
 case class Wait() extends InterfaceState
 
 class GameWin() extends MainFrame {
@@ -45,6 +46,7 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		mainWin.state match {
 			case Wait() => println("waiting ...")
 			case SelectPiece(p) => p.select(x, y)
+			case WaitDirection(p) => p.move(x, y)
 		}
 	}
 
