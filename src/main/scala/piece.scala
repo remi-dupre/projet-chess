@@ -87,12 +87,14 @@ class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, p
 class Knight(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "knight"
 	override def possible_move : List[Pos] = {
+		var x = pos.x
+		var y = pos.y
 		var pos_move: List[Pos] = List()
 		var list_move = List((2,1),(1,2),(2,-1),(-1,2),(-2,1),(1,-2),(-2,-1),(-1,-2))
 		for(moves <- list_move) {
-			var (x,y) = moves
-			if(In_board(x,y) && game.cell_player(x,y) != player ) {
-				pos_move = Pos(x,y)::pos_move
+			var (i,j) = moves
+			if(In_board(x+i,y+j) && game.cell_player(x+i,y+j) != player ) {
+				pos_move = Pos(x+i,y+j)::pos_move
 			}
 		}
 		return pos_move
