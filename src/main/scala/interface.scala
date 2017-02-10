@@ -48,7 +48,7 @@ class GameWin() extends MainFrame {
 	/** Met en valeur les cases sur lesquelles la pièce peut être déplacée */
 	def highlight_possible(p : Piece) = {
 		for(pos <- p.possible_move()) {
-			grid(pos.x)(pos.y).background = Color.green
+			grid(pos.x)(pos.y).highlight
 		}
 	}
 
@@ -79,6 +79,12 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		}
 	}
 	
+	def highlight = {
+		val light_ok = new Color(120, 220, 130)
+		val dark_ok = new Color(75, 150, 85)
+		background = if((x+y) % 2 == 0) light_ok else dark_ok
+	}
+
 	/** Met à jours l'affichage de la case */
 	def refresh = {
 		background = if((x+y) % 2 == 0) Color.white else Color.darkGray
