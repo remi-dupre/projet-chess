@@ -8,10 +8,10 @@ class Game {
 	var changed = () => {}
 
 	def start = {
-		for(i <- 0 to 7) {
+		/*for(i <- 0 to 7) {
 			pieces = new Pawn(this, 0, Pos(i, 6)) :: pieces
 			pieces = new Pawn(this, 1, Pos(i, 1)) :: pieces
-		}
+		}*/
 		pieces =
 			new King(this, 0, Pos(4, 7)) ::
 			new King(this, 1, Pos(4, 0)) ::
@@ -65,16 +65,18 @@ class Game {
 		case _ => pieces
 	}
 
-	def move(p : Piece, pos : Pos) : Unit = {
-		println(p.pos)
+	def move(p : Piece, pos : Pos) : Boolean = {
 		val possibleMoves : List[Pos] = p.possible_move()
 		for(position <- possibleMoves) position match {
-			case position if position == pos => p.pos = pos
+			case position if position == pos =>
+				p.pos = pos
+				playing = 1 - playing
+				players(playing).wait_play
+				changed()
+				return true
 			case _ => Nil
 		}
-		playing = 1 - playing
-		players(playing).wait_play
-		changed()
+		return false
 	}
 
 	def every_possible_move(player : Int) : List[Pos] = { 

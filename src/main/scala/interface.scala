@@ -29,6 +29,13 @@ class GameWin() extends MainFrame {
 		}
 	}
 
+	def highlight_possible(x : Int, y : Int) = {
+		val p = game.getPiece(x, y)
+		for(pos <- p.possible_move()) {
+			grid(pos.x)(pos.y).background = Color.green
+		}
+	}
+
 	def refresh = {
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
@@ -39,18 +46,20 @@ class GameWin() extends MainFrame {
 }
 
 class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
-	background = if((x+y) % 2 == 0) Color.white else Color.darkGray
 	refresh
 
 	action = Action("") {
 		mainWin.state match {
 			case Wait() => println("waiting ...")
-			case SelectPiece(p) => p.select(x, y)
-			case WaitDirection(p) => {p.move(x, y) ; game.changed()}
+			case SelectPiece(p) => if(p.select(x, y))
+				mainWin.highlight_possible(x, y)
+			case WaitDirection(p) => if(p.move(x, y))
+				game.changed()
 		}
 	}
 
 	def refresh = {
+		background = if((x+y) % 2 == 0) Color.white else Color.darkGray
 		val player = if(game.cell_player(x, y) == 0) "white" else "black"
 		game.cell_role(x, y) match {
 			case "empty" => icon = null 
