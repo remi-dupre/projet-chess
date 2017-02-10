@@ -1,27 +1,26 @@
 abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	def role : String
 	def possible_move() : List[Pos]
-	def In_board(x : Int, y: Int) : Boolean = {
-		return ((0 <= x)&&(x <= 8)&&(0 <= y)&&(y <= 8))
+	def in_board(x : Int, y: Int) : Boolean = {
+		return ((0 <= x)&&(x < 8)&&(0 <= y)&&(y < 8))
 	}
-	def annexe_possible_move(direction : (Int,Int)) : List [Pos] = {/* direction appartient à [-1..1]²\{0,0} , et renvoie */
-		val (i,j) = direction									/* la liste des moves possibles dans une direction */
-		val x = pos.x
-		val y = pos.y
+
+	def annexe_possible_move(direction : (Int,Int)) : List [Pos] = {
+		/* direction appartient à [-1..1]²\{0,0} , et renvoie */
+		val (i,j) = direction // la liste des moves possibles dans une direction
+		val Pos(x, y) = pos
 		var pos_move: List[Pos] = List()
-		var bool = true
-		for(k <- 1 to 8) {
-			if(bool && In_board(x+k*i,y+k*i) ) {
-				if( game.cell_player(x+k*i, y+k*i) == -1 ) {
-					pos_move = Pos(x+k*i, y+k*i)::pos_move
+		var clear = true
+		for(k <- 1 to 7) {
+			val (a, b) = (x+(k*i), y+(k*j))
+			if(clear && in_board(a, b) ) {
+				if( game.cell_player(a, b) == -1 ) {
+					pos_move = Pos(a, b)::pos_move
 				}
 				else{
-					if( player != game.cell_player(x+k*i, y+k*i) ) {
-						pos_move = Pos(x+k*i, y+k*i)::pos_move
-						bool = false
-					}
-					else{
-						bool = false
+					clear = false
+					if( player != game.cell_player(a, b) ) {
+						pos_move = Pos(a, b)::pos_move
 					}
 				}
 			}
@@ -38,7 +37,7 @@ class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos
 		var pos_move: List[Pos] = List()
 		for(i <- 0 to 2) {
 			for(j <- 0 to 2) {
-				if(((i,j) != (1,1)) && In_board(x+i-1,y+j-1)) {
+				if(((i,j) != (1,1)) && in_board(x+i-1,y+j-1)) {
 					pos_move = Pos(x+i-1,y+j-1)::pos_move
 				}
 			}
@@ -79,7 +78,7 @@ class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, p
 	override def role = "bishop"
 	override def possible_move : List[Pos] = {
 		var pos_move: List[Pos] = List()
-		pos_move = annexe_possible_move(1,1) ++ annexe_possible_move(-1,1) ++ annexe_possible_move(-1,-1) ++ annexe_possible_move(1,-1)
+		pos_move = annexe_possible_move((1,1)) ++ annexe_possible_move((-1,1)) ++ annexe_possible_move((-1,-1)) ++ annexe_possible_move((1,-1))
 		return pos_move
 	}
 }
@@ -93,7 +92,7 @@ class Knight(game : Game, player : Int, a_pos : Pos) extends Piece(game, player,
 		var list_move = List((2,1),(1,2),(2,-1),(-1,2),(-2,1),(1,-2),(-2,-1),(-1,-2))
 		for(moves <- list_move) {
 			var (i,j) = moves
-			if(In_board(x+i,y+j) && game.cell_player(x+i,y+j) != player ) {
+			if(in_board(x+i,y+j) && game.cell_player(x+i,y+j) != player ) {
 				pos_move = Pos(x+i,y+j)::pos_move
 			}
 		}
@@ -109,33 +108,34 @@ class Pawn(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos
 		var y = pos.y
 		var pos_move: List[Pos] = List()
 		if( player == 0) {
-			if(In_board(x,y+1)&&game.empty_cell(x, y+1)) {
+			if(in_board(x,y+1)&&game.empty_cell(x, y+1)) {
 				pos_move = Pos(x,y+1)::pos_move
 			}
-			if(In_board(x+1,y+1) && (game.cell_player(x+1,y+1) == 1-player)) {
+			if(in_board(x+1,y+1) && (game.cell_player(x+1,y+1) == 1-player)) {
 				pos_move = Pos(x+1,y+1)::pos_move
 			}
-			if(In_board(x-1,y+1) && (game.cell_player(x-1,y+1) == 1-player)) {
+			if(in_board(x-1,y+1) && (game.cell_player(x-1,y+1) == 1-player)) {
 				pos_move = Pos(x-1,y+1)::pos_move
 			}
-			if(!already_moved && In_board(x,y+2) && game.empty_cell(x,y+2)) {
+			if(!already_moved && in_board(x,y+2) && game.empty_cell(x,y+2)) {
 				pos_move = Pos(x,y+2)::pos_move
 			}
 		}
 		if( player == 1) {
-			if(In_board(x,y-1)&&game.empty_cell(x, y-1)) {
+			if(in_board(x,y-1)&&game.empty_cell(x, y-1)) {
 				pos_move = Pos(x,y-1)::pos_move
 			}
-			if(In_board(x+1,y-1) && (game.cell_player(x+1,y-1) == 1-player)) {
+			if(in_board(x+1,y-1) && (game.cell_player(x+1,y-1) == 1-player)) {
 				pos_move = Pos(x+1,y-1)::pos_move
 			}
-			if(In_board(x-1,y-1) && (game.cell_player(x-1,y-1) == 1-player)) {
+			if(in_board(x-1,y-1) && (game.cell_player(x-1,y-1) == 1-player)) {
 				pos_move = Pos(x-1,y-1)::pos_move
 			}
-			if(!already_moved && In_board(x,y-2) && game.empty_cell(x,y-2)) {
+			if(!already_moved && in_board(x,y-2) && game.empty_cell(x,y-2)) {
 				pos_move = Pos(x,y-2)::pos_move
 			}
 		}
 		return pos_move
 	}
 }
+
