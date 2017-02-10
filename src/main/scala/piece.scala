@@ -2,7 +2,7 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	def role : String
 	def possible_move() : List[Pos]
 	def in_board(x : Int, y: Int) : Boolean = {
-		return ((0 <= x)&&(x < 8)&&(0 <= y)&&(y < 8))
+		return ((0 <= x) && (x < 8) && (0 <= y) && (y < 8))
 	}
 
 	def annexe_possible_move(direction : (Int,Int)) : List [Pos] = {
@@ -67,20 +67,12 @@ class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, po
 
 class Rook(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "rook"
-	override def possible_move() : List[Pos] = {
-		var pos_move: List[Pos] = List()
-		pos_move = annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)
-		return pos_move
-	}
+	override def possible_move() : List[Pos] = annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)
 }
 
 class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "bishop"
-	override def possible_move : List[Pos] = {
-		var pos_move: List[Pos] = List()
-		pos_move = annexe_possible_move((1,1)) ++ annexe_possible_move((-1,1)) ++ annexe_possible_move((-1,-1)) ++ annexe_possible_move((1,-1))
-		return pos_move
-	}
+	override def possible_move : List[Pos] = annexe_possible_move((1,1)) ++ annexe_possible_move((-1,1)) ++ annexe_possible_move((-1,-1)) ++ annexe_possible_move((1,-1))
 }
 
 class Knight(game : Game, player : Int, a_pos : Pos) extends Piece(game, player, a_pos) {
