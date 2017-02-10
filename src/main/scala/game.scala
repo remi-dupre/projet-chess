@@ -4,6 +4,7 @@ class Game {
 	/* Initialisation of the game */
 	var pieces : List[Piece] = List()
 	val players : Array[Player] = Array(null, null)
+	var playing = 0
 	var changed = () => {}
 
 	def start = {
@@ -29,9 +30,10 @@ class Game {
 			new Bishop(this, 1, Pos(2, 0)) ::
 			new Bishop(this, 1, Pos(5, 0)) ::
 			pieces
-		
+
+		playing = 0
 		changed()
-		players(0).wait_play
+		players(playing).wait_play
 	}
 
 	def cell_player(x : Int, y : Int) : Int = {
@@ -64,11 +66,15 @@ class Game {
 	}
 
 	def move(p : Piece, pos : Pos) : Unit = {
-		val possibleMoves : List[Pos] = p.possible_move
+		println(p.pos)
+		val possibleMoves : List[Pos] = p.possible_move()
 		for(position <- possibleMoves) position match {
 			case position if position == pos => p.pos = pos
 			case _ => Nil
 		}
+		playing = 1 - playing
+		players(playing).wait_play
+		changed()
 	}
 
 	def every_possible_move(player : Int) : List[Pos] = { 
@@ -92,6 +98,14 @@ class Game {
 			case _ => ()
 		}
 		return false
+	}
+
+	def getPiece(i : Int, j : Int) : Piece = {
+		for(c <- pieces) c match {
+			case piece if (piece.pos == Pos(i,j)) => return piece
+			case _ => ()
+		}
+		return null
 	}
 }
 

@@ -18,8 +18,8 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 
 	def move(x : Int, y : Int) {
 		var (i, j) = selected
-		val piece = game.get_piece(i, j)
-		game.move(piece, x, y)
+		val piece = game.getPiece(i, j)
+		game.move(piece, Pos(x, y))
 	}
 }
 

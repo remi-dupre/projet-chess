@@ -46,7 +46,7 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		mainWin.state match {
 			case Wait() => println("waiting ...")
 			case SelectPiece(p) => p.select(x, y)
-			case WaitDirection(p) => p.move(x, y)
+			case WaitDirection(p) => {p.move(x, y) ; game.changed()}
 		}
 	}
 

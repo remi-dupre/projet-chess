@@ -1,6 +1,6 @@
 abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	def role : String
-	def possible_move : List[Pos]
+	def possible_move() : List[Pos]
 	def In_board(x : Int, y: Int) : Boolean = {
 		return ((0 <= x)&&(x <= 8)&&(0 <= y)&&(y <= 8))
 	}
@@ -32,7 +32,7 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 
 class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "king"
-	override def possible_move : List[Pos] = {
+	override def possible_move() : List[Pos] = {
 		val x = pos.x
 		val y = pos.y
 		var pos_move: List[Pos] = List()
@@ -54,7 +54,7 @@ class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos
 
 class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "queen"
-	override def possible_move : List[Pos] = {
+	override def possible_move() : List[Pos] = {
 		var pos_move: List[Pos] = List()
 		for(i <- 0 to 2) {
 			for(j <- 0 to 2) {
@@ -68,7 +68,7 @@ class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, po
 
 class Rook(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "rook"
-	override def possible_move : List[Pos] = {
+	override def possible_move() : List[Pos] = {
 		var pos_move: List[Pos] = List()
 		pos_move = annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)
 		return pos_move
@@ -84,9 +84,9 @@ class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, p
 	}
 }
 
-class Knight(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
+class Knight(game : Game, player : Int, a_pos : Pos) extends Piece(game, player, a_pos) {
 	override def role = "knight"
-	override def possible_move : List[Pos] = {
+	override def possible_move() : List[Pos] = {
 		var x = pos.x
 		var y = pos.y
 		var pos_move: List[Pos] = List()
@@ -104,7 +104,7 @@ class Knight(game : Game, player : Int, pos : Pos) extends Piece(game, player, p
 class Pawn(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	var already_moved = false
 	override def role = "pawn"
-	override def possible_move : List[Pos] = {
+	override def possible_move() : List[Pos] = {
 		var x = pos.x
 		var y = pos.y
 		var pos_move: List[Pos] = List()
