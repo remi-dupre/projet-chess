@@ -1,6 +1,8 @@
 import swing._
 import java.awt.Color
 import javax.swing.ImageIcon
+import scala.swing.event.Key
+import scala.swing.event.KeyPressed
 
 
 /**
@@ -45,6 +47,7 @@ class GameWin() extends MainFrame {
 		}
 	}
 
+
 	/** Met en valeur les cases sur lesquelles la pièce peut être déplacée */
 	def highlight_possible(p : Piece) = {
 		for(pos <- p.possible_move()) {
@@ -69,13 +72,29 @@ class GameWin() extends MainFrame {
 class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 	refresh
 
+
+	listenTo(keys)
+	reactions += {
+		case KeyPressed(_, Key.Escape, _, _) => {
+			mainWin.state match {
+				case WaitDirection(p) =>
+					mainWin.state = SelectPiece(p)
+					refresh
+				case _ => ()
+			}
+			mainWin.refresh
+		}
+	}
+
 	action = Action("") {
 		mainWin.state match {
 			case Wait() => println("waiting ...")
-			case SelectPiece(p) => if(p.select(x, y))
-				mainWin.highlight_possible(game.getPiece(x, y))
-			case WaitDirection(p) => if(p.move(x, y))
-				game.changed()
+			case SelectPiece(p) =>
+				if(p.select(x, y))
+					mainWin.highlight_possible(game.getPiece(x, y))
+			case WaitDirection(p) =>
+				if(p.move(x, y))
+					game.changed()
 		}
 	}
 	
