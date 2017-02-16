@@ -2,6 +2,8 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	var already_moved = false
 	def role : String
 	def possible_move() : List[Pos]
+
+	
 	def inCheck(new_pos : Pos) : Boolean = {
 		val x = pos.x
 		val y = pos.y
@@ -11,11 +13,11 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 		return bool
 	}
 
-	def removeInCheckMoves(pos_move : List[Pos]) : List[Pos] = { return pos_move
+	def removeInCheckMoves(pos_move : List[Pos]) : List[Pos] = {
 		var new_pos_move : List[Pos] = List()
 		for(new_pos <- pos_move) {
 			if( !inCheck(new_pos) ) {
-				new_pos_move = new_pos :: new_pos_move
+				new_pos_move = new_pos::new_pos_move
 			}
 		}
 		return new_pos_move
@@ -45,7 +47,7 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 				}
 			}
 		} 
-		return removeInCheckMoves(pos_move)
+		return pos_move
 	}
 }
 
@@ -63,7 +65,16 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				}
 			}
 		}
+<<<<<<< HEAD
+		for(piece <- game.pieces) {
+			if(pos_move.contains(piece.pos) && player == piece.player) {
+				game.remove(piece,game.pieces)
+			}
+		}
+		return pos_move /* A ne pas mettre en echec le roi */
+=======
 		return removeInCheckMoves(pos_move) /* A ne pas mettre en echec le roi */
+>>>>>>> c78df2006aff9d084832f6ee8f78195279b77e9b
 	}
 }
 
@@ -78,18 +89,18 @@ class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, po
 				}
 			}
 		}
-		return removeInCheckMoves(pos_move)
+		return pos_move
 	}
 }
 
 class Rook(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "rook"
-	override def possible_move() : List[Pos] = removeInCheckMoves((annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)))
+	override def possible_move() : List[Pos] = annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)
 }
 
 class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "bishop"
-	override def possible_move : List[Pos] = removeInCheckMoves((annexe_possible_move((1,1)) ++ annexe_possible_move((-1,1)) ++ annexe_possible_move((-1,-1)) ++ annexe_possible_move((1,-1))))
+	override def possible_move : List[Pos] = annexe_possible_move((1,1)) ++ annexe_possible_move((-1,1)) ++ annexe_possible_move((-1,-1)) ++ annexe_possible_move((1,-1))
 }
 
 class Knight(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
@@ -105,7 +116,7 @@ class Knight(game : Game, player : Int, m_pos : Pos) extends Piece(game, player,
 				pos_move = Pos(x+i,y+j)::pos_move
 			}
 		}
-		return removeInCheckMoves(pos_move)
+		return pos_move
 	}
 }
 
@@ -143,7 +154,7 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				pos_move = Pos(x,y-2)::pos_move
 			}
 		}
-		return removeInCheckMoves(pos_move)
+		return pos_move
 	}
 }
 

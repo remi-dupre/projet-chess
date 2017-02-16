@@ -50,7 +50,7 @@ class GameWin() extends MainFrame {
 
 	/** Met en valeur les cases sur lesquelles la pièce peut être déplacée */
 	def highlight_possible(p : Piece) = {
-		for(pos <- p.possible_move()) {
+		for(pos <- p.removeInCheckMoves(p.possible_move())) {
 			grid(pos.x)(pos.y).highlight
 		}
 	}
