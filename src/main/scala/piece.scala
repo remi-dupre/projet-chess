@@ -29,16 +29,17 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	}
 }
 
-class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
+class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "king"
 	override def possible_move() : List[Pos] = {
 		val x = pos.x
 		val y = pos.y
+		println(this.pos)
 		var pos_move: List[Pos] = List()
-		for(i <- 0 to 2) {
-			for(j <- 0 to 2) {
-				if(((i,j) != (1,1)) && in_board(x+i-1,y+j-1)) {
-					pos_move = Pos(x+i-1,y+j-1)::pos_move
+		for(i <- -1 to 1) {
+			for(j <- -1 to 1) {
+				if(((i,j) != (0,0)) && in_board(x+i, y+j)) {
+					pos_move = Pos(x+i, y+j)::pos_move
 				}
 			}
 		}
@@ -48,6 +49,7 @@ class King(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos
 			}
 		}
 		return pos_move /* A ne pas mettre en echec le roi */
+
 	}
 }
 
@@ -75,7 +77,7 @@ class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, p
 	override def possible_move : List[Pos] = annexe_possible_move((1,1)) ++ annexe_possible_move((-1,1)) ++ annexe_possible_move((-1,-1)) ++ annexe_possible_move((1,-1))
 }
 
-class Knight(game : Game, player : Int, a_pos : Pos) extends Piece(game, player, a_pos) {
+class Knight(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "knight"
 	override def possible_move() : List[Pos] = {
 		var x = pos.x
@@ -92,7 +94,7 @@ class Knight(game : Game, player : Int, a_pos : Pos) extends Piece(game, player,
 	}
 }
 
-class Pawn(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
+class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	var already_moved = false
 	override def role = "pawn"
 	override def possible_move() : List[Pos] = {
