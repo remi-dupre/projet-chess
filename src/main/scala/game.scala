@@ -92,10 +92,14 @@ class Game {
 				val ans = getPiece(pos.x, pos.y)
 				if(ans != null) remove(ans)
 				p.pos = pos
+				if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
+					remove(p)
+					pieces = (new Queen(this, p.player, pos)) :: pieces
+				}
 				p.already_moved = true
 				playing = 1 - playing
-				players(playing).wait_play
 				changed()
+				players(playing).wait_play
 				return true
 			case _ => Nil
 		}
@@ -106,13 +110,12 @@ class Game {
 	def every_possible_move(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
 		for(c <- pieces) c match {
-			case piece if (piece.player == player) => pos_move = pos_move ++ piece.possible_move
+			case piece if (piece.player == player) => 
+				pos_move = pos_move ++ piece.possible_move
 			case _ => ()
 		}
 		return pos_move
 	}
-
-
 
 	/** voir si le roi du player est en echec */
 	def inCheck(player : Int) : Boolean = {
