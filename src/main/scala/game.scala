@@ -89,10 +89,10 @@ class Game {
 		val possibleMoves : List[Pos] = p.possible_move()
 		for(position <- possibleMoves) position match {
 			case position if position == pos =>
+				val ans = getPiece(pos.x, pos.y)
+				if(ans != null) remove(ans)
 				p.pos = pos
-				if( p.role == "pawn" ) {
-					p.already_moved = true
-				}
+				p.already_moved = true
 				playing = 1 - playing
 				players(playing).wait_play
 				changed()
