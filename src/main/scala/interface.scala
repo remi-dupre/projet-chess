@@ -92,7 +92,7 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 			case SelectPiece(p) =>
 				if(p.select(x, y)) {
 					var piece = game.getPiece(x, y)
-					if(p.removeInCheckMoves(piece.possible_move().isEmpty))
+					if(piece.removeInCheckMoves(piece.possible_move()).isEmpty)
 						mainWin.state = SelectPiece(p)
 					else
 						mainWin.highlight_possible(game.getPiece(x, y))

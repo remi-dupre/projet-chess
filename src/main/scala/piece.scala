@@ -65,16 +65,7 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				}
 			}
 		}
-<<<<<<< HEAD
-		for(piece <- game.pieces) {
-			if(pos_move.contains(piece.pos) && player == piece.player) {
-				game.remove(piece,game.pieces)
-			}
-		}
 		return pos_move /* A ne pas mettre en echec le roi */
-=======
-		return removeInCheckMoves(pos_move) /* A ne pas mettre en echec le roi */
->>>>>>> c78df2006aff9d084832f6ee8f78195279b77e9b
 	}
 }
 
