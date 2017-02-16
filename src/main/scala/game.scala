@@ -18,10 +18,10 @@ class Game {
 
 	/** Initialise le plateau de jeu et lance la partie */
 	def start = {
-		/*for(i <- 0 to 7) {
+		for(i <- 0 to 7) {
 			pieces = new Pawn(this, 0, Pos(i, 6)) :: pieces
 			pieces = new Pawn(this, 1, Pos(i, 1)) :: pieces
-		}*/
+		}
 		pieces =
 			new King(this, 0, Pos(4, 7)) ::
 			new King(this, 1, Pos(4, 0)) ::
@@ -86,6 +86,9 @@ class Game {
 		for(position <- possibleMoves) position match {
 			case position if position == pos =>
 				p.pos = pos
+				if( p.role == "pawn" ) {
+					p.already_moved = true
+				}
 				playing = 1 - playing
 				players(playing).wait_play
 				changed()
@@ -105,7 +108,7 @@ class Game {
 		return pos_move
 	}
 
-	/** */
+	/** voir si le roi du player est en echec */
 	def inCheck(player : Int) : Boolean = {
 		var pos_move : List[Pos] = every_possible_move(1 - player)
 		var pos : Pos = Pos(-1,-1)
