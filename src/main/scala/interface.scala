@@ -90,8 +90,13 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		mainWin.state match {
 			case Wait() => println("waiting ...")
 			case SelectPiece(p) =>
-				if(p.select(x, y))
-					mainWin.highlight_possible(game.getPiece(x, y))
+				if(p.select(x, y)) {
+					var piece = game.getPiece(x, y)
+					if(piece.possible_move().isEmpty)
+						mainWin.state = SelectPiece(p)
+					else
+						mainWin.highlight_possible(game.getPiece(x, y))
+				}
 			case WaitDirection(p) =>
 				if(p.move(x, y))
 					game.changed()
