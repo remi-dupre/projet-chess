@@ -74,9 +74,13 @@ class Game {
 	}
 
 	/** Supprime la pièce p de la partie */
-	def remove(p : Piece, pieces : List[Piece]) : List[Piece] = pieces match {
-		case piece :: subpieces => if (piece.pos == p.pos) {return subpieces} else { piece :: (remove(p, subpieces)) }
-		case _ => pieces
+	def remove(p : Piece) = {
+		def run(l : List[Piece]) : List[Piece] = l match {
+			case List() => List()
+			case Piece(_, _, pos)::subpieces if pos == p.pos => subpieces
+			case piece::subpieces => piece :: run(subpieces)
+		}
+		pieces = run(pieces)
 	}
 
 	/** Déplace la pièce 'p' en position 'pos'
@@ -85,10 +89,10 @@ class Game {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
 		for(position <- possibleMoves) position match {
 			case position if position == pos =>
+				val ans = getPiece(pos.x, pos.y)
+				if(ans != null) remove(ans)
 				p.pos = pos
-				if( p.role == "pawn" ) {
-					p.already_moved = true
-				}
+				p.already_moved = true
 				playing = 1 - playing
 				players(playing).wait_play
 				changed()

@@ -60,17 +60,21 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		var pos_move: List[Pos] = List()
 		for(i <- -1 to 1) {
 			for(j <- -1 to 1) {
-				if(((i,j) != (0,0)) && in_board(x+i, y+j)) {
+				if(((i,j) != (0,0)) && in_board(x+i, y+j) && game.cell_player(x+i, y+j) != player) {
 					pos_move = Pos(x+i, y+j)::pos_move
 				}
 			}
 		}
+<<<<<<< HEAD
 		for(piece <- game.pieces) {
 			if(pos_move.contains(piece.pos) && player == piece.player) {
 				game.remove(piece,game.pieces)
 			}
 		}
 		return pos_move /* A ne pas mettre en echec le roi */
+=======
+		return removeInCheckMoves(pos_move) /* A ne pas mettre en echec le roi */
+>>>>>>> c78df2006aff9d084832f6ee8f78195279b77e9b
 	}
 }
 
