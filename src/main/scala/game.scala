@@ -74,9 +74,13 @@ class Game {
 	}
 
 	/** Supprime la pièce p de la partie */
-	def remove(p : Piece, pieces : List[Piece]) : List[Piece] = pieces match {
-		case piece :: subpieces => if (piece.pos == p.pos) {return subpieces} else { piece :: (remove(p, subpieces)) }
-		case _ => pieces
+	def remove(p : Piece) = {
+		def run(l : List[Piece]) : List[Piece] = l match {
+			case List() => List()
+			case Piece(_, _, pos)::subpieces if pos == p.pos => subpieces
+			case piece::subpieces => piece :: run(subpieces)
+		}
+		pieces = run(pieces)
 	}
 
 	/** Déplace la pièce 'p' en position 'pos'
