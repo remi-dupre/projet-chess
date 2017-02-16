@@ -82,7 +82,7 @@ class Game {
 	/** Déplace la pièce 'p' en position 'pos'
 	 * Si ce n'est pas possible, retourne false */
 	def move(p : Piece, pos : Pos) : Boolean = {
-		val possibleMoves : List[Pos] = p.possible_move()
+		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
 		for(position <- possibleMoves) position match {
 			case position if position == pos =>
 				p.pos = pos
@@ -108,6 +108,8 @@ class Game {
 		return pos_move
 	}
 
+
+
 	/** voir si le roi du player est en echec */
 	def inCheck(player : Int) : Boolean = {
 		var pos_move : List[Pos] = every_possible_move(1 - player)
@@ -131,5 +133,6 @@ class Game {
 		}
 		return null
 	}
-}
 
+	
+}
