@@ -87,6 +87,7 @@ class Game {
 	 * Si ce n'est pas possible, retourne false */
 	def move(p : Piece, pos : Pos) : Boolean = {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
+
 		for(position <- possibleMoves) position match {
 			case position if position == pos =>
 				val ans = getPiece(pos.x, pos.y)
@@ -101,15 +102,15 @@ class Game {
 				playing = 1 - playing
 				changed()
 
-				if(every_possible_move(playing).isEmpty && inCheck(playing)) {
+				if(every_possible_move_nocheck(playing).isEmpty && inCheck(playing)) {
 					println("Le joueur " + (if(playing == 0) "noir" else "blanc") + " a gagné")
 				}
-				else if(every_possible_move(playing).isEmpty) {
-					println("PAT")
+				else if(every_possible_move_nocheck(playing).isEmpty) {
+					println("J'aime les PAT")
 				}
 				else {
 					if(inCheck(playing))
-						println("Échec")
+						println("Échec du joueur " + (if(playing != 0) "noir" else "blanc"))
 					players(playing).wait_play
 				}
 				return true
@@ -128,6 +129,17 @@ class Game {
 		}
 		return pos_move
 	}
+
+	def every_possible_move_nocheck(player : Int) : List[Pos] = { 
+		var pos_move : List[Pos] = List()
+		for(c <- pieces) c match {
+			case piece if (piece.player == player) => 
+				pos_move = pos_move ++ piece.removeInCheckMoves(piece.possible_move)
+			case _ => ()
+		}
+		return pos_move
+	}
+
 
 	/** voir si le roi du player est en echec */
 	def inCheck(player : Int) : Boolean = {

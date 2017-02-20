@@ -42,9 +42,8 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 /**
  * Représente un IA
  * Par défault elle fait des movements aléatoires */
-class IA(color : Int, game : Game) extends Player(color, game) {
+class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game) {
 	override def wait_play = {
-		Thread.sleep(1000)
 		var pos_move : List[(Piece, Pos)] = List()
 		for(c <- game.pieces) c match {
 			case piece if (piece.player == color) => 
@@ -53,8 +52,8 @@ class IA(color : Int, game : Game) extends Player(color, game) {
 				}
 			case _ => ()
 		}
-	
-		// Thread.sleep(10)
+
+		Thread.sleep(speed)
 		val t = new Thread(new Runnable() {
          	def run() {
 				val (piece, dest) = Random.shuffle(pos_move).head
@@ -62,6 +61,6 @@ class IA(color : Int, game : Game) extends Player(color, game) {
 			}
 		});
 		t.start()
-	}	
+	}
 }
 
