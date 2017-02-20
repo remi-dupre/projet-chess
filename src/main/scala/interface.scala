@@ -34,6 +34,12 @@ class GameWin() extends MainFrame {
 		mainWin.refresh
 	}
 
+	override def closeOperation() {
+		game.pieces = List()
+		Thread.sleep(100)
+		System.exit(0)
+	}
+
 	/** État de la partie */
 	var state : InterfaceState = new Wait()
 	

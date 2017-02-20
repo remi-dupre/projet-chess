@@ -58,6 +58,7 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
          	def run() {
 				val (piece, dest) = Random.shuffle(pos_move).head
 				game.move(piece, dest)
+				Thread.currentThread().interrupt()
 			}
 		});
 		t.start()
