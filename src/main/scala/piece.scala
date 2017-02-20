@@ -7,8 +7,23 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	def inCheck(new_pos : Pos) : Boolean = {
 		val x = pos.x
 		val y = pos.y
+		val i = new_pos.x
+		val j = new_pos.y
+
+		val piece = game.getPiece(i, j)
+		piece match {
+			case null => ()
+			case piece => game.remove(piece)
+		}
+
 		pos = new_pos
 		val bool = game.inCheck(player)
+
+		piece match {
+			case null => ()
+			case piece => game.pieces = piece :: game.pieces
+		}
+
 		pos = Pos(x, y)
 		return bool
 	}
