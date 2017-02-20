@@ -54,14 +54,14 @@ class IA(color : Int, game : Game) extends Player(color, game) {
 			case _ => ()
 		}
 	
-
-		val t = new Timer()
-		t.schedule(new TimerTask {
-			override def run(): Unit = {
+		// Thread.sleep(10)
+		val t = new Thread(new Runnable() {
+         	def run() {
 				val (piece, dest) = Random.shuffle(pos_move).head
 				game.move(piece, dest)
 			}
-  		}, 1)
+		});
+		t.start()
 	}	
 }
 

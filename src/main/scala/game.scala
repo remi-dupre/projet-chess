@@ -96,10 +96,22 @@ class Game {
 					remove(p)
 					pieces = (new Queen(this, p.player, pos)) :: pieces
 				}
+
 				p.already_moved = true
 				playing = 1 - playing
 				changed()
-				players(playing).wait_play
+
+				if(every_possible_move(playing).isEmpty && inCheck(playing)) {
+					println("Le joueur " + (if(playing == 0) "noir" else "blanc") + " a gagné")
+				}
+				else if(every_possible_move(playing).isEmpty) {
+					println("PAT")
+				}
+				else {
+					if(inCheck(playing))
+						println("Échec")
+					players(playing).wait_play
+				}
 				return true
 			case _ => Nil
 		}
@@ -140,6 +152,5 @@ class Game {
 		}
 		return null
 	}
-
-	
 }
+
