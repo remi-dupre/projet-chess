@@ -33,6 +33,7 @@ class GameWin() extends MainFrame {
 	game.changed = () => {
 		mainWin.refresh
 	}
+
 	/** État de la partie */
 	var state : InterfaceState = new Wait()
 	
@@ -63,6 +64,8 @@ class GameWin() extends MainFrame {
 			}
 		}
 	}
+
+	refresh
 }
 
 
@@ -71,7 +74,6 @@ class GameWin() extends MainFrame {
  */
 class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 	refresh
-
 
 	listenTo(keys)
 	reactions += {
