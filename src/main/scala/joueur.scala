@@ -24,7 +24,6 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	def select(x : Int, y : Int) : Boolean = {
 		if(game.cell_player(x, y) == color) {
 			selected = (x, y)
-			println("selected " + x + "," + y)
 			interface.state = WaitDirection(this)
 			return true
 		}
@@ -60,7 +59,6 @@ class IA(color : Int, game : Game) extends Player(color, game) {
 		t.schedule(new TimerTask {
 			override def run(): Unit = {
 				val (piece, dest) = Random.shuffle(pos_move).head
-				println((piece, dest))
 				game.move(piece, dest)
 			}
   		}, 1)

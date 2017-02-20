@@ -56,7 +56,6 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 	override def possible_move() : List[Pos] = {
 		val x = pos.x
 		val y = pos.y
-		println(this.pos)
 		var pos_move: List[Pos] = List()
 		for(i <- -1 to 1) {
 			for(j <- -1 to 1) {

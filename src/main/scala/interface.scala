@@ -65,6 +65,7 @@ class GameWin() extends MainFrame {
 		}
 	}
 
+	centerOnScreen()
 	refresh
 }
 
