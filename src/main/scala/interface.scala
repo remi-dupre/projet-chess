@@ -22,11 +22,11 @@ case class Wait() extends InterfaceState
  * (au passage elle génère une partie dans sont constructeur)
  */
 class GameWin() extends MainFrame {
+	    preferredSize = new Dimension(600, 630)
+    	minimumSize = new Dimension(500, 530)
 	/* Caractéristiques de la fenêtre */
 	val mainWin = this
 	title = "Chess"
-	minimumSize = new Dimension(500, 500)
-	preferredSize = new Dimension(600, 600)
 
 	/** La partie associée */
 	val game = new Game()
@@ -42,17 +42,32 @@ class GameWin() extends MainFrame {
 
 	/** État de la partie */
 	var state : InterfaceState = new Wait()
-	
+
+    val msg = new Label("test")
+
 	/** L'ensemble des cases de la partie */
 	val grid = Array.ofDim[CellBtn](8, 8)
-	contents = new GridPanel(8, 8) {
-		for(j <- 0 to 7) {
-			for(i <- 0 to 7) {
-				grid(i)(j) = new CellBtn(i, j, game, mainWin)
-				contents += grid(i)(j)
-			}
-		}
-	}
+	contents = new BoxPanel(Orientation.Vertical) {
+        // main grid
+	    preferredSize = new Dimension(600, 650)
+        contents += new GridPanel(8, 8) {
+        	minimumSize = new Dimension(500, 500)
+		    for(j <- 0 to 7) {
+			    for(i <- 0 to 7) {
+				    grid(i)(j) = new CellBtn(i, j, game, mainWin)
+    				contents += grid(i)(j)
+	    		}
+		    }
+	    }
+
+        // bottom bar
+        contents += new BoxPanel(Orientation.Horizontal) {
+            preferredSize = new Dimension(1000, 50);
+            contents += new Button("Leave")
+            contents += new Separator(Orientation.Horizontal) {}
+            contents += msg
+        }
+    }
 
 
 	/** Met en valeur les cases sur lesquelles la pièce peut être déplacée */
@@ -126,6 +141,7 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 			case "empty" => icon = null 
 			case role => icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png")
 		}
+        mainWin.msg.text = "Au " + (if(game.playing == 0) "blanc" else "noir")  + " de jouer"
 	}
 }
 
