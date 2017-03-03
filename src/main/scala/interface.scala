@@ -63,7 +63,10 @@ class GameWin() extends MainFrame {
         // bottom bar
         contents += new BoxPanel(Orientation.Horizontal) {
             preferredSize = new Dimension(1000, 50);
-            contents += new Button("Leave")
+            contents += new Button(Action("Leave") {
+                close()
+                Main.menu.visible = true
+            })
             contents += new Separator(Orientation.Horizontal) {}
             contents += msg
         }

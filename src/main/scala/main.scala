@@ -1,6 +1,6 @@
 object Main {
+	val menu = new MenuWin
 	def main(argv : Array[String]) {
-		val menu = new MenuWin
 		menu.visible = true
 	}
 }
