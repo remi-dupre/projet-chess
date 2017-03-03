@@ -102,15 +102,7 @@ class Game {
 				playing = 1 - playing
 				changed()
 
-				if(every_possible_move_nocheck(playing).isEmpty && inCheck(playing)) {
-					println("Le joueur " + (if(playing == 0) "noir" else "blanc") + " a gagné")
-				}
-				else if(every_possible_move_nocheck(playing).isEmpty) {
-					println("J'aime les PAT")
-				}
-				else {
-					if(inCheck(playing))
-						println("Échec du joueur " + (if(playing != 0) "noir" else "blanc"))
+				if(!over) {
 					players(playing).wait_play
 				}
 				return true
@@ -118,6 +110,19 @@ class Game {
 		}
 		return false
 	}
+
+    def over : Boolean = {
+         every_possible_move_nocheck(playing).isEmpty
+    }
+
+    def victory : Boolean = {
+        over && inCheck(playing)
+    }
+
+    def pat : Boolean = {
+        !victory && over
+    }
+
 
 	/** Retourne la liste des positions où le joueur donné peut déplacer une pièce */
 	def every_possible_move(player : Int) : List[Pos] = { 

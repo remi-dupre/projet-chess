@@ -84,6 +84,16 @@ class GameWin() extends MainFrame {
 				grid(i)(j).refresh
 			}
 		}
+        mainWin.msg.text = "Au " + (if(game.playing == 0) "blanc" else "noir")  + " de jouer "
+        if(game.inCheck(game.playing)) {
+            mainWin.msg.text += "(Échec) "
+        }
+        if(game.pat) {
+            mainWin.msg.text = "PAT "
+        }
+        else if(game.over) {
+            mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
+        }
 	}
 
 	centerOnScreen()
@@ -139,9 +149,9 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		val player = if(game.cell_player(x, y) == 0) "white" else "black"
 		game.cell_role(x, y) match {
 			case "empty" => icon = null 
-			case role => icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png")
+			case role => icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png") ; disabledIcon = icon
 		}
-        mainWin.msg.text = "Au " + (if(game.playing == 0) "blanc" else "noir")  + " de jouer"
+        enabled = !game.over
 	}
 }
 
