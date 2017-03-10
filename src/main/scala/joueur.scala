@@ -45,12 +45,16 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game) {
 	override def wait_play = {
 		var pos_move : List[(Piece, Pos)] = List()
-		for(c <- game.pieces) c match {
-			case piece if (piece.player == color) => 
-				for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
-					pos_move = (piece, pos) :: pos_move
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				game.board(i)(j) match {
+					case piece if (piece.player == color) => 
+						for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
+							pos_move = (piece, pos) :: pos_move
+						}
+					case _ => ()
 				}
-			case _ => ()
+			}
 		}
 
 		Thread.sleep(speed)

@@ -180,17 +180,21 @@ class Game {
         // g.players = players //!\\ Checker la stabilité de cette ligne si elle a un interêt un jours 
         g.playing = playing
         // g.changed -> ne semble pas pertinent
-        g.pieces = List()
-        for(c <- pieces) {
-          g.pieces = (c.role match {
-            case "king" => new King(g, c.player, c.pos)
-            case "queen" => new Queen(g, c.player, c.pos)
-            case "rook" => new Rook(g, c.player, c.pos)
-            case "bishop" => new Bishop(g, c.player, c.pos)
-            case "knight" => new Knight(g, c.player, c.pos)
-            case "pawn" => new Pawn(g, c.player, c.pos)
-          }) :: g.pieces
-          g.pieces.last.already_moved = c.already_moved
+        g.board = Array.ofDim(8, 8)
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				val c = board(i)(j)
+				g.board(i)(j) = board(i)(j).role match {
+					case "king" => new King(g, c.player, c.pos)
+					case "queen" => new Queen(g, c.player, c.pos)
+					case "rook" => new Rook(g, c.player, c.pos)
+					case "bishop" => new Bishop(g, c.player, c.pos)
+					case "knight" => new Knight(g, c.player, c.pos)
+					case "pawn" => new Pawn(g, c.player, c.pos)
+					case _ => null
+          		}
+          		g.board(i)(j).already_moved = c.already_moved
+          	}
         }
         return g
     }

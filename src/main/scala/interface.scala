@@ -35,7 +35,7 @@ class GameWin() extends MainFrame {
 	}
 
 	override def closeOperation() {
-		game.pieces = List()
+		// game.pieces = List()
 		Thread.sleep(100)
 		System.exit(0)
 	}
