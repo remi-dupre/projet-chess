@@ -4,8 +4,8 @@ case class Pos(x : Int, y : Int)
  * Représente une partie d'échecs
  */
 class Game {
-	/** Liste des pièces sur le plateau */
-	var pieces : List[Piece] = List()
+	/** Plateau de jeu */
+	var board = Array.ofDim[Piece](8, 8)
 
 	/** Les deux joueurs */
 	val players : Array[Player] = Array(null, null)
@@ -19,27 +19,25 @@ class Game {
 	/** Initialise le plateau de jeu et lance la partie */
 	def start = {
 		for(i <- 0 to 7) {
-			pieces = new Pawn(this, 0, Pos(i, 6)) :: pieces
-			pieces = new Pawn(this, 1, Pos(i, 1)) :: pieces
+			board(i)(1) = new Pawn(this, 0, Pos(i, 1))
+			board(i)(6) = new Pawn(this, 1, Pos(i, 6))
 		}
-		pieces =
-			new King(this, 0, Pos(4, 7)) ::
-			new King(this, 1, Pos(4, 0)) ::
-			new Queen(this, 0, Pos(3, 7)) ::
-			new Queen(this, 1, Pos(3, 0)) ::
-			new Rook(this, 0, Pos(0, 7)) ::
-			new Rook(this, 0, Pos(7, 7)) ::
-			new Rook(this, 1, Pos(0, 0)) :: 
-			new Rook(this, 1, Pos(7, 0)) ::
-			new Knight(this, 0, Pos(1, 7)) ::
-			new Knight(this, 0, Pos(6, 7)) ::
-			new Knight(this, 1, Pos(1, 0)) ::
-			new Knight(this, 1, Pos(6, 0)) ::
-			new Bishop(this, 0, Pos(2, 7)) ::
-			new Bishop(this, 0, Pos(5, 7)) ::
-			new Bishop(this, 1, Pos(2, 0)) ::
-			new Bishop(this, 1, Pos(5, 0)) ::
-			pieces
+		board(4)(7) = new King(this, 0, Pos(4, 7))
+		board(4)(0) = new King(this, 1, Pos(4, 0))
+		board(3)(7) = new Queen(this, 0, Pos(3, 7))
+		board(3)(6) = new Queen(this, 1, Pos(3, 0))
+		board(0)(7) = new Rook(this, 0, Pos(0, 7))
+		board(7)(7) = new Rook(this, 0, Pos(7, 7))
+		board(0)(0) = new Rook(this, 1, Pos(0, 0))
+		board(7)(0) = new Rook(this, 1, Pos(7, 0))
+		board(1)(7) = new Knight(this, 0, Pos(1, 7))
+		board(6)(7) = new Knight(this, 0, Pos(6, 7))
+		board(1)(0) = new Knight(this, 1, Pos(1, 0))
+		board(6)(0) = new Knight(this, 1, Pos(6, 0))
+		board(2)(7) = new Bishop(this, 0, Pos(2, 7))
+		board(5)(7) = new Bishop(this, 0, Pos(5, 7))
+		board(2)(0) = new Bishop(this, 1, Pos(2, 0))
+		board(5)(0) = new Bishop(this, 1, Pos(5, 0))
 
 		playing = 0
 		changed()
@@ -48,39 +46,30 @@ class Game {
 
 	/** Retourne l'id du joueur qui contrôle la piece en position (x, y), -1 s'il n'y en a pas */
 	def cell_player(x : Int, y : Int) : Int = {
-		for(c <- pieces) c match {
-			case Piece(_, p, Pos(i, j)) if (i, j) == (x, y) => return p
-			case _ => ()
-		}
-		return -1
+		if ( board(x)(y) == null ) 
+			{ return -1 }
+		else 
+			{ return board(x)(y).player }
 	}
 
 	/** Retourne le rôle de la pièce (ex : "king") */
 	def cell_role(x : Int, y : Int) : String = {
-		for(c <- pieces) c match {
-			case Piece(_, _, Pos(i, j)) if (i, j) == (x, y) => return c.role
-			case _ => ()
-		}
-		return "empty"
+		if ( board(x)(y) == null ) 
+			{ return "empty" }
+		else 
+			{ return board(x)(y).role }
 	}
 
 	/** Vérifie si la case (x, y) est vide */
 	def empty_cell(x : Int, y : Int) : Boolean = {
-		for(c <- pieces) c match {
-			case Piece(_, _, Pos(i, j)) if (i, j) == (x, y) => return false
-			case _ => ()
-		}
-		return true
+		return ( board(x)(y) == null )
 	}
 
 	/** Supprime la pièce p de la partie */
 	def remove(p : Piece) = {
-		def run(l : List[Piece]) : List[Piece] = l match {
-			case List() => List()
-			case Piece(_, _, pos)::subpieces if pos == p.pos => subpieces
-			case piece::subpieces => piece :: run(subpieces)
-		}
-		pieces = run(pieces)
+		var x = p.pos.x
+		var y = p.pos.y
+		board(x)(y) = null
 	}
 
 	/** Déplace la pièce 'p' en position 'pos'
@@ -95,7 +84,8 @@ class Game {
 				p.pos = pos
 				if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
 					remove(p)
-					pieces = (new Queen(this, p.player, pos)) :: pieces
+					board(pos.x)(pos.y) = new Queen(this, p.player, pos)
+					/*pieces = (new Queen(this, p.player, pos)) :: pieces */
 				}
 
 				p.already_moved = true
@@ -127,10 +117,12 @@ class Game {
 	/** Retourne la liste des positions où le joueur donné peut déplacer une pièce mais en se mettant en echec */
 	def every_possible_move(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
-		for(c <- pieces) c match {
-			case piece if (piece.player == player) => 
-				pos_move = pos_move ++ piece.possible_move
-			case _ => ()
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if ( board(i)(j) != null && board(i)(j).player == player ) {
+					pos_move = pos_move ++ board(i)(j).possible_move
+				}
+			}
 		}
 		return pos_move
 	}
@@ -138,10 +130,12 @@ class Game {
 	/** retourn la liste des positions où le jouer donné peut LEGALEMENT déplacer sa pièce **/
 	def every_possible_move_nocheck(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
-		for(c <- pieces) c match {
-			case piece if (piece.player == player) => 
-				pos_move = pos_move ++ piece.removeInCheckMoves(piece.possible_move)
-			case _ => ()
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if ( board(i)(j) != null && board(i)(j).player == player ) {
+					pos_move = pos_move ++ board(i)(j).removeInCheckMoves(board(i)(j).possible_move)
+				}
+			}
 		}
 		return pos_move
 	}
@@ -151,31 +145,31 @@ class Game {
 	def inCheck(player : Int) : Boolean = {
 		var pos_move : List[Pos] = every_possible_move(1 - player)
 		var pos : Pos = Pos(-1,-1)
-		for(c <- pieces) c match {
-			case piece if ( (piece.role == "king") && (piece.player == player) ) => pos = piece.pos
-			case _ => ()
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if ( (board(i)(j).role == "king") && (board(i)(j).player == player) ) {
+					pos = board(i)(j).pos
+				}
+			}
 		}
-		for(position <- pos_move) position match {
-			case position if (position == pos) => return true
-			case _ => ()
+		for(position <- pos_move) {
+			if (position == pos) { 
+				return true
+			}
 		}
 		return false
 	}
 
 	/** Retourne l'éventuelle pièce présente en (i, j) */
 	def getPiece(i : Int, j : Int) : Piece = {
-		for(c <- pieces) c match {
-			case piece if (piece.pos == Pos(i,j)) => return piece
-			case _ => ()
-		}
-		return null
+		return board(i)(j)
 	}
 
 	def getControlledCell(i : Int, j: Int, player : Int) : Boolean = {
 		val pos_move : List[Pos] = every_possible_move_nocheck(1 - player)
 		var Booly = false
 		for(c <- pos_move) c match {
-			case Pos(x,y) if ( x == i, y == j ) => Bool = true
+			case Pos(x,y) if ( x == i && y == j ) => Booly = true
 			case Pos(x,y) => ()
 		}
 		return Booly
