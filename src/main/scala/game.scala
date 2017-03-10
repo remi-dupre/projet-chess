@@ -124,7 +124,7 @@ class Game {
     }
 
 
-	/** Retourne la liste des positions où le joueur donné peut déplacer une pièce */
+	/** Retourne la liste des positions où le joueur donné peut déplacer une pièce mais en se mettant en echec */
 	def every_possible_move(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
 		for(c <- pieces) c match {
@@ -135,6 +135,7 @@ class Game {
 		return pos_move
 	}
 
+	/** retourn la liste des positions où le jouer donné peut LEGALEMENT déplacer sa pièce **/
 	def every_possible_move_nocheck(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
 		for(c <- pieces) c match {
@@ -168,6 +169,16 @@ class Game {
 			case _ => ()
 		}
 		return null
+	}
+
+	def getControlledCell(i : Int, j: Int, player : Int) : Boolean = {
+		val pos_move : List[Pos] = every_possible_move_nocheck(1 - player)
+		var Booly = false
+		for(c <- pos_move) c match {
+			case Pos(x,y) if ( x == i, y == j ) => Bool = true
+			case Pos(x,y) => ()
+		}
+		return Booly
 	}
 }
 

@@ -79,6 +79,17 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				}
 			}
 		}
+		/* règle spéciale du roque en plus */
+		if ( !already_move ) {
+			/* petit roque */
+			if (game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y) && empty_cell(x + 3, y) && !game.getControlledCell(x + 1, y) && !game.getControlledCell(x + 2, y) && !game.getControlledCell(x,y) && !game.getControlledCell(x + 3, y)) {
+				pos_move = Pos(x + 2, y)::pos_move
+			}
+			/* Grand roque */
+			if (game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && empty_cell(x + 3, y) !game.getControlledCell(x - 1, y) && !game.getControlledCell(x - 2, y) && !game.getControlledCell(x,y)) {
+				pos_move = Pos(x - 3, y)::pos_move
+			}
+		}
 		return pos_move /* A ne pas mettre en echec le roi */
 	}
 }
