@@ -9,23 +9,17 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 		val y = pos.y
 		val i = new_pos.x
 		val j = new_pos.y
+        val g2 = game.copy
 
-		val piece = game.getPiece(i, j)
+		val piece = g2.getPiece(i, j)
 		piece match {
 			case null => ()
-			case piece => game.remove(piece)
+			case piece => g2.remove(piece)
 		}
-
-		pos = new_pos
-		val bool = game.inCheck(player)
-
-		piece match {
-			case null => ()
-			case piece => game.pieces = piece :: game.pieces
-		}
-
-		pos = Pos(x, y)
-		return bool
+        
+        val this2 = g2.getPiece(x, y)
+        this2.pos = new_pos
+		return g2.inCheck(player)
 	}
 
 	def removeInCheckMoves(pos_move : List[Pos]) : List[Pos] = {
@@ -77,17 +71,6 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				if(((i,j) != (0,0)) && in_board(x+i, y+j) && game.cell_player(x+i, y+j) != player) {
 					pos_move = Pos(x+i, y+j)::pos_move
 				}
-			}
-		}
-		/* règle spéciale du roque en plus */
-		if ( !already_move ) {
-			/* petit roque */
-			if (game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y) && empty_cell(x + 3, y) && !game.getControlledCell(x + 1, y) && !game.getControlledCell(x + 2, y) && !game.getControlledCell(x, y) && !game.getControlledCell(x + 3, y) ) {
-				pos_move = Pos(x + 2, y)::pos_move
-			}
-			/* Grand roque */
-			if (game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && empty_cell(x - 3, y) && !game.getControlledCell(x - 1, y) && !game.getControlledCell(x - 2, y) && !game.getControlledCell(x, y) && !game.getControlledCell(x + 3, y) ) {
-				pos_move = Pos(x - 3, y)::pos_move
 			}
 		}
 		return pos_move /* A ne pas mettre en echec le roi */
@@ -142,20 +125,34 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		var x = pos.x
 		var y = pos.y
 		var pos_move: List[Pos] = List()
-		val vecteur = (2*player - 1) 
-		if(in_board(x,y+vecteur)&&game.empty_cell(x, y+vecteur)) {
-			pos_move = Pos(x,y+vecteur)::pos_move
+		if( player == 1) {
+			if(in_board(x,y+1)&&game.empty_cell(x, y+1)) {
+				pos_move = Pos(x,y+1)::pos_move
+			}
+			if(in_board(x+1,y+1) && (game.cell_player(x+1,y+1) == 1-player)) {
+				pos_move = Pos(x+1,y+1)::pos_move
+			}
+			if(in_board(x-1,y+1) && (game.cell_player(x-1,y+1) == 1-player)) {
+				pos_move = Pos(x-1,y+1)::pos_move
+			}
+			if(!already_moved && in_board(x,y+2) && game.empty_cell(x,y+2) && game.empty_cell(x,y+1)) {
+				pos_move = Pos(x,y+2)::pos_move
+			}
 		}
-		if(in_board(x+vecteur,y+vecteur) && (game.cell_player(x+vecteur,y+vecteur) == 1-player)) {
-			pos_move = Pos(x+vecteur,y+vecteur)::pos_move
+		if( player == 0) {
+			if(in_board(x,y-1)&&game.empty_cell(x, y-1)) {
+				pos_move = Pos(x,y-1)::pos_move
+			}
+			if(in_board(x+1,y-1) && (game.cell_player(x+1,y-1) == 1-player)) {
+				pos_move = Pos(x+1,y-1)::pos_move
+			}
+			if(in_board(x-1,y-1) && (game.cell_player(x-1,y-1) == 1-player)) {
+				pos_move = Pos(x-1,y-1)::pos_move
+			}
+			if(!already_moved && in_board(x,y-2) && game.empty_cell(x,y-2) && game.empty_cell(x,y-1)) {
+				pos_move = Pos(x,y-2)::pos_move
+			}
 		}
-		if(in_board(x-vecteur,y+vecteur) && (game.cell_player(x-vecteur,y+vecteur) == 1-player)) {
-			pos_move = Pos(x-vecteur,y+vecteur)::pos_move
-		}
-		if(!already_moved && in_board(x,y+2*vecteur) && game.empty_cell(x,y+2*vecteur) && game.empty_cell(x,y+vecteur)) {
-			pos_move = Pos(x,y+2*vecteur)::pos_move
-		}
-
 		return pos_move
 	}
 }
