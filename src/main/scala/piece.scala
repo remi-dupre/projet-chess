@@ -5,19 +5,10 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 
 	
 	def inCheck(new_pos : Pos) : Boolean = {
-		val x = pos.x
-		val y = pos.y
-		val i = new_pos.x
-		val j = new_pos.y
         val g2 = game.copy
-
-		val piece = g2.getPiece(i, j)
-		piece match {
-			case null => ()
-			case piece => g2.remove(piece)
-		}
-        
-        val this2 = g2.getPiece(x, y)
+        val this2 = g2.getPiece(pos.x, pos.y)
+        g2.board(new_pos.x)(new_pos.y) = this2
+        g2.remove(this2)
         this2.pos = new_pos
 		return g2.inCheck(player)
 	}

@@ -22,8 +22,8 @@ case class Wait() extends InterfaceState
  * (au passage elle génère une partie dans sont constructeur)
  */
 class GameWin() extends MainFrame {
-	    preferredSize = new Dimension(600, 630)
-    	minimumSize = new Dimension(500, 530)
+    preferredSize = new Dimension(600, 630)
+    minimumSize = new Dimension(500, 530)
 	/* Caractéristiques de la fenêtre */
 	val mainWin = this
 	title = "Chess"
@@ -97,7 +97,7 @@ class GameWin() extends MainFrame {
         else if(game.over) {
             mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
         }
-	}
+    }
 
 	centerOnScreen()
 	refresh

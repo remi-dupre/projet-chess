@@ -48,11 +48,12 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				game.board(i)(j) match {
+                    case null => ()
 					case piece if (piece.player == color) => 
 						for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
 							pos_move = (piece, pos) :: pos_move
 						}
-					case _ => ()
+                    case _ => ()
 				}
 			}
 		}
