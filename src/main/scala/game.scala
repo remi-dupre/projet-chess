@@ -77,28 +77,23 @@ class Game {
 	def move(p : Piece, pos : Pos) : Boolean = {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
 
-		for(position <- possibleMoves) position match {
-			case position if position == pos =>
-				val ans = getPiece(pos.x, pos.y)
-				if(ans != null) remove(ans)
-                board(pos.x)(pos.y) = p
-                remove(p)
-				p.pos = pos
-				if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
-					remove(p)
-					board(pos.x)(pos.y) = new Queen(this, p.player, pos)
-					/*pieces = (new Queen(this, p.player, pos)) :: pieces */
-				}
+		for(position <- possibleMoves)
+        if(position == pos) {
+            board(pos.x)(pos.y) = p
+            remove(p)
+			p.pos = pos
+			if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
+				board(pos.x)(pos.y) = new Queen(this, p.player, pos)
+			}
 
-				p.already_moved = true
-				playing = 1 - playing
-				changed()
+			p.already_moved = true
+			playing = 1 - playing
+			changed()
 
-				if(!over) {
-					players(playing).wait_play
-				}
-				return true
-			case _ => Nil
+			if(!over) {
+				players(playing).wait_play
+			}
+			return true
 		}
 		return false
 	}
@@ -169,12 +164,11 @@ class Game {
 
 	def getControlledCell(i : Int, j: Int, player : Int) : Boolean = {
 		val pos_move : List[Pos] = every_possible_move_nocheck(1 - player)
-		var Booly = false
-		for(c <- pos_move) c match {
-			case Pos(x,y) if ( x == i && y == j ) => Booly = true
-			case Pos(x,y) => ()
+		var ret = false
+		for(c <- pos_move) {
+            ret = ret || (c.x == i && c.y == j)
 		}
-		return Booly
+		return ret 
 	}
 
     def copy : Game = {

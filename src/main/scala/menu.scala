@@ -40,8 +40,8 @@ class MenuWin extends MainFrame {
 		contents += new Button(Action("IA vs. IA (20ms / tour)") {
 			menu.visible = false
 			val fen = new GameWin()
-			fen.game.players(0) = new IA(0, fen.game, 20)
-			fen.game.players(1) = new IA(1, fen.game, 20)
+			fen.game.players(0) = new IA(0, fen.game, 0)
+			fen.game.players(1) = new IA(1, fen.game, 0)
 			fen.game.start
 			fen.visible = true
 		})  

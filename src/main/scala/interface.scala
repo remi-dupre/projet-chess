@@ -150,9 +150,12 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 	def refresh = {
 		background = if((x+y) % 2 == 0) Color.white else Color.darkGray
 		val player = if(game.cell_player(x, y) == 0) "white" else "black"
-		game.cell_role(x, y) match {
-			case "empty" => icon = null 
-			case role => icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png") ; disabledIcon = icon
+		val role = game.cell_role(x, y)
+        if(role == "empty") {
+            icon = null
+        }
+        else {
+			icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png") ; disabledIcon = icon
 		}
         enabled = !game.over
 	}
