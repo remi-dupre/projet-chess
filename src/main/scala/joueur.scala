@@ -5,6 +5,7 @@ import java.util.TimerTask
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
 	def wait_play : Unit
+    def get_promotion_type : String
 }
 
 /**
@@ -17,6 +18,10 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	override def wait_play = {
 		interface.state = SelectPiece(this)
 	}
+
+    override def get_promotion_type : String = {
+        return interface.promo_btn.role
+    }
 
 	var selected = (-1, -1) /** La pièce sélectionnée */
 	/** Sélectonne un pièce si possible
@@ -35,8 +40,6 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	def move(x : Int, y : Int) : Boolean = {
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
-		println("##############################")
-		println(piece,  Pos(x, y))
 		return game.move(piece, Pos(x, y))
 	}
 }
@@ -68,5 +71,9 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
 		});
 		t.start()
 	}
+
+    override def get_promotion_type : String =  {
+        "queen"
+    }
 }
 

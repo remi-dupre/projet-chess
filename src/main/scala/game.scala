@@ -90,14 +90,19 @@ class Game {
 		    		    p.Pawn_Rules = true
 			        }
                     else if(p.pos.y == 7 || p.pos.y == 0) {
-	    			    board(pos.x)(pos.y) = new Queen(this, p.player, pos)
+                        val new_role = players(playing).get_promotion_type
+                        board(pos.x)(pos.y) = new_role match {
+                            case "queen"  => new Queen(this, p.player, pos)
+                            case "knight" => new Knight(this, p.player, pos)
+                            case "bishop" => new Bishop(this, p.player, pos)
+                            case "rook"   => new Rook(this, p.player, pos)
+                            case _ => println("Promotion was refused")
+                        }
 		    	    }
                 }
 	    		p.already_moved = turn
 		    	playing = 1 - playing
-			    println("bite number 1")
     			changed()
-	    		println("bite number 2")
     
 	    		if(!over) {
 		    		players(playing).wait_play
