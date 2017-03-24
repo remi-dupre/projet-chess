@@ -67,12 +67,12 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		}
 		if ( already_moved == -1) {
 			/* petit roque */
-			if (game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y) && game.empty_cell(x + 3, y) && !game.getControlledCell(x + 1, y, player) && !game.getControlledCell(x + 2, y, player) && !game.getControlledCell(x,y, player) && !game.getControlledCell(x + 3, y, player)) {
-				pos_move = Pos(x + 2, y)::pos_move
+			if (game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y) && !game.getControlledCell(x + 1, y, player) && !game.getControlledCell(x + 2, y, player) && !game.getControlledCell(x,y, player) && !game.getControlledCell(x + 3, y, player)) {
+				pos_move = pos_move			
 			}
 			/* Grand roque */
-			if (game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && game.empty_cell(x + 3, y) && !game.getControlledCell(x - 1, y, player) && !game.getControlledCell(x - 2, y, player) && !game.getControlledCell(x,y, player)) {
-				pos_move = Pos(x - 3, y)::pos_move
+			if (game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && game.empty_cell(x - 3, y) && !game.getControlledCell(x - 1, y, player) && !game.getControlledCell(x - 2, y, player) && !game.getControlledCell(x,y, player) && !game.getControlledCell(x-3, y, player) && !game.getControlledCell(x-4, y, player)) {
+				pos_move = pos_move
 			}
 		}
 		return pos_move /* A ne pas mettre en echec le roi */
@@ -143,12 +143,12 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		}
 	/* Règle de la prise en passant */
 		if (in_board(x+1,y) && game.board(x+1)(y) != null) {
-			if (game.board(x+1)(y).role == "Pawn" && game.board(x+1)(y).Pawn_Rules == true && game.board(x+1)(y).already_moved == (game.turn -1) && game.board(x+1)(y).player == (1 - player)) {
+			if(game.board(x+1)(y).role == "pawn" && game.board(x+1)(y).Pawn_Rules == true && game.board(x+1)(y).already_moved == (game.turn -1) && game.board(x+1)(y).player == (1 - player)) {
 				pos_move = Pos(x+1,y+vecteur)::pos_move
 			}
 		}
 		if (in_board(x-1,y) && game.board(x-1)(y) != null) {
-			if(game.board(x-1)(y).role == "Pawn" && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1) && game.board(x-1)(y).player == (1 - player)) {
+			if(game.board(x-1)(y).role == "pawn" && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1) && game.board(x-1)(y).player == (1 - player)) {
 				pos_move = Pos(x-1,y+vecteur)::pos_move
 			}
 		}

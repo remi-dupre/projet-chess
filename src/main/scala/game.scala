@@ -85,19 +85,46 @@ class Game {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
 		for(position <- possibleMoves)
         if(position == pos) {
+        	/* prise en passant */
+        	if(p.role == "pawn") {
+	        	if(Math.abs(p.pos.y - pos.y) == 2) {
+		    		p.Pawn_Rules = true
+			    }
+			    if(Math.abs(p.pos.x - pos.x) == 1) {
+			    	remove(board(pos.x)(pos.y - (-1+2*playing)))
+			    }
+			}
+			/* petit roque */
+			if(p.role == "king" && p.pos.x - pos.x == -2) {
+				board(p.pos.x+1)(p.pos.y) = board(p.pos.x+3)(p.pos.y)
+				remove(board(p.pos.x+3)(p.pos.y))
+			}
+			/* grand roque */
+			if(p.role == "king" && p.pos.x - pos.x == 3) {
+				board(p.pos.x-2)(p.pos.y) = board(p.pos.x-4)(p.pos.y)
+				remove(board(p.pos.x-4)(p.pos.y))
+			}
+
+
+			/* REMPLACEMENT DANS LA PARTIE */
             board(pos.x)(pos.y) = p
             remove(p)
+            /* REMPLACEMENT DANS LA PARTIE */
+
 			p.pos = pos
             if(p.role == "pawn") {
-                if(abs(p.pos.y - pos.y) == 2) {
-	    		    p.Pawn_Rules = true
-		        }
-                else if(p.pos.y == 7 || p.pos.y == 0) {
+                if(p.pos.y == 7 || p.pos.y == 0) {
     			    board(pos.x)(pos.y) = new Queen(this, p.player, pos)
 	    	    }
             }
 			p.already_moved = turn
 			playing = 1 - playing
+			if(turn == 0) {
+				save = Save(Move(p, pos), List())
+			}
+			else {
+				Backup.addMoveToSave(Move(p, pos), save)
+			}
 			turn = turn + 1
 			changed()
 			
@@ -174,7 +201,7 @@ class Game {
 	}
 
 	def getControlledCell(i : Int, j: Int, player : Int) : Boolean = {
-		val pos_move : List[Pos] = every_possible_move_nocheck(1 - player)
+		val pos_move : List[Pos] = every_possible_move(1 - player)
 		var ret = false
 		for(c <- pos_move) {
             ret = ret || (c.x == i && c.y == j)
@@ -186,6 +213,7 @@ class Game {
         val g = new Game
         // g.players = players //!\\ Checker la stabilité de cette ligne si elle a un interêt un jours 
         g.playing = playing
+        g.turn = turn
         // g.changed -> ne semble pas pertinent
         g.board = Array.ofDim(8, 8)
 		for(i <- 0 to 7) {
