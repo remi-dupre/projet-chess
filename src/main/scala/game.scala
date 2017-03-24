@@ -1,3 +1,5 @@
+import scala.math.abs
+
 case class Pos(x : Int, y : Int)
 
 /**
@@ -11,10 +13,14 @@ class Game {
 	val players : Array[Player] = Array(null, null)
 
 	/** L'indice dans 'players' du joueur qui doit jouer */
+	/** 0 = blanc, 1 = noir **/
 	var playing = 0
 
 	/** Une fonction qui est appelée quand le jeu est modifié */
 	var changed = () => {}
+
+	/** Nombre de tours de la partie **/
+	var turn = 0
 
 	/** Initialise le plateau de jeu et lance la partie */
 	def start = {
@@ -81,6 +87,8 @@ class Game {
 			case position if position == pos =>
 				val ans = getPiece(pos.x, pos.y)
 				if(ans != null) remove(ans)
+				if(p.role == "pawn" && abs(p.pos.y - pos.y) == 2)
+					p.Pawn_Rules = true
 				p.pos = pos
 				if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
 					remove(p)
@@ -88,7 +96,7 @@ class Game {
 					/*pieces = (new Queen(this, p.player, pos)) :: pieces */
 				}
 
-				p.already_moved = true
+				p.already_moved = turn
 				playing = 1 - playing
 				changed()
 
