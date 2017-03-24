@@ -22,6 +22,9 @@ class Game {
 	/** Nombre de tours de la partie **/
 	var turn = 0
 
+	/** Système de sauvegarde **/
+	var save: Save = Save(Move(null,Pos(-1,-1)), List())
+
 	/** Initialise le plateau de jeu et lance la partie */
 	def start = {
 		for(i <- 0 to 7) {
@@ -102,6 +105,7 @@ class Game {
                 }
 	    		p.already_moved = turn
 		    	playing = 1 - playing
+			    turn = turn + 1
     			changed()
     
 	    		if(!over) {
@@ -109,9 +113,7 @@ class Game {
 			    }
     			return true
 	    	}
-            println("dan")
         }
-            println("pouet")
 		return false
 	}
 
