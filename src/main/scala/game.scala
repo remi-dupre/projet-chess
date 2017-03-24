@@ -96,7 +96,7 @@ class Game {
                             case "knight" => new Knight(this, p.player, pos)
                             case "bishop" => new Bishop(this, p.player, pos)
                             case "rook"   => new Rook(this, p.player, pos)
-                            case _ => println("Promotion was refused")
+                            case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
                         }
 		    	    }
                 }
@@ -109,7 +109,9 @@ class Game {
 			    }
     			return true
 	    	}
+            println("dan")
         }
+            println("pouet")
 		return false
 	}
 

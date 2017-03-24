@@ -141,8 +141,16 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 						mainWin.highlight_possible(game.getPiece(x, y))
 				}
 			case WaitDirection(p) =>
-				if(p.move(x, y))
+				if(p.move(x, y)) {
 					game.changed()
+                }
+                else if (p.select(x, y)) {
+					var piece = game.getPiece(x, y)
+					if(!piece.removeInCheckMoves(piece.possible_move()).isEmpty) {
+                        mainWin.refresh
+						mainWin.highlight_possible(game.getPiece(x, y))
+                    }
+                }
 		}
 	}
 	
