@@ -142,13 +142,13 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 			pos_move = Pos(x,y+2*vecteur)::pos_move
 		}
 	/* Règle de la prise en passant */
-		if (in_board(x+1,y)) {
+		if (in_board(x+1,y) && game.board(x+1)(y) != null) {
 			if (game.board(x+1)(y).role == "Pawn" && game.board(x+1)(y).Pawn_Rules == true && game.board(x+1)(y).already_moved == (game.turn -1) && game.board(x+1)(y).player == (1 - player)) {
 				pos_move = Pos(x+1,y+vecteur)::pos_move
 			}
 		}
-		if (in_board(x-1,y)) {
-			if (game.board(x-1)(y).role == "Pawn" && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1) && game.board(x-1)(y).player == (1 - player)) {
+		if (in_board(x-1,y) && game.board(x-1)(y) != null) {
+			if(game.board(x-1)(y).role == "Pawn" && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1) && game.board(x-1)(y).player == (1 - player)) {
 				pos_move = Pos(x-1,y+vecteur)::pos_move
 			}
 		}

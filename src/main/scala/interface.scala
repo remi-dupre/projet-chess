@@ -151,7 +151,6 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		background = if((x+y) % 2 == 0) Color.white else Color.darkGray
 		val player = if(game.cell_player(x, y) == 0) "white" else "black"
 		val role = game.cell_role(x, y)
-		println("dsflksdlmfjsdlkfj")
         if(role == "empty") {
             icon = null
         }
