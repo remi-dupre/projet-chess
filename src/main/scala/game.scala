@@ -25,13 +25,13 @@ class Game {
 	/** Initialise le plateau de jeu et lance la partie */
 	def start = {
 		for(i <- 0 to 7) {
-			board(i)(1) = new Pawn(this, 0, Pos(i, 1))
-			board(i)(6) = new Pawn(this, 1, Pos(i, 6))
+			board(i)(1) = new Pawn(this, 1, Pos(i, 1))
+			board(i)(6) = new Pawn(this, 0, Pos(i, 6))
 		}
 		board(4)(7) = new King(this, 0, Pos(4, 7))
 		board(4)(0) = new King(this, 1, Pos(4, 0))
 		board(3)(7) = new Queen(this, 0, Pos(3, 7))
-		board(3)(6) = new Queen(this, 1, Pos(3, 0))
+		board(3)(0) = new Queen(this, 1, Pos(3, 0))
 		board(0)(7) = new Rook(this, 0, Pos(0, 7))
 		board(7)(7) = new Rook(this, 0, Pos(7, 7))
 		board(0)(0) = new Rook(this, 1, Pos(0, 0))
@@ -82,35 +82,33 @@ class Game {
 	 * Si ce n'est pas possible, retourne false */
 	def move(p : Piece, pos : Pos) : Boolean = {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
+		for(position <- possibleMoves)
+        if(position == pos) {
+            board(pos.x)(pos.y) = p
+            remove(p)
+			p.pos = pos
+			if(p.role == "pawn" && abs(p.pos.y - pos.y) == 2) {
+				p.Pawn_Rules = true
+			}
+			if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
+				board(pos.x)(pos.y) = new Queen(this, p.player, pos)
+			}
+			p.already_moved = turn
+			playing = 1 - playing
+			println("bite number 1")
+			changed()
+			println("bite number 2")
 
-		for(position <- possibleMoves) position match {
-			case position if position == pos =>
-				val ans = getPiece(pos.x, pos.y)
-				if(ans != null) remove(ans)
-				if(p.role == "pawn" && abs(p.pos.y - pos.y) == 2)
-					p.Pawn_Rules = true
-				p.pos = pos
-				if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
-					remove(p)
-					board(pos.x)(pos.y) = new Queen(this, p.player, pos)
-					/*pieces = (new Queen(this, p.player, pos)) :: pieces */
-				}
-
-				p.already_moved = turn
-				playing = 1 - playing
-				changed()
-
-				if(!over) {
-					players(playing).wait_play
-				}
-				return true
-			case _ => Nil
+			if(!over) {
+				players(playing).wait_play
+			}
+			return true
 		}
 		return false
 	}
 
     def over : Boolean = {
-         every_possible_move_nocheck(playing).isEmpty
+        every_possible_move_nocheck(playing).isEmpty
     }
 
     def victory : Boolean = {
@@ -155,7 +153,7 @@ class Game {
 		var pos : Pos = Pos(-1,-1)
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
-				if ( (board(i)(j).role == "king") && (board(i)(j).player == player) ) {
+				if ( board(i)(j) != null && board(i)(j).role == "king" && board(i)(j).player == player ) {
 					pos = board(i)(j).pos
 				}
 			}
@@ -175,12 +173,11 @@ class Game {
 
 	def getControlledCell(i : Int, j: Int, player : Int) : Boolean = {
 		val pos_move : List[Pos] = every_possible_move_nocheck(1 - player)
-		var Booly = false
-		for(c <- pos_move) c match {
-			case Pos(x,y) if ( x == i && y == j ) => Booly = true
-			case Pos(x,y) => ()
+		var ret = false
+		for(c <- pos_move) {
+            ret = ret || (c.x == i && c.y == j)
 		}
-		return Booly
+		return ret 
 	}
 
     def copy : Game = {
@@ -192,17 +189,19 @@ class Game {
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				val c = board(i)(j)
-				g.board(i)(j) = board(i)(j).role match {
-					case "king" => new King(g, c.player, c.pos)
-					case "queen" => new Queen(g, c.player, c.pos)
-					case "rook" => new Rook(g, c.player, c.pos)
-					case "bishop" => new Bishop(g, c.player, c.pos)
-					case "knight" => new Knight(g, c.player, c.pos)
-					case "pawn" => new Pawn(g, c.player, c.pos)
-					case _ => null
-          		}
-          		g.board(i)(j).already_moved = c.already_moved
-          	}
+                if( c != null) {
+    				g.board(i)(j) = board(i)(j).role match {
+	    				case "king" => new King(g, c.player, c.pos)
+		    			case "queen" => new Queen(g, c.player, c.pos)
+			    		case "rook" => new Rook(g, c.player, c.pos)
+				    	case "bishop" => new Bishop(g, c.player, c.pos)
+					    case "knight" => new Knight(g, c.player, c.pos)
+    					case "pawn" => new Pawn(g, c.player, c.pos)
+	    				case _ => null
+              		}
+          	    	g.board(i)(j).already_moved = c.already_moved
+            	}
+            }
         }
         return g
     }

@@ -22,8 +22,8 @@ case class Wait() extends InterfaceState
  * (au passage elle génère une partie dans sont constructeur)
  */
 class GameWin() extends MainFrame {
-	    preferredSize = new Dimension(600, 630)
-    	minimumSize = new Dimension(500, 530)
+    preferredSize = new Dimension(600, 630)
+    minimumSize = new Dimension(500, 530)
 	/* Caractéristiques de la fenêtre */
 	val mainWin = this
 	title = "Chess"
@@ -97,7 +97,7 @@ class GameWin() extends MainFrame {
         else if(game.over) {
             mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
         }
-	}
+    }
 
 	centerOnScreen()
 	refresh
@@ -150,9 +150,13 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 	def refresh = {
 		background = if((x+y) % 2 == 0) Color.white else Color.darkGray
 		val player = if(game.cell_player(x, y) == 0) "white" else "black"
-		game.cell_role(x, y) match {
-			case "empty" => icon = null 
-			case role => icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png") ; disabledIcon = icon
+		val role = game.cell_role(x, y)
+		println("dsflksdlmfjsdlkfj")
+        if(role == "empty") {
+            icon = null
+        }
+        else {
+			icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png") ; disabledIcon = icon
 		}
         enabled = !game.over
 	}

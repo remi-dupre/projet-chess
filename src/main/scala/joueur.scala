@@ -35,6 +35,8 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	def move(x : Int, y : Int) : Boolean = {
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
+		println("##############################")
+		println(piece,  Pos(x, y))
 		return game.move(piece, Pos(x, y))
 	}
 }
@@ -47,12 +49,11 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
 		var pos_move : List[(Piece, Pos)] = List()
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
-				game.board(i)(j) match {
-					case piece if (piece.player == color) => 
-						for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
-							pos_move = (piece, pos) :: pos_move
-						}
-					case _ => ()
+                val piece = game.board(i)(j)
+                if(piece != null && piece.player == color) {
+				    for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
+						pos_move = (piece, pos) :: pos_move
+					}
 				}
 			}
 		}

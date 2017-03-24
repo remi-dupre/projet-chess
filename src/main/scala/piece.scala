@@ -6,19 +6,10 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 
 	
 	def inCheck(new_pos : Pos) : Boolean = {
-		val x = pos.x
-		val y = pos.y
-		val i = new_pos.x
-		val j = new_pos.y
         val g2 = game.copy
-
-		val piece = g2.getPiece(i, j)
-		piece match {
-			case null => ()
-			case piece => g2.remove(piece)
-		}
-        
-        val this2 = g2.getPiece(x, y)
+        val this2 = g2.getPiece(pos.x, pos.y)
+        g2.board(new_pos.x)(new_pos.y) = this2
+        g2.remove(this2)
         this2.pos = new_pos
 		return g2.inCheck(player)
 	}
@@ -141,10 +132,10 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		if(in_board(x,y+vecteur)&&game.empty_cell(x, y+vecteur)) {
 			pos_move = Pos(x,y+vecteur)::pos_move
 		}
-		if(in_board(x+vecteur,y+vecteur) && (game.cell_player(x+vecteur,y+vecteur) == vecteur-player)) {
+		if(in_board(x+vecteur,y+vecteur) && (game.cell_player(x+vecteur,y+vecteur) == 1-player)) {
 			pos_move = Pos(x+vecteur,y+vecteur)::pos_move
 		}
-		if(in_board(x-vecteur,y+vecteur) && (game.cell_player(x-vecteur,y+vecteur) == vecteur-player)) {
+		if(in_board(x-vecteur,y+vecteur) && (game.cell_player(x-vecteur,y+vecteur) == 1-player)) {
 			pos_move = Pos(x-vecteur,y+vecteur)::pos_move
 		}
 		if( already_moved == -1 && in_board(x,y+2*vecteur) && game.empty_cell(x,y+2*vecteur) && game.empty_cell(x,y+vecteur)) {
@@ -153,12 +144,12 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 	/* Règle de la prise en passant */
 		if (in_board(x+1,y)) {
 			if (game.board(x+1)(y).role == "Pawn" && game.board(x+1)(y).Pawn_Rules == true && game.board(x+1)(y).already_moved == (game.turn -1) && game.board(x+1)(y).player == (1 - player)) {
-				pos_move = Pos(x+1,y)::pos_move
+				pos_move = Pos(x+1,y+vecteur)::pos_move
 			}
 		}
 		if (in_board(x-1,y)) {
 			if (game.board(x-1)(y).role == "Pawn" && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1) && game.board(x-1)(y).player == (1 - player)) {
-				pos_move = Pos(x-1,y)::pos_move
+				pos_move = Pos(x-1,y+vecteur)::pos_move
 			}
 		}
 
