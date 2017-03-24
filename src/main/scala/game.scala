@@ -73,37 +73,38 @@ class Game {
 
 	/** Supprime la pièce p de la partie */
 	def remove(p : Piece) = {
-		var x = p.pos.x
-		var y = p.pos.y
-		board(x)(y) = null
+		board(p.pos.x)(p.pos.y) = null
 	}
 
 	/** Déplace la pièce 'p' en position 'pos'
 	 * Si ce n'est pas possible, retourne false */
 	def move(p : Piece, pos : Pos) : Boolean = {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
-		for(position <- possibleMoves)
-        if(position == pos) {
-            board(pos.x)(pos.y) = p
-            remove(p)
-			p.pos = pos
-			if(p.role == "pawn" && abs(p.pos.y - pos.y) == 2) {
-				p.Pawn_Rules = true
-			}
-			if(p.role == "pawn" && (p.pos.y == 7 || p.pos.y == 0)) {
-				board(pos.x)(pos.y) = new Queen(this, p.player, pos)
-			}
-			p.already_moved = turn
-			playing = 1 - playing
-			println("bite number 1")
-			changed()
-			println("bite number 2")
-
-			if(!over) {
-				players(playing).wait_play
-			}
-			return true
-		}
+		for(position <- possibleMoves) {
+            if(position == pos) {
+                board(pos.x)(pos.y) = p
+                remove(p)
+			    p.pos = pos
+                if(p.role == "pawn") {
+                    if(abs(p.pos.y - pos.y) == 2) {
+		    		    p.Pawn_Rules = true
+			        }
+                    else if(p.pos.y == 7 || p.pos.y == 0) {
+	    			    board(pos.x)(pos.y) = new Queen(this, p.player, pos)
+		    	    }
+                }
+	    		p.already_moved = turn
+		    	playing = 1 - playing
+			    println("bite number 1")
+    			changed()
+	    		println("bite number 2")
+    
+	    		if(!over) {
+		    		players(playing).wait_play
+			    }
+    			return true
+	    	}
+        }
 		return false
 	}
 
