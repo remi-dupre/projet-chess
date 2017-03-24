@@ -44,12 +44,17 @@ class GameWin() extends MainFrame {
 	var state : InterfaceState = new Wait()
 
     val msg = new Label("test")
+    val promo_btn = new PromoBtn()
+    val leave_btn = new Button(Action("Leave") {
+        close()
+        Main.menu.visible = true
+    })
 
 	/** L'ensemble des cases de la partie */
 	val grid = Array.ofDim[CellBtn](8, 8)
 	contents = new BoxPanel(Orientation.Vertical) {
         // main grid
-	    preferredSize = new Dimension(600, 650)
+	    preferredSize = new Dimension(600, 700)
         contents += new GridPanel(8, 8) {
         	minimumSize = new Dimension(500, 500)
 		    for(j <- 0 to 7) {
@@ -61,13 +66,14 @@ class GameWin() extends MainFrame {
 	    }
 
         // bottom bar
-        contents += new BoxPanel(Orientation.Horizontal) {
-            preferredSize = new Dimension(1000, 50);
-            contents += new Button(Action("Leave") {
-                close()
-                Main.menu.visible = true
-            })
-            contents += new Separator(Orientation.Horizontal) {}
+        contents += new GridPanel(1,3) {
+            preferredSize = new Dimension(1000, 60);
+            contents += leave_btn
+            
+            contents += promo_btn
+	        promo_btn.icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
+
+            //contents += new Separator(Orientation.Horizontal) {}
             contents += msg
         }
     }
@@ -135,8 +141,16 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 						mainWin.highlight_possible(game.getPiece(x, y))
 				}
 			case WaitDirection(p) =>
-				if(p.move(x, y))
+				if(p.move(x, y)) {
 					game.changed()
+                }
+                else if (p.select(x, y)) {
+					var piece = game.getPiece(x, y)
+					if(!piece.removeInCheckMoves(piece.possible_move()).isEmpty) {
+                        mainWin.refresh
+						mainWin.highlight_possible(game.getPiece(x, y))
+                    }
+                }
 		}
 	}
 	
@@ -159,5 +173,24 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		}
         enabled = !game.over
 	}
+}
+
+/**
+ * Sélectionne la pièce vers laquelle promouvoir
+ */
+class PromoBtn() extends Button {
+    val promo_btn = this
+    val roles = Array("queen", "knight", "bishop", "rook")
+    var r_i = 0
+    preferredSize = new Dimension(300, 500)
+	
+    action = Action("promotion") {
+        promo_btn.r_i = (promo_btn.r_i+1) % 4
+	    icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
+    }
+
+    def role = {
+        roles(r_i)
+    }
 }
 

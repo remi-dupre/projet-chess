@@ -114,7 +114,14 @@ class Game {
 			p.pos = pos
             if(p.role == "pawn") {
                 if(p.pos.y == 7 || p.pos.y == 0) {
-    			    board(pos.x)(pos.y) = new Queen(this, p.player, pos)
+	                val new_role = players(playing).get_promotion_type
+	                board(pos.x)(pos.y) = new_role match {
+	                    case "queen"  => new Queen(this, p.player, pos)
+	                    case "knight" => new Knight(this, p.player, pos)
+	                    case "bishop" => new Bishop(this, p.player, pos)
+	                    case "rook"   => new Rook(this, p.player, pos)
+	                    case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
+	                }
 	    	    }
             }
 			p.already_moved = turn
