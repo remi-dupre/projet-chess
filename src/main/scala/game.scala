@@ -90,7 +90,8 @@ class Game {
 	        	if(Math.abs(p.pos.y - pos.y) == 2) {
 		    		p.Pawn_Rules = true
 			    }
-			    if(Math.abs(p.pos.x - pos.x) == 1) {
+			    else if(Math.abs(p.pos.x - pos.x) == 1 && board(pos.x)(pos.y - (-1+2*playing)) != null && board(pos.x)(pos.y - (-1+2*playing)).role == "pawn" && board(pos.x)(pos.y) == null ) {
+			    	println("lol")
 			    	remove(board(pos.x)(pos.y - (-1+2*playing)))
 			    }
 			}
