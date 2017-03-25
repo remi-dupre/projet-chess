@@ -108,9 +108,8 @@ class Game {
 
 
 			/* REMPLACEMENT DANS LA PARTIE */
-            board(pos.x)(pos.y) = p
-            remove(p)
-            /* REMPLACEMENT DANS LA PARTIE */
+            p.move_to(pos)
+           /* REMPLACEMENT DANS LA PARTIE */
 
 			p.pos = pos
             if(p.role == "pawn") {

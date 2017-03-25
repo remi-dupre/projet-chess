@@ -4,11 +4,20 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	def role : String
 	def possible_move() : List[Pos]
 
+    def move_to(new_pos : Pos) : Boolean = {
+        val possible_dirs = removeInCheckMoves(possible_move())
+        if(possible_dirs.contains(new_pos)) {
+            game.board(new_pos.x)(new_pos.y) = this
+            game.board(pos.x)(pos.y) = null
+            pos = new_pos
+            return true
+        }
+        return false
+    }
 	
 	def inCheck(new_pos : Pos) : Boolean = {
         val g2 = game.copy
         val this2 = g2.getPiece(pos.x, pos.y)
-        g2.board(new_pos.x)(new_pos.y) = this2
         g2.remove(this2)
         if(this2 != null) {
         	this2.pos = new_pos
