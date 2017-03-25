@@ -18,9 +18,11 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	def inCheck(new_pos : Pos) : Boolean = {
         val g_clone = game.copy
         val this_clone = g_clone.getPiece(pos.x, pos.y)
-        g_clone.board(this_clone.pos.x)(this_clone.pos.y) = null
-        this_clone.pos = new_pos
-        g_clone.board(new_pos.x)(new_pos.y) = this_clone
+        if(this_clone != null) {
+            g_clone.board(this_clone.pos.x)(this_clone.pos.y) = null
+            this_clone.pos = new_pos
+            g_clone.board(new_pos.x)(new_pos.y) = this_clone
+        }
 		return g_clone.inCheck(player)
 	}
 
@@ -78,11 +80,11 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		if ( already_moved == -1) {
 			/* petit roque */
 			if (game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y) && !game.getControlledCell(x + 1, y, player) && !game.getControlledCell(x + 2, y, player) && !game.getControlledCell(x,y, player) && !game.getControlledCell(x + 3, y, player)) {
-				pos_move = pos_move			
+				pos_move = Pos(x+2, y)::pos_move			
 			}
 			/* Grand roque */
 			if (game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && game.empty_cell(x - 3, y) && !game.getControlledCell(x - 1, y, player) && !game.getControlledCell(x - 2, y, player) && !game.getControlledCell(x,y, player) && !game.getControlledCell(x-3, y, player) && !game.getControlledCell(x-4, y, player)) {
-				pos_move = pos_move
+				pos_move = Pos(x-3, y)::pos_move
 			}
 		}
 		return pos_move /* A ne pas mettre en echec le roi */
