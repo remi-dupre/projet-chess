@@ -155,6 +155,18 @@ class Game {
         !victory && over
     }
 
+    /** Retourne la liste des positions attaquées */
+    def every_attacked_cells(player : Int) : List[Pos] = {
+       	var pos_move : List[Pos] = List()
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if ( board(i)(j) != null && board(i)(j).player == player ) {
+					pos_move = pos_move ++ board(i)(j).attacked_cells
+				}
+			}
+		}
+		return pos_move
+    }
 
 	/** Retourne la liste des positions où le joueur donné peut déplacer une pièce mais en se mettant en echec */
 	def every_possible_move(player : Int) : List[Pos] = { 
@@ -207,13 +219,8 @@ class Game {
 		return board(i)(j)
 	}
 
-	def getControlledCell(i : Int, j: Int, player : Int) : Boolean = {
-		val pos_move : List[Pos] = every_possible_move(1 - player)
-		var ret = false
-		for(c <- pos_move) {
-            ret = ret || (c.x == i && c.y == j)
-		}
-		return ret 
+	def isControlledCell(i : Int, j: Int, player : Int) : Boolean = {
+		return every_attacked_cells(1 - player).contains(Pos(i, j))
 	}
 
     def copy : Game = {
