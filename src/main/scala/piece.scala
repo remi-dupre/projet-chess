@@ -102,8 +102,21 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				pos_move = Pos(x-3, y)::pos_move
 			}
 		}
-		return pos_move /* A ne pas mettre en echec le roi */
+		return pos_move /* A ne pas mettre en échec le roi */
 	}
+
+    override def move_to(new_pos : Pos) {
+        /* Petit roque */
+		if(role == "king" && pos.x - new_pos.x == -2) {
+		    game.board(pos.x+3)(pos.y).move_to(Pos(pos.x+1, pos.y))
+		}
+		/* Grand roque */
+		if(role == "king" && pos.x - new_pos.x == 3) {
+			game.board(pos.x-4)(pos.y).move_to(Pos(pos.x-2, pos.y))
+		}
+
+        super.move_to(new_pos)
+    }
 }
 
 class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {

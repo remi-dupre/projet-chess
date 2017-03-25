@@ -85,17 +85,6 @@ class Game {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
 		for(position <- possibleMoves)
         if(position == pos) {
-			/* petit roque */
-			if(p.role == "king" && p.pos.x - pos.x == -2) {
-				board(p.pos.x+1)(p.pos.y) = board(p.pos.x+3)(p.pos.y)
-				remove(board(p.pos.x+3)(p.pos.y))
-			}
-			/* grand roque */
-			if(p.role == "king" && p.pos.x - pos.x == 3) {
-				board(p.pos.x-2)(p.pos.y) = board(p.pos.x-4)(p.pos.y)
-				remove(board(p.pos.x-4)(p.pos.y))
-			}
-
             p.move_to(pos)
 
             if(p.role == "pawn") {
