@@ -7,6 +7,64 @@ case class Save(var move: Move, var saveList: List[Save])
 
 object Backup {
 	/* Algebrique notation : n. (Z)z9 (Z)z9 */
+	def createGameListFromSave(game:Game, save:Save) : List[Game] = {
+		if( save.saveList.isEmpty ) {
+			return List(game)
+		}
+		else {
+			val game_copy = game.copy
+			game.move(save.move.p, save.move.pos)
+			return game_copy::( createGameListFromSave(game, save.saveList.head))
+		}
+	}
+
+	def compteur(game:Game) : Int = {
+		var n = 0
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if (game.board(i)(j) != null) {
+					n = n+1
+				}
+			}
+		}
+		return n
+	}
+
+	def isIdentique(game1:Game, game2:Game): Boolean = {
+		var res = game1.board == game2.board
+		res = res && game1.every_possible_move_nocheck(0) == game2.every_possible_move_nocheck(0)
+		res = res && game1.every_possible_move_nocheck(1) == game2.every_possible_move_nocheck(1)
+		return res
+	}
+
+	def tripleRepetition(game:Game, save:Save): Boolean = {
+		val n = compteur(game)
+		var i = 0
+		val listGame = createGameListFromSave(game, save).reverse
+		def aux(game:Game, listGame:List[Game]) : Boolean = {
+			if(listGame.isEmpty) {
+				return false
+			}
+			else {
+				val game1 = listGame.head
+				val m = compteur(game1)
+				if(n != m) {
+					return false
+				}
+				if(isIdentique(game,game1)) {
+					i = i + 1 
+				}
+				if(i == 3) {
+					return true
+				}
+				return aux(game, listGame.tail)
+			}
+		}
+		return aux(game, listGame)
+	}
+
+	def cinquanteCoup(game:Game, save:Save) = {}
+
 	def addMoveToSave(move: Move, save: Save):Unit = {
 		if(save.saveList.isEmpty) {
 			save.saveList = List(Save(move, List()))
@@ -55,7 +113,7 @@ object Backup {
 						y = (c - 'a' - 1)
 					}
 					if (bloc == 3) {
-						move_list = Move(game.board(i)(j), Pos(x, y)) :: move_list
+						move_list = Move(game.board(i)(j), Pos(x, y) ) :: move_list
 						n = 0
 						i = -1
 						j = -1
