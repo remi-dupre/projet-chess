@@ -95,11 +95,16 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 
 		if ( already_moved == -1) {
 			/* petit roque */
-			if (game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y) && !game.isControlledCell(x + 1, y, player) && !game.isControlledCell(x + 2, y, player) && !game.isControlledCell(x,y, player) && !game.isControlledCell(x + 3, y, player)) {
+			if( game.board(x+3)(y) != null && game.board(x+3)(y).already_moved == -1 ) // La tour n'a pas bougé
+			if( game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y)) // C'est vide entre le roi et la tour
+            if( !game.isControlledCell(x + 1, y, player) && !game.isControlledCell(x + 2, y, player) && !game.isControlledCell(x,y, player) && !game.isControlledCell(x + 3, y, player)) { // Aucune des cases entre n'est en échec
 				pos_move = Pos(x+2, y)::pos_move			
 			}
+
 			/* Grand roque */
-			if (game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && game.empty_cell(x - 3, y) && !game.isControlledCell(x - 1, y, player) && !game.isControlledCell(x - 2, y, player) && !game.isControlledCell(x,y, player) && !game.isControlledCell(x-3, y, player) && !game.isControlledCell(x-4, y, player)) {
+			if( game.board(x-4)(y) != null && game.board(x-4)(y).already_moved == -1 ) // La tour n'a pas bougé
+			if( game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && game.empty_cell(x - 3, y) ) // C'est vide
+            if( !game.isControlledCell(x - 1, y, player) && !game.isControlledCell(x - 2, y, player) && !game.isControlledCell(x,y, player) && !game.isControlledCell(x-3, y, player) && !game.isControlledCell(x-4, y, player)) { // Il n'y a pas de case en échec
 				pos_move = Pos(x-3, y)::pos_move
 			}
 		}
