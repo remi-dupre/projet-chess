@@ -85,15 +85,6 @@ class Game {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
 		for(position <- possibleMoves)
         if(position == pos) {
-        	/* prise en passant */
-        	if(p.role == "pawn") {
-	        	if(Math.abs(p.pos.y - pos.y) == 2) {
-		    		p.Pawn_Rules = true
-			    }
-			    else if(Math.abs(p.pos.x - pos.x) == 1 && board(pos.x)(pos.y - (-1+2*playing)) != null && board(pos.x)(pos.y - (-1+2*playing)).role == "pawn" && board(pos.x)(pos.y) == null ) {
-			    	remove(board(pos.x)(pos.y - (-1+2*playing)))
-			    }
-			}
 			/* petit roque */
 			if(p.role == "king" && p.pos.x - pos.x == -2) {
 				board(p.pos.x+1)(p.pos.y) = board(p.pos.x+3)(p.pos.y)
@@ -105,10 +96,7 @@ class Game {
 				remove(board(p.pos.x-4)(p.pos.y))
 			}
 
-
-			/* REMPLACEMENT DANS LA PARTIE */
             p.move_to(pos)
-           /* REMPLACEMENT DANS LA PARTIE */
 
             if(p.role == "pawn") {
                 if(p.pos.y == 7 || p.pos.y == 0) {
