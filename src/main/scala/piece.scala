@@ -16,11 +16,12 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
     }
 	
 	def inCheck(new_pos : Pos) : Boolean = {
-        val g2 = game.copy
-        val this2 = g2.getPiece(pos.x, pos.y)
-        g2.remove(this2)
-        this2.pos = new_pos
-		return g2.inCheck(player)
+        val g_clone = game.copy
+        val this_clone = g_clone.getPiece(pos.x, pos.y)
+        g_clone.board(this_clone.pos.x)(this_clone.pos.y) = null
+        this_clone.pos = new_pos
+        g_clone.board(new_pos.x)(new_pos.y) = this_clone
+		return g_clone.inCheck(player)
 	}
 
 	def removeInCheckMoves(pos_move : List[Pos]) : List[Pos] = {
