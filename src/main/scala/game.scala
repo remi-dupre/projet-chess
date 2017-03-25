@@ -91,7 +91,6 @@ class Game {
 		    		p.Pawn_Rules = true
 			    }
 			    else if(Math.abs(p.pos.x - pos.x) == 1 && board(pos.x)(pos.y - (-1+2*playing)) != null && board(pos.x)(pos.y - (-1+2*playing)).role == "pawn" && board(pos.x)(pos.y) == null ) {
-			    	println("lol")
 			    	remove(board(pos.x)(pos.y - (-1+2*playing)))
 			    }
 			}
@@ -111,7 +110,6 @@ class Game {
             p.move_to(pos)
            /* REMPLACEMENT DANS LA PARTIE */
 
-			p.pos = pos
             if(p.role == "pawn") {
                 if(p.pos.y == 7 || p.pos.y == 0) {
 	                val new_role = players(playing).get_promotion_type
