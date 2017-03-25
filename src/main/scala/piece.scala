@@ -2,10 +2,13 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	var already_moved : Int = -1
 	var Pawn_Rules : Boolean = false
 	def role : String
-	def possible_move() : List[Pos]
+    def attacked_cells() : List[Pos]
+    def possible_move() : List[Pos] = {
+        attacked_cells()
+    }
 
     def move_to(new_pos : Pos) : Boolean = {
-        val possible_dirs = removeInCheckMoves(possible_move())
+        val possible_dirs = possible_move()
         if(possible_dirs.contains(new_pos)) {
             game.board(new_pos.x)(new_pos.y) = this
             game.board(pos.x)(pos.y) = null
@@ -19,9 +22,10 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
         val g_clone = game.copy
         val this_clone = g_clone.getPiece(pos.x, pos.y)
         if(this_clone != null) {
-            g_clone.board(this_clone.pos.x)(this_clone.pos.y) = null
+            /*g_clone.board(this_clone.pos.x)(this_clone.pos.y) = null
             this_clone.pos = new_pos
-            g_clone.board(new_pos.x)(new_pos.y) = this_clone
+            g_clone.board(new_pos.x)(new_pos.y) = this_clone*/
+           this_clone.move_to(new_pos)
         }
 		return g_clone.inCheck(player)
 	}
@@ -66,10 +70,13 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 
 class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "king"
-	override def possible_move() : List[Pos] = {
+
+    // les mouvements standarts
+	override def attacked_cells() : List[Pos] = {
 		val x = pos.x
 		val y = pos.y
 		var pos_move: List[Pos] = List()
+
 		for(i <- -1 to 1) {
 			for(j <- -1 to 1) {
 				if(((i,j) != (0,0)) && in_board(x+i, y+j) && game.cell_player(x+i, y+j) != player) {
@@ -77,18 +84,28 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				}
 			}
 		}
-		if ( already_moved == -1 ) {
+        return pos_move
+    }
+
+    // avec le rock
+    override def possible_move() : List[Pos] = {
+		val x = pos.x
+		val y = pos.y
+        var pos_move = attacked_cells
+
+		if ( already_moved == -1) {
 			/* petit roque */
-			if ( game.board(x+3)(y) != null && game.board(x+3)(y).already_moved == -1 ) {
-				if (game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y) && !game.getControlledCell(x + 1, y, player) && !game.getControlledCell(x + 2, y, player) && !game.getControlledCell(x,y, player) && !game.getControlledCell(x + 3, y, player)) {
-					pos_move = Pos(x+2, y)::pos_move			
-				}
+			if( game.board(x+3)(y) != null && game.board(x+3)(y).already_moved == -1 ) // La tour n'a pas bougé
+			if( game.empty_cell(x + 1, y) && game.empty_cell(x + 2, y)) // C'est vide entre le roi et la tour
+            if( !game.isControlledCell(x + 1, y, player) && !game.isControlledCell(x + 2, y, player) && !game.isControlledCell(x,y, player) && !game.isControlledCell(x + 3, y, player)) { // Aucune des cases entre n'est en échec
+				pos_move = Pos(x+2, y)::pos_move			
 			}
+
 			/* Grand roque */
-			if ( game.board(x-4)(y) != null && game.board(x-4)(y).already_moved == -1 ) {
-				if (game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && game.empty_cell(x - 3, y) && !game.getControlledCell(x - 1, y, player) && !game.getControlledCell(x - 2, y, player) && !game.getControlledCell(x,y, player) && !game.getControlledCell(x-3, y, player) && !game.getControlledCell(x-4, y, player)) {
-					pos_move = Pos(x-3, y)::pos_move
-				}
+			if( game.board(x-4)(y) != null && game.board(x-4)(y).already_moved == -1 ) // La tour n'a pas bougé
+			if( game.empty_cell(x - 1, y) && game.empty_cell(x - 2, y) && game.empty_cell(x - 3, y) ) // C'est vide
+            if( !game.isControlledCell(x - 1, y, player) && !game.isControlledCell(x - 2, y, player) && !game.isControlledCell(x,y, player) && !game.isControlledCell(x-3, y, player) && !game.isControlledCell(x-4, y, player)) { // Il n'y a pas de case en échec
+				pos_move = Pos(x-3, y)::pos_move
 			}
 		}
 		return pos_move /* A ne pas mettre en echec le roi */
@@ -97,7 +114,7 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 
 class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "queen"
-	override def possible_move() : List[Pos] = {
+	override def attacked_cells() : List[Pos] = {
 		var pos_move: List[Pos] = List()
 		for(i <- 0 to 2) {
 			for(j <- 0 to 2) {
@@ -112,17 +129,21 @@ class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, po
 
 class Rook(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "rook"
-	override def possible_move() : List[Pos] = annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)
+	override def attacked_cells() : List[Pos] = annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)
 }
 
 class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "bishop"
-	override def possible_move : List[Pos] = annexe_possible_move((1,1)) ++ annexe_possible_move((-1,1)) ++ annexe_possible_move((-1,-1)) ++ annexe_possible_move((1,-1))
+	override def attacked_cells : List[Pos] =
+        annexe_possible_move((1,1)) ++
+        annexe_possible_move((-1,1)) ++
+        annexe_possible_move((-1,-1)) ++
+        annexe_possible_move((1,-1))
 }
 
 class Knight(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "knight"
-	override def possible_move() : List[Pos] = {
+	override def attacked_cells() : List[Pos] = {
 		var x = pos.x
 		var y = pos.y
 		var pos_move: List[Pos] = List()
@@ -139,7 +160,7 @@ class Knight(game : Game, player : Int, m_pos : Pos) extends Piece(game, player,
 
 class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "pawn"
-	override def possible_move() : List[Pos] = {
+	override def attacked_cells() : List[Pos] = {
 		var x = pos.x
 		var y = pos.y
 		var pos_move: List[Pos] = List()
