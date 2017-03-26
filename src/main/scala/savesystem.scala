@@ -1,14 +1,25 @@
 import scala.io.Source
 import java.io._
 
-case class Move(from: Pos, to: Pos)
+case class Move(from: Pos, to: Pos) {
+	var promote_to : String = null
+}
 
 case class Save(var move: Move, var saveList: List[Save])
+
+class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
+	override def wait_play = {}
+
+	override def get_promotion_type : String = {
+		return promotion_type
+	}
+}
 
 object Backup {
 	/* Algebrique notation : n. (Z)z9 (Z)z9 */
 	def createGameListFromSave(game:Game, save:Save) : List[Game] = {
 		val game_c = game.copy
+		game_c.players(game.playing) = new FakePlayer(game.playing, game_c, save.move.promote_to)
 		game_c.move(
 			game_c.board(save.move.from.x)(save.move.from.y),
 			save.move.to
@@ -50,7 +61,7 @@ object Backup {
 				val hd_game = listGame.head
 				if(n != compteur(hd_game))
 					return false
-				if(game.is_copy_of(hd_game)) {
+				if(isIdentique(game, hd_game)) {
 					i += 1
 					if(i == 3)
 						return true

@@ -115,6 +115,7 @@ class Game {
 						case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
 					}
 				}
+				save_current.move.promote_to = board(pos.x)(pos.y).role
 			}
 			p.already_moved = turn
 			playing = 1 - playing
@@ -130,7 +131,7 @@ class Game {
 	}
 
 	def over : Boolean = {
-		every_possible_move_nocheck(playing).isEmpty
+		(save_root != null && Backup.tripleRepetition(this, save_root)) || every_possible_move_nocheck(playing).isEmpty
 	}
 
 	def victory : Boolean = {
@@ -138,7 +139,7 @@ class Game {
 	}
 
 	def pat : Boolean = {
-		(save_root != null && Backup.tripleRepetition(this, save_root)) || (!victory && over)
+		!victory && over
 	}
 
 	/** Retourne la liste des positions attaquées */
