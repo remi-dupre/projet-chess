@@ -45,7 +45,7 @@ class GameWin() extends MainFrame {
 
     val msg = new Label("test")
     val promo_btn = new PromoBtn()
-    val leave_btn = new Button(Action("Leave") {
+    val leave_btn = new Button(Action("Menu") {
         close()
         Main.menu.visible = true
     })
