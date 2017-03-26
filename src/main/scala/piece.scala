@@ -190,17 +190,12 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		var vecteur : Int = -1+2*player
 		
 		/* mouvement de base */
-		if(in_board(x,y+vecteur)&&game.empty_cell(x, y+vecteur)) {
-			pos_move = Pos(x, y+vecteur)::pos_move
-		}
+
 		if(in_board(x+vecteur,y+vecteur) && (game.cell_player(x+vecteur,y+vecteur) == 1-player)) {
 			pos_move = Pos(x+vecteur, y+vecteur)::pos_move
 		}
 		if(in_board(x-vecteur,y+vecteur) && (game.cell_player(x-vecteur,y+vecteur) == 1-player)) {
 			pos_move = Pos(x-vecteur, y+vecteur)::pos_move
-		}
-		if( already_moved == -1 && in_board(x,y+2*vecteur) && game.empty_cell(x,y+2*vecteur) && game.empty_cell(x,y+vecteur)) {
-			pos_move = Pos(x, y+2*vecteur)::pos_move
 		}
 		
 		/* Règle de la prise en passant */
@@ -216,6 +211,22 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		}
 
 		return pos_move
+	}
+
+	override def possible_move() : List[Pos] = {
+		var x = pos.x
+		var y = pos.y
+		var pos_move: List[Pos] = List()
+		var vecteur : Int = -1+2*player
+
+		if(in_board(x,y+vecteur)&&game.empty_cell(x, y+vecteur)) {
+			pos_move = Pos(x, y+vecteur)::pos_move
+		}
+		if( already_moved == -1 && in_board(x,y+2*vecteur) && game.empty_cell(x,y+2*vecteur) && game.empty_cell(x,y+vecteur)) {
+			pos_move = Pos(x, y+2*vecteur)::pos_move
+		}
+
+		return pos_move ++ attacked_cells
 	}
 	
 	override def move_to(new_pos : Pos) {
