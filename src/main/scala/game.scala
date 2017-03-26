@@ -77,12 +77,7 @@ class Game {
 
 	/** Vérifie si la case (x, y) est vide */
 	def empty_cell(x : Int, y : Int) : Boolean = {
-		return ( board(x)(y) == null )
-	}
-
-	/** Supprime la pièce p de la partie */
-	def remove(p : Piece) = {
-		board(p.pos.x)(p.pos.y) = null
+		return board(x)(y) == null
 	}
 
 	/** Déplace la pièce 'p' en position 'pos'
@@ -114,8 +109,8 @@ class Game {
 						case "rook"   => new Rook(this, p.player, pos)
 						case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
 					}
+					save_current.move.promote_to = board(pos.x)(pos.y).role
 				}
-				save_current.move.promote_to = board(pos.x)(pos.y).role
 			}
 			p.already_moved = turn
 			playing = 1 - playing
@@ -241,4 +236,3 @@ class Game {
 		return g
 	}
 }
-
