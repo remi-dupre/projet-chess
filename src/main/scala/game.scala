@@ -12,7 +12,7 @@ class Game() {
 	/** Les deux joueurs */
 	val players : Array[Player] = Array(null, null)
 	val timer = new Cadency(List(
-		Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3)
+		Period(5, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(10, 1)
 	))
 	var timers : Array[Cadency] = Array(timer.copy, timer.copy)
 	var turn_start : Long = -1 // le timestamp du début du tour
@@ -164,15 +164,23 @@ class Game() {
 	}
 
 	def over : Boolean = {
-		triple_repetition || legal_moves(playing).isEmpty
+		triple_repetition || legal_moves(playing).isEmpty || defeat
+	}
+
+	def time_defeat : Boolean = {
+		return timers != null && timers(1-playing).free_time < 0
+	}
+
+	def defeat : Boolean = {
+		return time_defeat
 	}
 
 	def victory : Boolean = {
-		over && inCheck(playing)
+		(over && inCheck(playing) && !defeat)
 	}
 
 	def pat : Boolean = {
-		!victory && over
+		!defeat && !victory && over
 	}
 
 	def nb_pieces : Int = {

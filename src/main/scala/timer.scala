@@ -60,6 +60,9 @@ class TimeCounter(game : Game) extends Label {
 	val thread = new Thread(new Runnable() {
 	 	def run() {
 			while(true) {
+				if(game.over)
+					return
+	
 				val turn_duration = tools.timestamp - game.turn_start
 				if(game.timers == null) {
 					counter_label.text = turn_duration + "s"

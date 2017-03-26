@@ -102,8 +102,13 @@ class GameWin() extends MainFrame {
 			if(game.triple_repetition)
 				mainWin.msg.text += "(triple répétition) "
 		}
-		else if(game.over) {
+		else if(game.victory) {
 			mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
+		}
+		else if(game.defeat) {
+			mainWin.msg.text = "Le " + (if(game.playing == 0) "blanc" else "noir")  + " a gagné "
+			if( game.time_defeat )
+				mainWin.msg.text += "(temps) "
 		}
 	}
 
