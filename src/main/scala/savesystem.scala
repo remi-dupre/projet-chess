@@ -1,21 +1,33 @@
 import scala.io.Source
 import java.io._
 
-case class Move(p: Piece, pos: Pos)
+case class Move(from: Pos, to: Pos) {
+	var promote_to : String = null
+}
 
 case class Save(var move: Move, var saveList: List[Save])
+
+class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
+	override def wait_play = {}
+
+	override def get_promotion_type : String = {
+		return promotion_type
+	}
+}
 
 object Backup {
 	/* Algebrique notation : n. (Z)z9 (Z)z9 */
 	def createGameListFromSave(game:Game, save:Save) : List[Game] = {
-		if( save.saveList.isEmpty ) {
-			return List(game)
-		}
-		else {
-			val game_copy = game.copy
-			/*game_copy.move(save.move.p, save.move.pos)*/
-			return game::( createGameListFromSave(game_copy, save.saveList.head))
-		}
+		val game_c = game.copy
+		game_c.players(game.playing) = new FakePlayer(game.playing, game_c, save.move.promote_to)
+		game_c.move(
+			game_c.board(save.move.from.x)(save.move.from.y),
+			save.move.to
+		)
+		if( save.saveList.isEmpty )
+			return List(game_c)
+		else
+			return game_c::createGameListFromSave(game_c, save.saveList.head)
 	}
 
 	def compteur(game:Game) : Int = {
@@ -31,36 +43,33 @@ object Backup {
 	}
 
 	def isIdentique(game1:Game, game2:Game): Boolean = {
-		var res = game1.board == game2.board
+/*		var res = game1.board == game2.board
 		res = res && game1.every_possible_move_nocheck(0) == game2.every_possible_move_nocheck(0)
-		res = res && game1.every_possible_move_nocheck(1) == game2.every_possible_move_nocheck(1)
-		return res
+		res = res && game1.every_possible_move_nocheck(1) == game2.every_possible_move_nocheck(1)*/
+		return game1.is_copy_of(game2)
 	}
 
 	def tripleRepetition(game:Game, save:Save): Boolean = {
 		val n = compteur(game)
 		var i = 0
 		val listGame = createGameListFromSave(new Game(), save).reverse
-		def aux(game:Game, listGame:List[Game]) : Boolean = {
+		def count_repet(game:Game, listGame:List[Game]) : Boolean = {
 			if(listGame.isEmpty) {
 				return false
 			}
 			else {
-				val game1 = listGame.head
-				val m = compteur(game1)
-				if(n != m) {
+				val hd_game = listGame.head
+				if(n != compteur(hd_game))
 					return false
+				if(isIdentique(game, hd_game)) {
+					i += 1
+					if(i == 3)
+						return true
 				}
-				if(isIdentique(game,game1)) {
-					i = i + 1 
-				}
-				if(i == 3) {
-					return true
-				}
-				return aux(game, listGame.tail)
+				return count_repet(game, listGame.tail)
 			}
 		}
-		return aux(game, listGame)
+		return count_repet(game, listGame)
 	}
 
 	def cinquanteCoup(game:Game, save:Save) = {}
@@ -113,7 +122,7 @@ object Backup {
 						y = (c - 'a' - 1)
 					}
 					if (bloc == 3) {
-						move_list = Move(game.board(i)(j), Pos(x, y) ) :: move_list
+						move_list = Move(game.board(i)(j).pos, Pos(x, y) ) :: move_list
 						n = 0
 						i = -1
 						j = -1
@@ -162,10 +171,11 @@ object Backup {
 		var n = 0
 		val game = new Game()
 		for(move <- listMoves) {
-			writer.write(CreateAlgraebricFromMove(move.p, move.pos, n, game ))
-			game.move(move.p, move.pos)
+			//writer.write(CreateAlgraebricFromMove(move.p, move.pos, n, game ))
+			//game.move(move.p, move.pos)
 			n = n +1
 		}
 		writer.close()
 	}
 }
+

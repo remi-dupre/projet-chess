@@ -23,10 +23,11 @@ class Game {
 	var turn = 0
 
 	/** Système de sauvegarde **/
-	var save: Save = Save(Move(null,Pos(-1,-1)), List())
+	var save_root: Save = null
+	var save_current : Save = null
 
 	/** Initialise le plateau de jeu et lance la partie */
-	def start = {
+	def init = {
 		for(i <- 0 to 7) {
 			board(i)(1) = new Pawn(this, 1, Pos(i, 1))
 			board(i)(6) = new Pawn(this, 0, Pos(i, 6))
@@ -47,11 +48,16 @@ class Game {
 		board(5)(7) = new Bishop(this, 0, Pos(5, 7))
 		board(2)(0) = new Bishop(this, 1, Pos(2, 0))
 		board(5)(0) = new Bishop(this, 1, Pos(5, 0))
+	}
 
+	def start = {
+		init
 		playing = 0
 		changed()
 		players(playing).wait_play
 	}
+
+	init
 
 	/** Retourne l'id du joueur qui contrôle la piece en position (x, y), -1 s'il n'y en a pas */
 	def cell_player(x : Int, y : Int) : Int = {
@@ -71,46 +77,47 @@ class Game {
 
 	/** Vérifie si la case (x, y) est vide */
 	def empty_cell(x : Int, y : Int) : Boolean = {
-		return ( board(x)(y) == null )
-	}
-
-	/** Supprime la pièce p de la partie */
-	def remove(p : Piece) = {
-		board(p.pos.x)(p.pos.y) = null
+		return board(x)(y) == null
 	}
 
 	/** Déplace la pièce 'p' en position 'pos'
 	 * Si ce n'est pas possible, retourne false */
 	def move(p : Piece, pos : Pos) : Boolean = {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
-		for(position <- possibleMoves)
-        if(position == pos) {
-            p.move_to(pos)
 
-            if(p.role == "pawn") {
-                if(p.pos.y == 7 || p.pos.y == 0) {
-	                val new_role = players(playing).get_promotion_type
-	                board(pos.x)(pos.y) = new_role match {
-	                    case "queen"  => new Queen(this, p.player, pos)
-	                    case "knight" => new Knight(this, p.player, pos)
-	                    case "bishop" => new Bishop(this, p.player, pos)
-	                    case "rook"   => new Rook(this, p.player, pos)
-	                    case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
-	                }
-	    	    }
-            }
-			p.already_moved = turn
-			playing = 1 - playing
-			if(turn == 0) {
-				save = Save(Move(p, pos), List())
+		if(possibleMoves.contains(pos)) {
+			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
+				save_root = Save(Move(p.pos, pos), List())
+				save_current = save_root
 			}
 			else {
-				Backup.addMoveToSave(Move(p, pos), save)
+				val new_save = Save(Move(p.pos, pos), List())
+				save_current.saveList = new_save :: save_current.saveList
+				save_current = new_save
+				//Backup.addMoveToSave(Move(p, pos), save)
 			}
+
+			p.move_to(pos)
+
+			if(p.role == "pawn") {
+				if(p.pos.y == 7 || p.pos.y == 0) {
+					val new_role = players(playing).get_promotion_type
+					board(pos.x)(pos.y) = new_role match {
+						case "queen"  => new Queen(this, p.player, pos)
+						case "knight" => new Knight(this, p.player, pos)
+						case "bishop" => new Bishop(this, p.player, pos)
+						case "rook"   => new Rook(this, p.player, pos)
+						case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
+					}
+					save_current.move.promote_to = board(pos.x)(pos.y).role
+				}
+			}
+			p.already_moved = turn
+			playing = 1 - playing
 			turn = turn + 1
 			changed()
 			
-			if(!over) {
+			if(players(playing) != null && !over) {
 				players(playing).wait_play
 			}
 			return true
@@ -118,21 +125,21 @@ class Game {
 		return false
 	}
 
-    def over : Boolean = {
-        every_possible_move_nocheck(playing).isEmpty
-    }
+	def over : Boolean = {
+		(save_root != null && Backup.tripleRepetition(this, save_root)) || every_possible_move_nocheck(playing).isEmpty
+	}
 
-    def victory : Boolean = {
-        over && inCheck(playing)
-    }
+	def victory : Boolean = {
+		over && inCheck(playing)
+	}
 
-    def pat : Boolean = {
-        !victory && over
-    }
+	def pat : Boolean = {
+		!victory && over
+	}
 
-    /** Retourne la liste des positions attaquées */
-    def every_attacked_cells(player : Int) : List[Pos] = {
-       	var pos_move : List[Pos] = List()
+	/** Retourne la liste des positions attaquées */
+	def every_attacked_cells(player : Int) : List[Pos] = {
+	   	var pos_move : List[Pos] = List()
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				if ( board(i)(j) != null && board(i)(j).player == player ) {
@@ -141,7 +148,7 @@ class Game {
 			}
 		}
 		return pos_move
-    }
+	}
 
 	/** Retourne la liste des positions où le joueur donné peut déplacer une pièce mais en se mettant en echec */
 	def every_possible_move(player : Int) : List[Pos] = { 
@@ -198,31 +205,34 @@ class Game {
 		return every_attacked_cells(1 - player).contains(Pos(i, j))
 	}
 
-    def copy : Game = {
-        val g = new Game
-        // g.players = players //!\\ Checker la stabilité de cette ligne si elle a un interêt un jours 
-        g.playing = playing
-        g.turn = turn
-        // g.changed -> ne semble pas pertinent
-        g.board = Array.ofDim(8, 8)
+	def is_copy_of(game_c : Game) : Boolean = {
+		var ret = true
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				val p1 = board(i)(j)
+				val p2 = game_c.board(i)(j)
+				ret = ret && ((p1 == p2) // Gère le cas "null == null"
+					|| ((p1 != null && p2 != null) && (p1.role, p1.player) == (p2.role, p2.player)))
+			}
+		}
+		return ret
+	}
+
+	def copy : Game = {
+		val g = new Game
+		// g.players = players //!\\ Checker la stabilité de cette ligne si elle a un interêt un jours 
+		g.playing = playing
+		g.turn = turn
+		// g.changed -> ne semble pas pertinent
+		g.board = Array.ofDim(8, 8)
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				val c = board(i)(j)
-                if( c != null) {
-    				g.board(i)(j) = board(i)(j).role match {
-	    				case "king" => new King(g, c.player, c.pos)
-		    			case "queen" => new Queen(g, c.player, c.pos)
-			    		case "rook" => new Rook(g, c.player, c.pos)
-				    	case "bishop" => new Bishop(g, c.player, c.pos)
-					    case "knight" => new Knight(g, c.player, c.pos)
-    					case "pawn" => new Pawn(g, c.player, c.pos)
-	    				case _ => null
-              		}
-          	    	g.board(i)(j).already_moved = c.already_moved
-            	}
-            }
-        }
-        return g
-    }
+				if( c != null) {
+					g.board(i)(j) = c.copy_for(g)
+				}
+			}
+		}
+		return g
+	}
 }
-
