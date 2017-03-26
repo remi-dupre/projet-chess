@@ -126,7 +126,7 @@ class Game {
 	}
 
 	def over : Boolean = {
-		(save_root != null && Backup.tripleRepetition(this, save_root)) || every_possible_move_nocheck(playing).isEmpty
+		(save_root != null && Backup.tripleRepetition(this, save_root)) || legal_moves(playing).isEmpty
 	}
 
 	def victory : Boolean = {
@@ -175,11 +175,6 @@ class Game {
 		}
 		return pos_move
 	}
-	def every_possible_move_nocheck(player : Int) : List[Pos] = {
-		//println("deprecated every_possible_move_nocheck")
-		return legal_moves(player)
-	}
-
 
 	/** voir si le roi du player est en echec */
 	def inCheck(player : Int) : Boolean = {
