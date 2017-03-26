@@ -5,7 +5,7 @@ import java.util.TimerTask
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
 	def wait_play : Unit
-    def get_promotion_type : String
+	def get_promotion_type : String
 }
 
 /**
@@ -19,9 +19,9 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 		interface.state = SelectPiece(this)
 	}
 
-    override def get_promotion_type : String = {
-        return interface.promo_btn.role
-    }
+	override def get_promotion_type : String = {
+		return interface.promo_btn.role
+	}
 
 	var selected = (-1, -1) /** La pièce sélectionnée */
 	/** Sélectonne un pièce si possible
@@ -52,9 +52,9 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
 		var pos_move : List[(Piece, Pos)] = List()
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
-                val piece = game.board(i)(j)
-                if(piece != null && piece.player == color) {
-				    for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
+				val piece = game.board(i)(j)
+				if(piece != null && piece.player == color) {
+					for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
 						pos_move = (piece, pos) :: pos_move
 					}
 				}
@@ -63,7 +63,7 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
 
 		Thread.sleep(speed)
 		val t = new Thread(new Runnable() {
-         	def run() {
+		 	def run() {
 				val (piece, dest) = Random.shuffle(pos_move).head
 				game.move(piece, dest)
 				Thread.currentThread().interrupt()
@@ -72,8 +72,8 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
 		t.start()
 	}
 
-    override def get_promotion_type : String =  {
-        "queen"
-    }
+	override def get_promotion_type : String =  {
+		"queen"
+	}
 }
 
