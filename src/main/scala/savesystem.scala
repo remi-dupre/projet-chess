@@ -49,6 +49,19 @@ object Backup {
 		return game1.is_copy_of(game2)
 	}
 
+	def hasPawnMoved(game1:Game, game2:Game): Boolean = {
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if(game1.board(i)(j) != null && game1.board(i)(j).role == "pawn") {
+					if(game2.board(i)(j) == null || game2.board(i)(j).role != "pawn") {
+						return true
+					}
+				}
+			}
+		}
+		return false
+	}
+
 	def tripleRepetition(game:Game, save:Save): Boolean = {
 		val n = compteur(game)
 		var i = 0
@@ -72,7 +85,29 @@ object Backup {
 		return count_repet(game, listGame)
 	}
 
-	def cinquanteCoup(game:Game, save:Save) = {}
+	def cinquanteCoup(game:Game, save:Save): Boolean = {
+		val n = compteur(game)
+		val listGame = createGameListFromSave(new Game(), save).reverse
+		def count_repet(game:Game, listGame:List[Game],k) : Boolean = {
+			if(k == 50) {
+				return true
+			}
+			if(listGame.isEmpty) {
+				return false
+			}
+			else {
+				val game1 = listGame.head
+				if(hasPawnMoved(game, game1)) {
+					return false
+				}
+				if(n != compteur(game1)) {
+					return false
+				}
+				return count_repet(game, listGame.tail, k+1)
+			}
+		}
+		return count_repet(game, listGame, 0)
+	}
 
 	def addMoveToSave(move: Move, save: Save):Unit = {
 		if(save.saveList.isEmpty) {

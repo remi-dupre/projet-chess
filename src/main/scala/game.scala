@@ -126,7 +126,7 @@ class Game {
 	}
 
 	def over : Boolean = {
-		(save_root != null && Backup.tripleRepetition(this, save_root)) || every_possible_move_nocheck(playing).isEmpty
+		every_possible_move_nocheck(playing).isEmpty || (save_root != null && Backup.tripleRepetition(this, save_root)) ||  impossibilityOfCheckMate(this)
 	}
 
 	def victory : Boolean = {
@@ -234,5 +234,42 @@ class Game {
 			}
 		}
 		return g
+	}
+
+	def impossibilityOfCheckMate(game:Game) : Boolean = {
+		var white = 0
+		var black = 0
+		var whiteBishop = 0
+		var blackBishop = 0
+		var res = false
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if( board(i)(j) != null && board(i)(j).role != "king") {
+					if( board(i)(j).role == "queen" || board(i)(j).role == "rook" || board(i)(j).role == "pawn") {
+						return false
+					}
+					else if(board(i)(j).role == "bishop") {
+						if(board(i)(j).player == 0) {
+							white = white + 1
+							whiteBishop = 2- (i+j)%2
+						}
+						else {
+							black = black + 1
+							blackBishop = 2 - (i+j)%2
+						}
+					}
+					else {
+						if(board(i)(j).player == 0) {
+							white = white + 1
+						}
+						else {
+							black = black + 1
+						}
+					}
+				}
+			}
+		}
+		res = res || (white == 0 && black <= 1) || (white <= 1 && black == 0) || ( white == 1 && black == 1 && whiteBishop != 0 && whiteBishop == blackBishop )
+		return res
 	}
 }

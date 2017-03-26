@@ -208,9 +208,9 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 			}
 		}
 		if (in_board(x-1,y) && game.board(x-1)(y) != null) {
-			if(game.board(x-1)(y).role == "pawn")
-			  && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1))
-			  && (game.board(x-1)(y).player == (1 - player)) {
+			if((game.board(x-1)(y).role == "pawn")
+			  && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1)
+			  && (game.board(x-1)(y).player == (1 - player))) {
 				pos_move = Pos(x-1, y+vecteur)::pos_move
 			}
 		}
