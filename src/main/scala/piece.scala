@@ -76,6 +76,15 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 		return pos_move
 	}
 }
+class Pyramid(game: Game, player: Int, m_pos: Pos) extends Piece(game, player, m_pos) {
+	override def role = "pyramid"
+	override def attacked_cells() : List[Pos] = { 
+		return List() 
+	}
+	override def possible_move() : List[Pos] = {
+		return List()
+	}
+}
 
 class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "king"

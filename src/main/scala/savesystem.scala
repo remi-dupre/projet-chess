@@ -92,7 +92,7 @@ object Backup {
 	def cinquanteCoup(game:Game, save:Save): Boolean = {
 		val n = compteur(game)
 		val listGame = createGameListFromSave(new Game(), save).reverse
-		def count_repet(game:Game, listGame:List[Game],k) : Boolean = {
+		def count_repet_bis(game:Game, listGame:List[Game], k:Int) : Boolean = {
 			if(k == 50) {
 				return true
 			}
@@ -107,10 +107,10 @@ object Backup {
 				if(n != compteur(game1)) {
 					return false
 				}
-				return count_repet(game, listGame.tail, k+1)
+				return count_repet_bis(game, listGame.tail, k+1)
 			}
 		}
-		return count_repet(game, listGame, 0)
+		return count_repet_bis(game, listGame, 0)
 	}
 
 	def addMoveToSave(move: Move, save: Save):Unit = {

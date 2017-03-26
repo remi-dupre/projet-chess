@@ -99,8 +99,12 @@ class GameWin() extends MainFrame {
 		}
 		if(game.pat) {
 			mainWin.msg.text = "PAT "
-			if(game.triple_repetition)
+			if(game.triple_repetition) {
 				mainWin.msg.text += "(triple répétition) "
+			}
+			if(game.impossibilityOfCheckMate) {
+				mainWin.msg.text += "(Impossibilité de Mater) "
+			}
 		}
 		else if(game.over) {
 			mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
