@@ -48,12 +48,12 @@ class GameWin() extends MainFrame {
 		close()
 		Main.menu.visible = true
 	})
-	var label_timer = new TimeCounter()
+	var label_timer = new TimeCounter(game)
 
 	/** L'ensemble des cases de la partie */
 	val grid = Array.ofDim[CellBtn](8, 8)
 	contents = new BoxPanel(Orientation.Vertical) {
-		// main grid
+		// Main grid
 		preferredSize = new Dimension(600, 700)
 		contents += new GridPanel(8, 8) {
 			minimumSize = new Dimension(500, 500)
@@ -65,7 +65,7 @@ class GameWin() extends MainFrame {
 			}
 		}
 
-		// bottom bar
+		// Bottom bar
 		contents += new GridPanel(1,3) {
 			preferredSize = new Dimension(1000, 60);
 			contents += leave_btn
@@ -73,7 +73,6 @@ class GameWin() extends MainFrame {
 			contents += promo_btn
 			promo_btn.icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
 
-			//contents += new Separator(Orientation.Horizontal) {}
 			contents += msg
 			contents += label_timer
 		}
