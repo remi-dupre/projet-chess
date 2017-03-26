@@ -34,41 +34,6 @@ object Backup {
 			return save.game_state :: createGameListFromSave(save.game_state, save.saveList.head)
 	}
 
-	def compteur(game:Game) : Int = {
-		var n = 0
-		for(i <- 0 to 7) {
-			for(j <- 0 to 7) {
-				if (game.board(i)(j) != null) {
-					n = n+1
-				}
-			}
-		}
-		return n
-	}
-
-	def tripleRepetition(game:Game, save:Save): Boolean = {
-		val n = compteur(game)
-		var i = 0
-		val listGame = createGameListFromSave(new Game(), save).reverse
-		def count_repet(game:Game, listGame:List[Game]) : Boolean = {
-			if(listGame.isEmpty) {
-				return false
-			}
-			else {
-				val hd_game = listGame.head
-				if( game.is_copy_of(hd_game)
-				  && game.legal_moves(0) == hd_game.legal_moves(0)
-				  && game.legal_moves(1) == hd_game.legal_moves(1) ) {
-					i += 1
-					if(i == 3)
-						return true
-				}
-				return count_repet(game, listGame.tail)
-			}
-		}
-		return count_repet(game, listGame)
-	}
-
 	def cinquanteCoup(game:Game, save:Save) = {}
 
 	def addMoveToSave(move: Move, save: Save):Unit = {

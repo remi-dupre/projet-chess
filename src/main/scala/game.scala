@@ -125,8 +125,36 @@ class Game {
 		return false
 	}
 
+	def triple_repetition : Boolean = {
+		if(save_root == null)
+			return false
+
+		val n =  nb_pieces
+		var i = 0
+		val listGame = Backup.createGameListFromSave(new Game(), save_root).reverse
+		def count_repet(listGame:List[Game]) : Boolean = {
+			if(listGame.isEmpty) {
+				return false
+			}
+			else {
+				val hd_game = listGame.head
+				if( n != hd_game.nb_pieces )
+					return false
+				if( is_copy_of(hd_game)
+				  && legal_moves(0) == hd_game.legal_moves(0)
+				  && legal_moves(1) == hd_game.legal_moves(1) ) {
+					i += 1
+					if(i == 3)
+						return true
+				}
+				return count_repet(listGame.tail)
+			}
+		}
+		return count_repet(listGame)
+	}
+
 	def over : Boolean = {
-		(save_root != null && Backup.tripleRepetition(this, save_root)) || legal_moves(playing).isEmpty
+		triple_repetition || legal_moves(playing).isEmpty
 	}
 
 	def victory : Boolean = {
@@ -135,6 +163,15 @@ class Game {
 
 	def pat : Boolean = {
 		!victory && over
+	}
+
+	def nb_pieces : Int = {
+		var n = 0
+		for(i <- 0 to 7)
+		for(j <- 0 to 7)
+			if( board(i)(j) != null )
+				n += 1
+		return n
 	}
 
 	/** Retourne la liste des positions attaquées */
