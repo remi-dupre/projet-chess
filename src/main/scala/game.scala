@@ -164,7 +164,7 @@ class Game {
 	}
 
 	/** retourn la liste des positions où le jouer donné peut LEGALEMENT déplacer sa pièce **/
-	def every_possible_move_nocheck(player : Int) : List[Pos] = { 
+	def legal_moves(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
@@ -174,6 +174,10 @@ class Game {
 			}
 		}
 		return pos_move
+	}
+	def every_possible_move_nocheck(player : Int) : List[Pos] = {
+		//println("deprecated every_possible_move_nocheck")
+		return legal_moves(player)
 	}
 
 
@@ -206,16 +210,17 @@ class Game {
 	}
 
 	def is_copy_of(game_c : Game) : Boolean = {
-		var ret = true
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				val p1 = board(i)(j)
 				val p2 = game_c.board(i)(j)
-				ret = ret && ((p1 == p2) // Gère le cas "null == null"
-					|| ((p1 != null && p2 != null) && (p1.role, p1.player) == (p2.role, p2.player)))
+				if( !(p1 == null && p2 == null) )
+				if( (p1 != null && p2 == null) || (p1 == null && p2 != null)
+				  || (p1.role != p2.role) || (p1.player != p2.player) )
+					return false
 			}
 		}
-		return ret
+		return true
 	}
 
 	def copy : Game = {
