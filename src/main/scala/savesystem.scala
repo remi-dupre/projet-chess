@@ -5,11 +5,12 @@ case class Move(from: Pos, to: Pos) {
 	var promote_to : String = null
 }
 
-case class Save(var move: Move, var saveList: List[Save])
+case class Save(var move: Move, var saveList: List[Save]) {
+	var game_state : Game = null
+}
 
 class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
 	override def wait_play = {}
-
 	override def get_promotion_type : String = {
 		return promotion_type
 	}
@@ -18,16 +19,19 @@ class FakePlayer(color : Int, game : Game, promotion_type : String) extends Play
 object Backup {
 	/* Algebrique notation : n. (Z)z9 (Z)z9 */
 	def createGameListFromSave(game:Game, save:Save) : List[Game] = {
-		val game_c = game.copy
-		game_c.players(game.playing) = new FakePlayer(game.playing, game_c, save.move.promote_to)
-		game_c.move(
-			game_c.board(save.move.from.x)(save.move.from.y),
-			save.move.to
-		)
+		if(save.game_state == null) {
+			val game_c = game.copy
+			game_c.players(game.playing) = new FakePlayer(game.playing, game_c, save.move.promote_to)
+			game_c.move(
+				game_c.board(save.move.from.x)(save.move.from.y),
+				save.move.to
+			)
+			save.game_state = game_c
+		}
 		if( save.saveList.isEmpty )
-			return List(game_c)
+			return List(save.game_state)
 		else
-			return game_c::createGameListFromSave(game_c, save.saveList.head)
+			return save.game_state :: createGameListFromSave(save.game_state, save.saveList.head)
 	}
 
 	def compteur(game:Game) : Int = {

@@ -22,8 +22,8 @@ case class Wait() extends InterfaceState
  * (au passage elle génère une partie dans sont constructeur)
  */
 class GameWin() extends MainFrame {
-    preferredSize = new Dimension(600, 630)
-    minimumSize = new Dimension(500, 530)
+	preferredSize = new Dimension(600, 630)
+	minimumSize = new Dimension(500, 530)
 	/* Caractéristiques de la fenêtre */
 	val mainWin = this
 	title = "Chess"
@@ -43,40 +43,40 @@ class GameWin() extends MainFrame {
 	/** État de la partie */
 	var state : InterfaceState = new Wait()
 
-    val msg = new Label("test")
-    val promo_btn = new PromoBtn()
-    val leave_btn = new Button(Action("Leave") {
-        close()
-        Main.menu.visible = true
-    })
+	val msg = new Label("test")
+	val promo_btn = new PromoBtn()
+	val leave_btn = new Button(Action("Menu") {
+		close()
+		Main.menu.visible = true
+	})
 
 	/** L'ensemble des cases de la partie */
 	val grid = Array.ofDim[CellBtn](8, 8)
 	contents = new BoxPanel(Orientation.Vertical) {
-        // main grid
-	    preferredSize = new Dimension(600, 700)
-        contents += new GridPanel(8, 8) {
-        	minimumSize = new Dimension(500, 500)
-		    for(j <- 0 to 7) {
-			    for(i <- 0 to 7) {
-				    grid(i)(j) = new CellBtn(i, j, game, mainWin)
-    				contents += grid(i)(j)
-	    		}
-		    }
-	    }
+		// main grid
+		preferredSize = new Dimension(600, 700)
+		contents += new GridPanel(8, 8) {
+			minimumSize = new Dimension(500, 500)
+			for(j <- 0 to 7) {
+				for(i <- 0 to 7) {
+					grid(i)(j) = new CellBtn(i, j, game, mainWin)
+					contents += grid(i)(j)
+				}
+			}
+		}
 
-        // bottom bar
-        contents += new GridPanel(1,3) {
-            preferredSize = new Dimension(1000, 60);
-            contents += leave_btn
-            
-            contents += promo_btn
-	        promo_btn.icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
+		// bottom bar
+		contents += new GridPanel(1,3) {
+			preferredSize = new Dimension(1000, 60);
+			contents += leave_btn
+			
+			contents += promo_btn
+			promo_btn.icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
 
-            //contents += new Separator(Orientation.Horizontal) {}
-            contents += msg
-        }
-    }
+			//contents += new Separator(Orientation.Horizontal) {}
+			contents += msg
+		}
+	}
 
 
 	/** Met en valeur les cases sur lesquelles la pièce peut être déplacée */
@@ -93,17 +93,19 @@ class GameWin() extends MainFrame {
 				grid(i)(j).refresh
 			}
 		}
-        mainWin.msg.text = "Au " + (if(game.playing == 0) "blanc" else "noir")  + " de jouer "
-        if(game.inCheck(game.playing)) {
-            mainWin.msg.text += "(Échec) "
-        }
-        if(game.pat) {
-            mainWin.msg.text = "PAT "
-        }
-        else if(game.over) {
-            mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
-        }
-    }
+		mainWin.msg.text = "Au " + (if(game.playing == 0) "blanc" else "noir")  + " de jouer "
+		if(game.inCheck(game.playing)) {
+			mainWin.msg.text += "(Échec) "
+		}
+		if(game.pat) {
+			mainWin.msg.text = "PAT "
+			if(game.triple_repetition)
+				mainWin.msg.text += "(triple répétition) "
+		}
+		else if(game.over) {
+			mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
+		}
+	}
 
 	centerOnScreen()
 	refresh
@@ -143,14 +145,14 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 			case WaitDirection(p) =>
 				if(p.move(x, y)) {
 					game.changed()
-                }
-                else if (p.select(x, y)) {
+				}
+				else if (p.select(x, y)) {
 					var piece = game.getPiece(x, y)
 					if(!piece.removeInCheckMoves(piece.possible_move()).isEmpty) {
-                        mainWin.refresh
+						mainWin.refresh
 						mainWin.highlight_possible(game.getPiece(x, y))
-                    }
-                }
+					}
+				}
 		}
 	}
 	
@@ -165,13 +167,13 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 		background = if((x+y) % 2 == 0) Color.white else Color.darkGray
 		val player = if(game.cell_player(x, y) == 0) "white" else "black"
 		val role = game.cell_role(x, y)
-        if(role == "empty") {
-            icon = null
-        }
-        else {
+		if(role == "empty") {
+			icon = null
+		}
+		else {
 			icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png") ; disabledIcon = icon
 		}
-        enabled = !game.over
+		enabled = !game.over
 	}
 }
 
@@ -179,18 +181,18 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
  * Sélectionne la pièce vers laquelle promouvoir
  */
 class PromoBtn() extends Button {
-    val promo_btn = this
-    val roles = Array("queen", "knight", "bishop", "rook")
-    var r_i = 0
-    preferredSize = new Dimension(300, 500)
+	val promo_btn = this
+	val roles = Array("queen", "knight", "bishop", "rook")
+	var r_i = 0
+	preferredSize = new Dimension(300, 500)
 	
-    action = Action("promotion") {
-        promo_btn.r_i = (promo_btn.r_i+1) % 4
-	    icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
-    }
+	action = Action("promotion") {
+		promo_btn.r_i = (promo_btn.r_i+1) % 4
+		icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
+	}
 
-    def role = {
-        roles(r_i)
-    }
+	def role = {
+		roles(r_i)
+	}
 }
 

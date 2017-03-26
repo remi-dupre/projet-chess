@@ -2,7 +2,7 @@ import scala.math.abs
 
 abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	var already_moved : Int = -1
-	var Pawn_Rules : Boolean = false
+	var pawn_rules : Boolean = false
 	def role : String
 
 	def copy_for(new_game : Game) : Piece = {
@@ -15,7 +15,7 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 			case "pawn" => new Pawn(new_game, player, pos)
 		}
 		ret.already_moved = already_moved
-		ret.Pawn_Rules = Pawn_Rules
+		ret.pawn_rules = pawn_rules
 		return ret
 	}
 
@@ -200,17 +200,17 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		}
 		
 		/* Règle de la prise en passant */
-		if (in_board(x+1,y) && game.board(x+1)(y) != null) {
-			if(game.board(x+1)(y).role == "pawn"
-			  && game.board(x+1)(y).Pawn_Rules == true && game.board(x+1)(y).already_moved == (game.turn -1)
-			  && game.board(x+1)(y).player == (1 - player)) {
+		if( in_board(x+1,y) && game.board(x+1)(y) != null ) {
+			if( game.board(x+1)(y).role == "pawn"
+			  && game.board(x+1)(y).pawn_rules == true && game.board(x+1)(y).already_moved == (game.turn -1)
+			  && game.board(x+1)(y).player == (1-player)) {
 				pos_move = Pos(x+1, y+vecteur)::pos_move
 			}
 		}
-		if (in_board(x-1,y) && game.board(x-1)(y) != null) {
-			if((game.board(x-1)(y).role == "pawn")
-			  && game.board(x-1)(y).Pawn_Rules == true && game.board(x-1)(y).already_moved == (game.turn -1)
-			  && (game.board(x-1)(y).player == (1 - player))) {
+		if( in_board(x-1,y) && game.board(x-1)(y) != null ) {
+			if( game.board(x-1)(y).role == "pawn"
+			  && game.board(x-1)(y).pawn_rules == true && game.board(x-1)(y).already_moved == (game.turn-1)
+			  && game.board(x-1)(y).player == (1-player) ) {
 				pos_move = Pos(x-1, y+vecteur)::pos_move
 			}
 		}
@@ -241,7 +241,7 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 	override def move_to(new_pos : Pos) {
 		val dir_y = -1 + 2*player
 		if(abs(pos.y - new_pos.y) == 2) { // Le pion peut être mangé par prise en passant
-			Pawn_Rules = true
+			pawn_rules = true
 		}
 		else if(abs(pos.x - new_pos.x) == 1 // Un mouvement diagonal
 		  && game.board(new_pos.x)(new_pos.y - dir_y) != null

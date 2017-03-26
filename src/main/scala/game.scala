@@ -125,8 +125,36 @@ class Game {
 		return false
 	}
 
+	def triple_repetition : Boolean = {
+		if(save_root == null)
+			return false
+
+		val n =  nb_pieces
+		var i = 0
+		val listGame = Backup.createGameListFromSave(new Game(), save_root).reverse
+		def count_repet(listGame:List[Game]) : Boolean = {
+			if(listGame.isEmpty) {
+				return false
+			}
+			else {
+				val hd_game = listGame.head
+				if( n != hd_game.nb_pieces )
+					return false
+				if( is_copy_of(hd_game)
+				  && legal_moves(0) == hd_game.legal_moves(0)
+				  && legal_moves(1) == hd_game.legal_moves(1) ) {
+					i += 1
+					if(i == 3)
+						return true
+				}
+				return count_repet(listGame.tail)
+			}
+		}
+		return count_repet(listGame)
+	}
+
 	def over : Boolean = {
-		every_possible_move_nocheck(playing).isEmpty || (save_root != null && Backup.tripleRepetition(this, save_root)) ||  impossibilityOfCheckMate(this)
+		triple_repetition || legal_moves(playing).isEmpty || impossibilityOfCheckMate(this)
 	}
 
 	def victory : Boolean = {
@@ -135,6 +163,15 @@ class Game {
 
 	def pat : Boolean = {
 		!victory && over
+	}
+
+	def nb_pieces : Int = {
+		var n = 0
+		for(i <- 0 to 7)
+		for(j <- 0 to 7)
+			if( board(i)(j) != null )
+				n += 1
+		return n
 	}
 
 	/** Retourne la liste des positions attaquées */
@@ -164,7 +201,7 @@ class Game {
 	}
 
 	/** retourn la liste des positions où le jouer donné peut LEGALEMENT déplacer sa pièce **/
-	def every_possible_move_nocheck(player : Int) : List[Pos] = { 
+	def legal_moves(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
@@ -175,7 +212,6 @@ class Game {
 		}
 		return pos_move
 	}
-
 
 	/** voir si le roi du player est en echec */
 	def inCheck(player : Int) : Boolean = {
@@ -206,16 +242,17 @@ class Game {
 	}
 
 	def is_copy_of(game_c : Game) : Boolean = {
-		var ret = true
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				val p1 = board(i)(j)
 				val p2 = game_c.board(i)(j)
-				ret = ret && ((p1 == p2) // Gère le cas "null == null"
-					|| ((p1 != null && p2 != null) && (p1.role, p1.player) == (p2.role, p2.player)))
+				if( !(p1 == null && p2 == null) )
+				if( (p1 != null && p2 == null) || (p1 == null && p2 != null)
+				  || (p1.role != p2.role) || (p1.player != p2.player) )
+					return false
 			}
 		}
-		return ret
+		return true
 	}
 
 	def copy : Game = {
