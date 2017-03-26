@@ -5,12 +5,13 @@ case class Pos(x : Int, y : Int)
 /**
  * Représente une partie d'échecs
  */
-class Game {
+class Game() {
 	/** Plateau de jeu */
 	var board = Array.ofDim[Piece](8, 8)
 
 	/** Les deux joueurs */
 	val players : Array[Player] = Array(null, null)
+	var timers : Array[Cadency] = null
 
 	/** L'indice dans 'players' du joueur qui doit jouer */
 	/** 0 = blanc, 1 = noir **/

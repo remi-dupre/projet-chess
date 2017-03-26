@@ -1,3 +1,6 @@
+import swing._
+
+
 case class Period(var duration : Int, var moves : Int)
 
 class Cadency(a_periods : List[Period]) {
@@ -36,4 +39,28 @@ class Cadency(a_periods : List[Period]) {
 			periods.head.duration -= time
 		}
 	}
+
+	/** Copy a Cadency */
+	def copy : Cadency = {
+		return new Cadency(
+			periods.map(
+				(p : Period) => new Period(p.duration, p.moves)
+			)
+		)
+	}
+}
+
+class TimeCounter() extends Label {
+	val counter_label = this
+	val begin = tools.timestamp
+
+	val thread = new Thread(new Runnable() {
+	 	def run() {
+			while(true) {
+				counter_label.text = (tools.timestamp - begin) + "s"
+				Thread.sleep(1000)
+			}
+		}
+	});
+	thread.start()
 }

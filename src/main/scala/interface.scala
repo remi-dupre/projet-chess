@@ -35,7 +35,6 @@ class GameWin() extends MainFrame {
 	}
 
 	override def closeOperation() {
-		// game.pieces = List()
 		Thread.sleep(100)
 		System.exit(0)
 	}
@@ -49,6 +48,7 @@ class GameWin() extends MainFrame {
 		close()
 		Main.menu.visible = true
 	})
+	var label_timer = new TimeCounter()
 
 	/** L'ensemble des cases de la partie */
 	val grid = Array.ofDim[CellBtn](8, 8)
@@ -75,6 +75,7 @@ class GameWin() extends MainFrame {
 
 			//contents += new Separator(Orientation.Horizontal) {}
 			contents += msg
+			contents += label_timer
 		}
 	}
 
