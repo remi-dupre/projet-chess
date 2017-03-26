@@ -13,8 +13,8 @@ object Backup {
 		}
 		else {
 			val game_copy = game.copy
-			game.move(save.move.p, save.move.pos)
-			return game_copy::( createGameListFromSave(game, save.saveList.head))
+			/*game_copy.move(save.move.p, save.move.pos)*/
+			return game::( createGameListFromSave(game_copy, save.saveList.head))
 		}
 	}
 
@@ -40,7 +40,7 @@ object Backup {
 	def tripleRepetition(game:Game, save:Save): Boolean = {
 		val n = compteur(game)
 		var i = 0
-		val listGame = createGameListFromSave(game, save).reverse
+		val listGame = createGameListFromSave(new Game(), save).reverse
 		def aux(game:Game, listGame:List[Game]) : Boolean = {
 			if(listGame.isEmpty) {
 				return false
