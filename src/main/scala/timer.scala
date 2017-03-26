@@ -5,7 +5,7 @@ class Cadency(a_periods : List[Period]) {
 
 	/** Le nombre de moves sur la période actuelle */
 	def period_moves : Int = {
-		if(periods.is_empty) {
+		if(periods.isEmpty) {
 			return 0
 		}
 		else {
@@ -15,7 +15,7 @@ class Cadency(a_periods : List[Period]) {
 
 	/** Donne le temps qu'on peut passer à faire un tour dans l'état actuel */
 	def free_time : Int = {
-		if(periods.is_empty) {
+		if(periods.isEmpty) {
 			return -1
 		}
 		else {
@@ -29,7 +29,7 @@ class Cadency(a_periods : List[Period]) {
 			periods = List()
 		}
 		else if(periods.head.moves == 1) { // On a joué tous les coups de la période
-			periods = periods.head
+			periods = periods.tail
 		}
 		else {
 			periods.head.moves -= 1
