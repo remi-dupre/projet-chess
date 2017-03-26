@@ -9,7 +9,6 @@ case class Save(var move: Move, var saveList: List[Save])
 
 class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
 	override def wait_play = {}
-
 	override def get_promotion_type : String = {
 		return promotion_type
 	}
@@ -42,13 +41,6 @@ object Backup {
 		return n
 	}
 
-	def isIdentique(game1:Game, game2:Game): Boolean = {
-/*		var res = game1.board == game2.board
-		res = res && game1.every_possible_move_nocheck(0) == game2.every_possible_move_nocheck(0)
-		res = res && game1.every_possible_move_nocheck(1) == game2.every_possible_move_nocheck(1)*/
-		return game1.is_copy_of(game2)
-	}
-
 	def tripleRepetition(game:Game, save:Save): Boolean = {
 		val n = compteur(game)
 		var i = 0
@@ -60,8 +52,10 @@ object Backup {
 			else {
 				val hd_game = listGame.head
 				if(n != compteur(hd_game))
-					return false
-				if(isIdentique(game, hd_game)) {
+					println("pouet")
+				if( game.is_copy_of(hd_game)
+				  && game.legal_moves(0) == hd_game.legal_moves(0)
+				  && game.legal_moves(1) == hd_game.legal_moves(1) ) {
 					i += 1
 					if(i == 3)
 						return true
