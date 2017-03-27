@@ -1,5 +1,5 @@
 import javax.swing.ImageIcon
-import java.time.Instant.now
+/*import java.time.Instant.now*/
 
 object tools {
 	/** http://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon */
@@ -11,6 +11,7 @@ object tools {
 	}
 
 	def timestamp : Long = {
-		return now.getEpochSecond
+		return 0
+		/*return now.getEpochSecond*/
 	}
 }

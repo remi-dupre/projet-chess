@@ -51,24 +51,8 @@ class Game() {
 		board(5)(0) = new Bishop(this, 1, Pos(5, 0))
 	}
 
-	def init_proteus = {
-		for(i <- 0 to 3) {
-			board(2*i)(6) = new Dice(this, 0, Pos(2*i, 6))
-			board(2*i+1)(7) = new Dice(this, 0, Pos(2*i+1, 7))
-			board(2*i)(0) = new Dice(this, 1, Pos(2*i, 0))
-			board(2*i+1)(1) = new Dice(this, 1, Pos(2*i, 0))
-		}
-	}
-
 	def start = {
 		init
-		playing = 0
-		changed()
-		players(playing).wait_play
-	}
-
-	def start_proteus = {
-		init_proteus
 		playing = 0
 		changed()
 		players(playing).wait_play
