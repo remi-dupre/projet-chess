@@ -58,7 +58,84 @@ class FakePlayer(color : Int, game : Game, promotion_type : String) extends Play
 object Backup {
 	/* Algebrique notation : n. (Z)z9 (Z)z9 */
 
-	def cinquanteCoup(game:Game, save:Save) = {}
+	def compteur(game:Game) : Int = {
+		var n = 0
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if (game.board(i)(j) != null) {
+					n = n+1
+				}
+			}
+		}
+		return n
+	}
+
+	def isIdentique(game1:Game, game2:Game): Boolean = {
+/*		var res = game1.board == game2.board
+		res = res && game1.every_possible_move_nocheck(0) == game2.every_possible_move_nocheck(0)
+		res = res && game1.every_possible_move_nocheck(1) == game2.every_possible_move_nocheck(1)*/
+		return game1.is_copy_of(game2)
+	}
+
+	def hasPawnMoved(game1:Game, game2:Game): Boolean = {
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				if(game1.board(i)(j) != null && game1.board(i)(j).role == "pawn") {
+					if(game2.board(i)(j) == null || game2.board(i)(j).role != "pawn") {
+						return true
+					}
+				}
+			}
+		}
+		return false
+	}
+
+	def tripleRepetition(game:Game, save:Save): Boolean = {
+		val n = compteur(game)
+		var i = 0
+		val listGame = createGameListFromSave(new Game(), save).reverse
+		def count_repet(game:Game, listGame:List[Game]) : Boolean = {
+			if(listGame.isEmpty) {
+				return false
+			}
+			else {
+				val hd_game = listGame.head
+				if(n != compteur(hd_game))
+					return false
+				if(isIdentique(game, hd_game)) {
+					i += 1
+					if(i == 3)
+						return true
+				}
+				return count_repet(game, listGame.tail)
+			}
+		}
+		return count_repet(game, listGame)
+	}
+
+	def cinquanteCoup(game:Game, save:Save): Boolean = {
+		val n = compteur(game)
+		val listGame = createGameListFromSave(new Game(), save).reverse
+		def count_repet_bis(game:Game, listGame:List[Game], k:Int) : Boolean = {
+			if(k == 50) {
+				return true
+			}
+			if(listGame.isEmpty) {
+				return false
+			}
+			else {
+				val game1 = listGame.head
+				if(hasPawnMoved(game, game1)) {
+					return false
+				}
+				if(n != compteur(game1)) {
+					return false
+				}
+				return count_repet_bis(game, listGame.tail, k+1)
+			}
+		}
+		return count_repet_bis(game, listGame, 0)
+	}
 
 	def addMoveToSave(move: Move, save: Save):Unit = {
 		if(save.saveList.isEmpty) {
