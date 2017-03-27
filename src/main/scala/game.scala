@@ -10,7 +10,7 @@ class Game() {
 	var board = Array.ofDim[Piece](8, 8)
 
 	/** Les deux joueurs */
-	val players : Array[Player] = Array(null, null)
+	var players : Array[Player] = Array(null, null)
 	val timer = new Cadency(List(
 		Period(60, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(10, 1)
 	))
@@ -53,13 +53,13 @@ class Game() {
 		board(5)(7) = new Bishop(this, 0, Pos(5, 7))
 		board(2)(0) = new Bishop(this, 1, Pos(2, 0))
 		board(5)(0) = new Bishop(this, 1, Pos(5, 0))
+		turn_start = tools.timestamp
 	}
 
 	def start = {
 		init
 		playing = 0
 		changed()
-		turn_start = tools.timestamp
 		players(playing).wait_play
 	}
 

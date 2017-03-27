@@ -29,7 +29,7 @@ class GameWin() extends MainFrame {
 	title = "Chess"
 
 	/** La partie associée */
-	val game = new Game()
+	var game = new Game()
 	game.changed = () => {
 		mainWin.refresh
 	}

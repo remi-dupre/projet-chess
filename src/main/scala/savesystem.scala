@@ -7,6 +7,24 @@ case class Move(from: Pos, to: Pos) {
 
 case class Save(var move: Move, var saveList: List[Save]) {
 	var game_state : Game = null
+	
+	def apply_moves(game : Game) : Unit = {
+		if(!saveList.isEmpty) {
+			saveList.head.apply_moves(game)
+		}
+		val save_players = game.players
+		game.players = Array(
+			new FakePlayer(0, game, move.promote_to),
+			new FakePlayer(1, game, move.promote_to)
+		)
+		println(move.from)
+		println(move.to)
+		game.move(
+			game.board(move.from.x)(move.from.y),
+			move.to
+		)
+		game.players = save_players
+	}
 }
 
 class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
@@ -44,9 +62,10 @@ object Backup {
 			addMoveToSave(move, save.saveList.head)
 		}
 	}
-	def createSaveFromPGN(filename:String, game: Game) : List[Move] = {
+	def createSaveFromPGN(filename:String) : Save = {
+		var game = new Game()
 		var bool = false
-		var move_list : List[Move] = List()
+		var move_list : Save = null
 		var n = 0
 		var i = -1
 		var j = -1
@@ -73,18 +92,30 @@ object Backup {
 					}
 
 					if ((c - '0') >= 1 && (c - '0') <= 8 && bloc == 1) {
-						j = (c - 'a' - 1)
+						j = c - '1'
 					}
 
 					if ((c - 'a') >= 0 && (c - 'a') <= 7 && bloc == 2) {
-						x = (c - 'a')
+						x = c - 'a'
 					}
 
 					if ((c - '0') >= 1 && (c - '0') <= 8 && bloc == 2) {
-						y = (c - 'a' - 1)
+						y = c - '1'
 					}
 					if (bloc == 3) {
-						move_list = Move(game.board(i)(j).pos, Pos(x, y) ) :: move_list
+						println(Pos(i, j) +"=>" + Pos(x, y))
+						if(move_list == null) {
+							move_list = Save(
+								Move(Pos(x, y), Pos(i, j) ),
+								List()
+							)
+						}
+						else {
+							move_list = Save(
+								Move(Pos(x, y), Pos(i, j) ),
+								List(move_list)
+							)
+						}
 						n = 0
 						i = -1
 						j = -1
