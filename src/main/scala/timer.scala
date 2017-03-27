@@ -59,7 +59,7 @@ class TimeCounter(game : Game) extends Label {
 
 	val thread = new Thread(new Runnable() {
 	 	def run() {
-			while(true) {
+			while(!game.over) {
 				if(game.over)
 					return
 	

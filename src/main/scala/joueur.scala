@@ -40,7 +40,10 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	def move(x : Int, y : Int) : Boolean = {
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
-		return game.move(piece, Pos(x, y))
+		val ret = game.move(piece, Pos(x, y))
+		if(game.save_root != null)
+			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
+		return ret
 	}
 }
 

@@ -111,16 +111,17 @@ object Backup {
 			if(p.role == role) {
 				a = (role(0) - 32).toChar.toString
 			}
-			if(piece != null && piece.role == role) {
+			if(game.board(x)(y) != null && game.board(x)(y).role == role) {
 				b = (role(0) - 32).toChar.toString
 			}
 		} 
-		var res = n.toString + ". " + a + ('a' + x).toChar + (y+1).toString + " " + b + ('a' + i).toChar + (j+1).toString
+		var res = n.toString + ". " + a + ('a' + x).toChar + (y+1).toString + " " + b + ('a' + i).toChar + (j+1).toString + " "
 		return res
 	}
 
 	def CreatePGNfromSave(save: Save, nom: String) : Unit = {
-		val writer = new PrintWriter(new File(nom + ".txt"))
+		val writer = new PrintWriter(new File(nom))
+
 		def list_moves(v: Save):List[Move] = {
 			if(!v.saveList.isEmpty) {
 				return (v.move :: list_moves(v.saveList.head))
@@ -129,14 +130,16 @@ object Backup {
 				return List(v.move)
 			}
 		}
-		val listMoves = list_moves(save)
+
 		var n = 0
 		val game = new Game()
-		for(move <- listMoves) {
-			//writer.write(CreateAlgraebricFromMove(move.p, move.pos, n, game ))
-			//game.move(move.p, move.pos)
+		for(move <- list_moves(save)) {
+			var piece = game.board(move.from.x)(move.from.y)
+			writer.write(CreateAlgraebricFromMove(piece, move.to, n, game))
+			game.move(piece, move.to)
 			n = n +1
 		}
+		writer.write("\n")
 		writer.close()
 	}
 }

@@ -12,7 +12,7 @@ class Game() {
 	/** Les deux joueurs */
 	val players : Array[Player] = Array(null, null)
 	val timer = new Cadency(List(
-		Period(5, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(10, 1)
+		Period(60, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(10, 1)
 	))
 	var timers : Array[Cadency] = Array(timer.copy, timer.copy)
 	var turn_start : Long = -1 // le timestamp du début du tour
@@ -103,7 +103,6 @@ class Game() {
 				val new_save = Save(Move(p.pos, pos), List())
 				save_current.saveList = new_save :: save_current.saveList
 				save_current = new_save
-				//Backup.addMoveToSave(Move(p, pos), save)
 			}
 
 			p.move_to(pos)
