@@ -93,7 +93,7 @@ object Backup {
 	def tripleRepetition(game:Game, save:Save): Boolean = {
 		val n = compteur(game)
 		var i = 0
-		val listGame = createGameListFromSave(new Game(), save).reverse
+		val listGame = save.game_list().reverse
 		def count_repet(game:Game, listGame:List[Game]) : Boolean = {
 			if(listGame.isEmpty) {
 				return false
@@ -115,7 +115,7 @@ object Backup {
 
 	def cinquanteCoup(game:Game, save:Save): Boolean = {
 		val n = compteur(game)
-		val listGame = createGameListFromSave(new Game(), save).reverse
+		val listGame = save.game_list().reverse
 		def count_repet_bis(game:Game, listGame:List[Game], k:Int) : Boolean = {
 			if(k == 50) {
 				return true
