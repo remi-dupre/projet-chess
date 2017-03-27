@@ -17,8 +17,6 @@ case class Save(var move: Move, var saveList: List[Save]) {
 			new FakePlayer(0, game, move.promote_to),
 			new FakePlayer(1, game, move.promote_to)
 		)
-		println(move.from)
-		println(move.to)
 		game.move(
 			game.board(move.from.x)(move.from.y),
 			move.to
@@ -72,6 +70,8 @@ object Backup {
 		var bloc = 0
 		var x = -1
 		var y = -1
+		var last_is_eq = false
+		var role : String = null
 		for (line <- Source.fromFile(filename).getLines) {
 			if (line != "") {
 				bool = true
@@ -102,19 +102,26 @@ object Backup {
 					if ((c - '0') >= 1 && (c - '0') <= 8 && bloc == 2) {
 						y = c - '1'
 					}
+					if(last_is_eq) {
+						role = c match {
+							case 'Q' => "queen"
+							case 'K' => "knight"
+							case 'B' => "bishop"
+							case 'R' => "rook"
+							case _ => println("promotion not specified") ; null
+						}
+					}
+					last_is_eq = (c == '=')
+
 					if (bloc == 3) {
-						println(Pos(i, j) +"=>" + Pos(x, y))
+						val move = Move(Pos(x, y), Pos(i, j))
+						move.promote_to = role
+
 						if(move_list == null) {
-							move_list = Save(
-								Move(Pos(x, y), Pos(i, j) ),
-								List()
-							)
+							move_list = Save(move, List())
 						}
 						else {
-							move_list = Save(
-								Move(Pos(x, y), Pos(i, j) ),
-								List(move_list)
-							)
+							move_list = Save(move, List(move_list))
 						}
 						n = 0
 						i = -1
@@ -122,6 +129,7 @@ object Backup {
 						bloc = 0
 						x = -1
 						y = -1
+						role = null
 					}
 				}
 			}
@@ -129,7 +137,7 @@ object Backup {
 		return move_list
 	}
 
-	def CreateAlgraebricFromMove(p : Piece, pos : Pos, n : Int, game: Game) : String = { /* y = {1,8}, x = {a,h} */
+	def CreateAlgraebricFromMove(p : Piece, pos : Pos, n : Int, game: Game, promotion : String) : String = { /* y = {1,8}, x = {a,h} */
 		val x = pos.x
 		val y = pos.y
 		val i = p.pos.x
@@ -146,8 +154,11 @@ object Backup {
 				b = (role(0) - 32).toChar.toString
 			}
 		} 
-		var res = n.toString + ". " + a + ('a' + x).toChar + (y+1).toString + " " + b + ('a' + i).toChar + (j+1).toString + " "
-		return res
+		var res = n.toString + ". " + a + ('a' + x).toChar + (y+1).toString + " " + b + ('a' + i).toChar + (j+1).toString
+		if(p.role == "pawn" && (pos.y == 0 || pos.y == 7)) {
+			res += "=" + (promotion(0) - 32).toChar
+		}
+		return res + " "
 	}
 
 	def CreatePGNfromSave(save: Save, nom: String) : Unit = {
@@ -166,7 +177,11 @@ object Backup {
 		val game = new Game()
 		for(move <- list_moves(save)) {
 			var piece = game.board(move.from.x)(move.from.y)
-			writer.write(CreateAlgraebricFromMove(piece, move.to, n, game))
+			writer.write(CreateAlgraebricFromMove(piece, move.to, n, game, move.promote_to))
+			game.players = Array(
+				new FakePlayer(0, game, move.promote_to),
+				new FakePlayer(1, game, move.promote_to)
+			)
 			game.move(piece, move.to)
 			n = n +1
 		}

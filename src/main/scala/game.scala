@@ -115,7 +115,7 @@ class Game() {
 						case "knight" => new Knight(this, p.player, pos)
 						case "bishop" => new Bishop(this, p.player, pos)
 						case "rook"   => new Rook(this, p.player, pos)
-						case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
+						case s => println("Promotion was refused : " + s) ; board(pos.x)(pos.y)
 					}
 					save_current.move.promote_to = board(pos.x)(pos.y).role
 				}
