@@ -140,7 +140,7 @@ class Game() {
 
 		val n =  nb_pieces
 		var i = 0
-		val listGame = Backup.createGameListFromSave(new Game(), save_root).reverse
+		val listGame = save_root.game_list().reverse
 		def count_repet(listGame:List[Game]) : Boolean = {
 			if(listGame.isEmpty) {
 				return false

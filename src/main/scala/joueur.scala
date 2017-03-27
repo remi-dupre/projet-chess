@@ -50,7 +50,7 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 /**
  * Représente un IA
  * Par défault elle fait des movements aléatoires */
-class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game) {
+class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) {
 	override def wait_play = {
 		var pos_move : List[(Piece, Pos)] = List()
 		for(i <- 0 to 7) {
@@ -69,8 +69,6 @@ class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game
 		 	def run() {
 				val (piece, dest) = Random.shuffle(pos_move).head
 				game.move(piece, dest)
-				if(game.save_root != null)
-					Backup.CreatePGNfromSave(game.save_root, "save.pgn")
 				Thread.currentThread().interrupt()
 			}
 		});

@@ -2,10 +2,13 @@ import scala.io.Source
 import java.io._
 
 case class Move(from: Pos, to: Pos) {
+	/** Représente un tour d'action pour un joueur */
 	var promote_to : String = null
 }
 
 case class Save(var move: Move, var saveList: List[Save]) {
+	/** Arbre de sauvegardes */
+
 	var game_state : Game = null
 	
 	def apply_moves(game : Game) : Unit = {
@@ -23,9 +26,29 @@ case class Save(var move: Move, var saveList: List[Save]) {
 		)
 		game.players = save_players
 	}
+
+	def game_list(game : Game = new Game()) : List[Game] = {
+		if(game_state == null) {
+			val game_c = game.copy
+			game_c.players(game.playing) = new FakePlayer(game.playing, game_c, move.promote_to)
+			game_c.move(
+				game_c.board(move.from.x)(move.from.y),
+				move.to
+			)
+			game_state = game_c
+		}
+		if( saveList.isEmpty )
+			return List(game_state)
+		else
+			return game_state :: saveList.head.game_list(game_state)
+	}
 }
 
 class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
+	/** Une classe qui simule un joueur inactif
+	 * Elle sert surtout à stocker un promotion à effectuer pour un "move"
+	 */
+
 	override def wait_play = {}
 	override def get_promotion_type : String = {
 		return promotion_type
@@ -34,21 +57,6 @@ class FakePlayer(color : Int, game : Game, promotion_type : String) extends Play
 
 object Backup {
 	/* Algebrique notation : n. (Z)z9 (Z)z9 */
-	def createGameListFromSave(game:Game, save:Save) : List[Game] = {
-		if(save.game_state == null) {
-			val game_c = game.copy
-			game_c.players(game.playing) = new FakePlayer(game.playing, game_c, save.move.promote_to)
-			game_c.move(
-				game_c.board(save.move.from.x)(save.move.from.y),
-				save.move.to
-			)
-			save.game_state = game_c
-		}
-		if( save.saveList.isEmpty )
-			return List(save.game_state)
-		else
-			return save.game_state :: createGameListFromSave(save.game_state, save.saveList.head)
-	}
 
 	def cinquanteCoup(game:Game, save:Save) = {}
 
