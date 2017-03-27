@@ -24,6 +24,7 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	}
 
 	var selected = (-1, -1) /** La pièce sélectionnée */
+	var points = 0 /* nombre de points dans la partie pour Proteus */
 	/** Sélectonne un pièce si possible
 	 * Retourne false si ca échoue */
 	def select(x : Int, y : Int) : Boolean = {
