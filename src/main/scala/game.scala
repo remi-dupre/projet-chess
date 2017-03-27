@@ -10,8 +10,12 @@ class Game() {
 	var board = Array.ofDim[Piece](8, 8)
 
 	/** Les deux joueurs */
-	val players : Array[Player] = Array(null, null)
-	var timers : Array[Cadency] = null
+	var players : Array[Player] = Array(null, null)
+	val timer = new Cadency(List(
+		Period(60, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(10, 1)
+	))
+	var timers : Array[Cadency] = Array(timer.copy, timer.copy)
+	var turn_start : Long = -1 // le timestamp du début du tour
 
 	/** L'indice dans 'players' du joueur qui doit jouer */
 	/** 0 = blanc, 1 = noir **/
@@ -49,6 +53,7 @@ class Game() {
 		board(5)(7) = new Bishop(this, 0, Pos(5, 7))
 		board(2)(0) = new Bishop(this, 1, Pos(2, 0))
 		board(5)(0) = new Bishop(this, 1, Pos(5, 0))
+		turn_start = tools.timestamp
 	}
 
 	def start = {
@@ -87,6 +92,9 @@ class Game() {
 		val possibleMoves : List[Pos] = p.removeInCheckMoves(p.possible_move())
 
 		if(possibleMoves.contains(pos)) {
+			if(timers != null) {
+				timers(playing).spend(tools.timestamp-turn_start)
+			}
 			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
 				save_root = Save(Move(p.pos, pos), List())
 				save_current = save_root
@@ -95,7 +103,6 @@ class Game() {
 				val new_save = Save(Move(p.pos, pos), List())
 				save_current.saveList = new_save :: save_current.saveList
 				save_current = new_save
-				//Backup.addMoveToSave(Move(p, pos), save)
 			}
 
 			p.move_to(pos)
@@ -108,7 +115,7 @@ class Game() {
 						case "knight" => new Knight(this, p.player, pos)
 						case "bishop" => new Bishop(this, p.player, pos)
 						case "rook"   => new Rook(this, p.player, pos)
-						case _ => println("Promotion was refused") ; board(pos.x)(pos.y)
+						case s => println("Promotion was refused : " + s) ; board(pos.x)(pos.y)
 					}
 					save_current.move.promote_to = board(pos.x)(pos.y).role
 				}
@@ -119,6 +126,7 @@ class Game() {
 			changed()
 			
 			if(players(playing) != null && !over) {
+				turn_start = tools.timestamp
 				players(playing).wait_play
 			}
 			return true
@@ -132,7 +140,7 @@ class Game() {
 
 		val n =  nb_pieces
 		var i = 0
-		val listGame = Backup.createGameListFromSave(new Game(), save_root).reverse
+		val listGame = save_root.game_list().reverse
 		def count_repet(listGame:List[Game]) : Boolean = {
 			if(listGame.isEmpty) {
 				return false
@@ -155,15 +163,23 @@ class Game() {
 	}
 
 	def over : Boolean = {
-		triple_repetition || legal_moves(playing).isEmpty || impossibilityOfCheckMate
+		triple_repetition || legal_moves(playing).isEmpty || impossibilityOfCheckMate || defeat
+	}
+
+	def time_defeat : Boolean = {
+		return timers != null && timers(1-playing).free_time < 0
+	}
+
+	def defeat : Boolean = {
+		return time_defeat
 	}
 
 	def victory : Boolean = {
-		over && inCheck(playing)
+		(over && inCheck(playing) && !defeat)
 	}
 
 	def pat : Boolean = {
-		!victory && over
+		!defeat && !victory && over
 	}
 
 	def nb_pieces : Int = {

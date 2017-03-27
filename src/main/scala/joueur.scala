@@ -41,14 +41,17 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	def move(x : Int, y : Int) : Boolean = {
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
-		return game.move(piece, Pos(x, y))
+		val ret = game.move(piece, Pos(x, y))
+		if(game.save_root != null)
+			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
+		return ret
 	}
 }
 
 /**
  * Représente un IA
  * Par défault elle fait des movements aléatoires */
-class IA(color : Int, game : Game, speed : Int = 500) extends Player(color, game) {
+class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) {
 	override def wait_play = {
 		var pos_move : List[(Piece, Pos)] = List()
 		for(i <- 0 to 7) {
