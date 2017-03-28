@@ -50,6 +50,7 @@ class FakePlayer(color : Int, game : Game, promotion_type : String) extends Play
 	 */
 
 	override def wait_play = {}
+	override def wait_roll = {}
 	override def get_promotion_type : String = {
 		return promotion_type
 	}

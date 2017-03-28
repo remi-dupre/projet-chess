@@ -5,6 +5,7 @@ import java.util.TimerTask
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
 	def wait_play : Unit
+	def wait_roll : Unit
 	def get_promotion_type : String
 }
 
@@ -15,9 +16,16 @@ abstract class Player(val color : Int, game : Game) {
  *  @param game La partie
  */
 class Human(color : Int, interface : GameWin, game : Game) extends Player(color, game) {
+	var for_move = true
+
 	override def wait_play = {
-		println("dan")
+		for_move = true
 		interface.state = SelectPiece(this)
+	}
+
+	override def wait_roll = {
+		for_move = false
+		interface.state = SelectPiece(this)	
 	}
 
 	override def get_promotion_type : String = {
@@ -29,12 +37,23 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	/** Sélectonne un pièce si possible
 	 * Retourne false si ca échoue */
 	def select(x : Int, y : Int) : Boolean = {
-		if(game.cell_player(x, y) == color) {
-			selected = (x, y)
-			interface.state = WaitDirection(this)
-			return true
+		if(for_move) {
+			if(game.cell_player(x, y) == color) {
+				selected = (x, y)
+				interface.state = WaitDirection(this)
+				return true
+			}
+			else return false
 		}
-		else return false
+		else {
+			if(game.cell_player(x, y) == color) {
+				selected = (x, y)
+				game.asInstanceOf[ProtGame].roll(Pos(x, y))
+				return true
+			}
+			else return false
+		}
+		return false
 	}
 	
 	/** Effectue le dépacement de la pièce sélectionnée si possible
@@ -76,6 +95,8 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 		});
 		t.start()
 	}
+
+	override def wait_roll = {}
 
 	override def get_promotion_type : String =  {
 		"queen"

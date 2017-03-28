@@ -91,6 +91,10 @@ class Game() {
 		return board(x)(y) == null
 	}
 
+	def in_board(x : Int, y: Int) : Boolean = {
+		return ((0 <= x) && (x < 8) && (0 <= y) && (y < 8))
+	}
+
 	/** Déplace la pièce 'p' en position 'pos'
 	 * Si ce n'est pas possible, retourne false */
 	def move(p : Piece, pos : Pos) : Boolean = {

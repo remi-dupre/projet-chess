@@ -43,6 +43,7 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 		println(ret)
 		return ret
 	}
+
 	override def possible_move() : List[Pos] = {
 		val save_piece = this
 		val new_piece = Dice.seq_roles(i_role) match {
@@ -75,6 +76,18 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 		i_role = max(0, i_role - 1)
 	}
 
+	def roll(up:Boolean) : Boolean = {
+		if(up && i_role <= 4) {
+			rotateUp
+			return true
+		}
+		else if (!up && i_role >= 1) {
+			rotateDown
+			return true
+		}
+		return false
+	}
+
 	def point : Int = {
 		if( i_role == 0 ) {
 			return 0
@@ -90,19 +103,12 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 class ProtGame() extends Game() {
 	override def init = {
 		for(i <- 0 to 3) {
-			board(2*i)(6) = new Dice(this, 0, Pos(2*i, 6))
-			board(2*i+1)(7) = new Dice(this, 0, Pos(2*i+1, 7))
-			board(2*i)(0) = new Dice(this, 1, Pos(2*i, 0))
-			board(2*i+1)(1) = new Dice(this, 1, Pos(2*i, 0))
+			board(2*i)(7) = new Dice(this, 0, Pos(2*i, 7))
+			board(2*i+1)(6) = new Dice(this, 0, Pos(2*i+1, 6))
+			board(2*i)(1) = new Dice(this, 1, Pos(2*i, 1))
+			board(2*i+1)(0) = new Dice(this, 1, Pos(2*i+1, 0))
 		}
 	}
-
-	/* override def start = {
-		init_proteus
-		playing = 0
-		changed()
-		players(playing).wait_play
-	}*/
 
 	def compteur_proteus(player:Int): Int = {
 		var n = 0
@@ -119,11 +125,7 @@ class ProtGame() extends Game() {
 		return every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1
 	}
 
-	def in_board(x : Int, y: Int) : Boolean = {
-		return ((0 <= x) && (x < 8) && (0 <= y) && (y < 8))
-	}
-
-	def move_proteus(p:Dice, pos:Pos): Boolean = {
+	override def move(p:Piece, pos:Pos): Boolean = {
 		val possibleMoves : List[Pos] = p.possible_move()
 		if(possibleMoves.contains(pos)) {
 			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
@@ -138,44 +140,40 @@ class ProtGame() extends Game() {
 			}
 
 		if(board(pos.x)(pos.y) != null) {
-			players(playing).points += board(pos.x)(pos.y).point
+//			players(playing).points += board(pos.x)(pos.y).point
 		}
 
 		p.move_to(pos)
 
-		if(in_board(pos.x, pos.y-1) && board(pos.x)(pos.y-1) != null && board(pos.x)(pos.y-1).role == "queen") {
+		//!\\ Ca fera jamais rien, qu'est-ce qu'il est sucé se passer ?
+		if(in_board(pos.x, pos.y-1) && board(pos.x)(pos.y-1) != null
+		  && board(pos.x)(pos.y-1).role == "queen") {
 			board(pos.x)(pos.y-1) = null
 		}
 
-		playing = 1 - playing
-		turn = turn + 1
 		changed()
 
-
 		if(players(playing) != null && !over) {
-				players(playing).wait_play
+				players(playing).wait_roll
 			}
 			return true
 		}
 		return false
 	}
 
-	def roll_proteus(p:Dice, up:Boolean) : Boolean = {
-		if(up && p.i_role <= 4) {
-			p.rotateUp
-			return true
-		}
-		else if (!up && p.i_role >= 1) {
-			p.rotateDown
-			return true
-		}
-		return false
+	def roll(pos : Pos, up : Boolean = true) : Boolean = {
+		board(pos.x)(pos.y).asInstanceOf[Dice].roll(up)
+		playing = 1 - playing
+		turn = 1 + turn
+		changed()
+		players(playing).wait_play
+		return true
 	}
 
 	override def over = {false}
 
 	def winning() : Int = {
-		if(players(playing).points > players(1-playing).points) {
+/*		if(players(playing).points > players(1-playing).points) {
 			return playing
 		}
 		if(players(playing).points = players(1-playing).points) {
@@ -184,5 +182,7 @@ class ProtGame() extends Game() {
 		else {
 			return 1 - playing
 		}
+*/
+		return -1
 	}
 }
