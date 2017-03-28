@@ -49,6 +49,19 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 
 	val msg = new Label("test")
 	val promo_btn = new PromoBtn()
+
+	val back_btn = new Button(Action("Retour") {
+		if(game.save_hist == null) {
+			game.save_hist = game.save_current
+			game.save_root.game_list()
+		}
+		game.copy_config_of(game.save_hist.father.game_state)
+		if(game.save_hist.father != null )
+			game.save_hist = game.save_hist.father
+		refresh
+	})
+	back_btn.visible = false
+
 	val leave_btn = new Button(Action("Menu") {
 		close()
 		Main.menu.visible = true
@@ -72,10 +85,11 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 		}
 
 		// Bottom bar
-		contents += new GridPanel(1,4) {
+		contents += new GridPanel(1,5) {
 			preferredSize = new Dimension(1000, 60);
 			contents += leave_btn
-			
+			contents += back_btn
+
 			contents += promo_btn
 			promo_btn.icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
 
@@ -95,7 +109,7 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 	}
 
 	/** Réaffiche les pièces là où elles sont et vire tous les effets graphiques */
-	def refresh = {
+	def refresh : Unit = {
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				grid(i)(j).refresh
@@ -104,6 +118,11 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 		mainWin.msg.text = "Au " + (if(game.playing == 0) "blanc" else "noir")  + " de jouer "
 		if(game.inCheck(game.playing)) {
 			mainWin.msg.text += "(Échec) "
+		}
+		if(game.over) {
+			roll_btn.visible = false
+			promo_btn.visible = false
+			back_btn.visible = true
 		}
 		if(game.pat) {
 			mainWin.msg.text = "PAT "
