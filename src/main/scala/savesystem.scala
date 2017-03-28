@@ -209,7 +209,7 @@ object Backup {
 							move_list = Save(move, List(), null)
 						}
 						else {
-							move_list = Save(move, List(move_list), move_list.saveList.head)
+							move_list = Save(move, List(move_list), null)
 						}
 						n = 0
 						i = -1
@@ -222,6 +222,13 @@ object Backup {
 				}
 			}
 		}
+		def make_papa(save : Save, papa : Save = null) {
+			save.father = papa
+			if(!save.saveList.isEmpty) {
+				make_papa(save.saveList.head, save)
+			}
+		}
+		make_papa(move_list)
 		return move_list
 	}
 

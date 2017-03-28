@@ -1,36 +1,36 @@
 import swing._
 
-def create_game(joueur1 : String, joueur2 : String,
-  get_save : Boolean = false,
-  ia0_delay : Int = 0, ia1_delay : Int = 0,
-  mode : GameType.Value = GameType.Normal) = {
-	menu.visible = false
-	val fen = new GameWin(mode)
-	fen.game.players(0) = joueur1 match {
-		case "human" => new Human(0, fen, fen.game, true)
-		case "ia"    => new IA(0, fen.game, ia0_delay)
-	}
-	fen.game.players(1) = joueur2 match {
-		case "human" => new Human(1, fen, fen.game, true)
-		case "ia"    => new IA(1, fen.game, ia1_delay)
-	}
-
-	fen.visible = true
-
-	if(get_save) {
-		val save = Backup.createSaveFromPGN("save.pgn")
-		fen.game.init
-		save.apply_moves(fen.game)
-		fen.game.players(fen.game.playing).wait_play
-	}
-	else {
-		fen.game.start
-	}
-}
-
 class MenuWin extends MainFrame {
 	title = "test"
 	val menu = this
+
+	def create_game(joueur1 : String, joueur2 : String,
+	  get_save : Boolean = false,
+	  ia0_delay : Int = 0, ia1_delay : Int = 0,
+	  mode : GameType.Value = GameType.Normal) = {
+		menu.visible = false
+		val fen = new GameWin(mode)
+		fen.game.players(0) = joueur1 match {
+			case "human" => new Human(0, fen, fen.game, true)
+			case "ia"    => new IA(0, fen.game, ia0_delay)
+		}
+		fen.game.players(1) = joueur2 match {
+			case "human" => new Human(1, fen, fen.game, true)
+			case "ia"    => new IA(1, fen.game, ia1_delay)
+		}
+
+		fen.visible = true
+
+		if(get_save) {
+			val save = Backup.createSaveFromPGN("save.pgn")
+			fen.game.init
+			save.apply_moves(fen.game)
+			fen.game.players(fen.game.playing).wait_play
+		}
+		else {
+			fen.game.start
+		}
+	}
 
 	contents = new GridPanel(5, 1) {
 		val use_save = new CheckBox("Récupérer la sauvegarde")
@@ -82,7 +82,7 @@ class MenuWin extends MainFrame {
 			if(select_black.i == 2)
 				ia1_delay = 500
 
-			create_game(j0_type, j1_type, use_save.selected, ia0_delay, ia1_delay, GameType.Proteus)
+			create_game(j0_type, j1_type, false, ia0_delay, ia1_delay, GameType.Proteus)
 		})
 		contents += new GridPanel(1, 2) {
 			new SelectPlayer()

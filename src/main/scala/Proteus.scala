@@ -16,7 +16,7 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 		return moves.filter(
 			((pos : Pos) => {
 				val piece = game.board(pos.x)(pos.y)
-				(piece == null) || (piece.role != "pyramid" && piece.role != "dice") || (Dice.seq_roles(piece.asInstanceOf[Dice].i_role) != "pyramid")
+				(piece == null) || (piece.role != "pyramid" ) || (piece.role == "dice" && Dice.seq_roles(piece.asInstanceOf[Dice].i_role) != "pyramid")
 			})
 		)
 	}
