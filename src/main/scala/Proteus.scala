@@ -95,6 +95,7 @@ class ProtGame() extends Game() {
 		}
 		points = Array(0, 0)
 		first_phase = true
+		turn_start = tools.timestamp
 	}
 
 	def compteur_proteus(player:Int): Int = {
@@ -112,7 +113,6 @@ class ProtGame() extends Game() {
 	override def move(p:Piece, pos:Pos): Boolean = {
 		val possibleMoves : List[Pos] = p.possible_move()
 		if(possibleMoves.contains(pos)) {
-
 			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
 				save_root = Save(Move(p.pos, pos), List(), null)
 				save_current = save_root
@@ -158,14 +158,22 @@ class ProtGame() extends Game() {
 	}
 
 	def roll(pos : Pos, up : Boolean = true) : Boolean = {
+		if(timers != null) {
+			timers(playing).spend(tools.timestamp-turn_start)
+		}
+		turn_start = tools.timestamp
+
 		board(pos.x)(pos.y).asInstanceOf[Dice].roll(up)
 		playing = 1 - playing
 		turn = 1 + turn
 		first_phase = true
 		changed()
+
 		if(!over) {
 			players(playing).wait_play
 		}
+
+		turn = turn + 1
 		return true
 	}
 
