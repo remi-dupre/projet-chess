@@ -3,7 +3,7 @@ import java.awt.Color
 import javax.swing.ImageIcon
 import scala.swing.event.Key
 import scala.swing.event.KeyPressed
-
+import scala.math._
 
 /**
  * Défini un état de l'interface :
@@ -52,6 +52,7 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 		close()
 		Main.menu.visible = true
 	})
+	val roll_btn = new RollBtn()
 	var label_timer = new TimeCounter(game)
 
 	/** L'ensemble des cases de la partie */
@@ -70,12 +71,14 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 		}
 
 		// Bottom bar
-		contents += new GridPanel(1,3) {
+		contents += new GridPanel(1,4) {
 			preferredSize = new Dimension(1000, 60);
 			contents += leave_btn
 			
 			contents += promo_btn
 			promo_btn.icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
+
+			contents += roll_btn
 
 			contents += msg
 			contents += label_timer
@@ -152,7 +155,7 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 					var piece = game.getPiece(x, y)
 					if(piece.removeInCheckMoves(piece.possible_move()).isEmpty)
 						mainWin.state = SelectPiece(p)
-					else
+					else if(p.for_move)
 						mainWin.highlight_possible(game.getPiece(x, y))
 				}
 			case WaitDirection(p) =>
@@ -215,3 +218,23 @@ class PromoBtn() extends Button {
 	}
 }
 
+/** Un choix de pièce vers laquelle roll */
+class RollBtn() extends GridPanel(1, 2) {
+	val btn_up = new Button(Action(""){})
+	val btn_down = new Button(Action(""){})
+	contents += btn_up
+	contents += btn_down
+	visible = false
+
+	def select(i_role : Int) = {
+		visible = true
+
+		var role_down = Dice.seq_roles(max(0, i_role-1))
+		btn_down.enabled = (i_role > 0)
+		btn_down.icon = tools.icon_resized("src/ressources/pieces/white/" + role_down + ".png", 30, 30)
+
+		var role_up = Dice.seq_roles(min(5, i_role+1))
+		btn_up.enabled = (i_role < 5)
+		btn_up.icon = tools.icon_resized("src/ressources/pieces/white/" + role_up + ".png", 30, 30)
+	}
+}

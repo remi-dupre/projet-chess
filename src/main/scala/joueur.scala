@@ -5,7 +5,8 @@ import java.util.TimerTask
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
 	def wait_play : Unit
-	def wait_roll : Unit
+	def wait_roll : Unit = {}
+	def get_roll_direction : Unit = {}
 	def get_promotion_type : String
 }
 
@@ -25,7 +26,11 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 
 	override def wait_roll = {
 		for_move = false
-		interface.state = SelectPiece(this)	
+		interface.state = SelectPiece(this)
+	}
+
+	override def get_roll_direction = {
+
 	}
 
 	override def get_promotion_type : String = {
@@ -46,12 +51,17 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 			else return false
 		}
 		else {
-			if(game.cell_player(x, y) == color) {
+/*			if(game.cell_player(x, y) == color) {
 				selected = (x, y)
 				game.asInstanceOf[ProtGame].roll(Pos(x, y))
 				return true
 			}
-			else return false
+			else return false*/
+			if(game.cell_player(x, y) == color) {
+				selected = (x, y)
+				interface.roll_btn.select(game.board(x)(y).asInstanceOf[Dice].i_role)
+				return true
+			}
 		}
 		return false
 	}
@@ -95,8 +105,6 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 		});
 		t.start()
 	}
-
-	override def wait_roll = {}
 
 	override def get_promotion_type : String =  {
 		"queen"
