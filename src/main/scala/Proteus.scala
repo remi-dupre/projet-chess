@@ -16,7 +16,7 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 		return moves.filter(
 			((pos : Pos) => {
 				val piece = game.board(pos.x)(pos.y)
-				(piece == null) || (Dice.seq_roles(piece.asInstanceOf[Dice].i_role) != "pyramid")
+				(piece == null) || (piece.role != "pyramid" && piece.role != "dice") || (Dice.seq_roles(piece.asInstanceOf[Dice].i_role) != "pyramid")
 			})
 		)
 	}
@@ -163,7 +163,9 @@ class ProtGame() extends Game() {
 		turn = 1 + turn
 		first_phase = true
 		changed()
-		players(playing).wait_play
+		if(!over) {
+			players(playing).wait_play
+		}
 		return true
 	}
 
@@ -172,7 +174,7 @@ class ProtGame() extends Game() {
 	}
 
 	override def over = {
-		first_phase && (every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1)
+		first_phase && (every_possible_move(1-playing).isEmpty || every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1)
 	}
 
 	override def winner : Int = {

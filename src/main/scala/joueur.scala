@@ -113,7 +113,7 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
 				val piece = game.board(i)(j)
-				if(piece != null && piece.player == color) {
+				if(piece != null && piece.player == color && piece.pos != last_pos) {
 					piece_list = piece :: piece_list
 					for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
 						pos_move = (piece, pos) :: pos_move
