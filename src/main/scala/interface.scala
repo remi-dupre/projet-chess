@@ -91,7 +91,7 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 			contents += back_btn
 
 			contents += promo_btn
-			promo_btn.icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
+			promo_btn.icon = Tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
 
 			contents += roll_btn
 
@@ -223,7 +223,7 @@ class PromoBtn() extends Button {
 	
 	action = Action("promotion") {
 		promo_btn.r_i = (promo_btn.r_i+1) % 4
-		icon = tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
+		icon = Tools.icon_resized("src/ressources/pieces/white/" + promo_btn.roles(promo_btn.r_i) + ".png", 30, 30)
 	}
 
 	def role = {
@@ -246,11 +246,11 @@ class RollBtn(a_interface : GameWin) extends GridPanel(1, 2) {
 
 		var role_down = Dice.seq_roles(max(0, i_role-1))
 		btn_down.enabled = (i_role > 0)
-		btn_down.icon = tools.icon_resized("src/ressources/pieces/white/" + role_down + ".png", 30, 30)
+		btn_down.icon = Tools.icon_resized("src/ressources/pieces/white/" + role_down + ".png", 30, 30)
 
 		var role_up = Dice.seq_roles(min(5, i_role+1))
 		btn_up.enabled = (i_role < 5)
-		btn_up.icon = tools.icon_resized("src/ressources/pieces/white/" + role_up + ".png", 30, 30)
+		btn_up.icon = Tools.icon_resized("src/ressources/pieces/white/" + role_up + ".png", 30, 30)
 	}
 
 	def selected(up : Boolean) = {

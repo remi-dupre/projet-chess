@@ -4,6 +4,12 @@ import swing._
 case class Period(var duration : Long, var moves : Int)
 
 class Cadency(a_periods : List[Period]) {
+	/** Défini une séries de périodes, à savoir :
+	 *   - pour chaque période un nombre de coup à jouer
+	 *   - le temps pour les jouer
+	 *   - la dernière période se répète indéfiniment
+	 */
+
 	var repeat_last = true
 	var periods = a_periods
 
@@ -55,22 +61,23 @@ class Cadency(a_periods : List[Period]) {
 }
 
 class TimeCounter(game : Game) extends Label {
+	/** Un affichage de timer */
 	val counter_label = this
 
 	val thread = new Thread(new Runnable() {
 	 	def run() {
 			while(!game.over) {
-				val turn_duration = tools.timestamp - game.turn_start
+				val turn_duration = Tools.timestamp - game.turn_start
 				if(game.timers == null) {
 					counter_label.text = turn_duration + "s"
 				}
 				else {
 					val cad = game.timers(game.playing)
 					if( cad.free_time < turn_duration ) {
-						counter_label.text = "Dépasse de " + (turn_duration - cad.free_time) + "s"
+						counter_label.text = "Dépasse de " + Tools.time_to_string(turn_duration - cad.free_time)
 					}
 					else {
-						counter_label.text = (cad.free_time - turn_duration) + "s pour " + cad.period_moves + " coups"
+						counter_label.text = Tools.time_to_string(cad.free_time - turn_duration) + " pour " + cad.period_moves + " coups"
 					}
 				}
 				Thread.sleep(50)

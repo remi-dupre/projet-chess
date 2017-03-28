@@ -76,15 +76,6 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 		return pos_move
 	}
 }
-class Pyramid(game: Game, player: Int, m_pos: Pos) extends Piece(game, player, m_pos) {
-	override def role = "pyramid"
-	override def attacked_cells() : List[Pos] = { 
-		return List() 
-	}
-	override def possible_move() : List[Pos] = {
-		return List()
-	}
-}
 
 class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "king"
@@ -261,41 +252,3 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		super.move_to(new_pos)
 	}
 }
-
-class Pawn_proteus(game:Game, player:Int, m_pos:Pos) extends Piece(game, player, m_pos) {
-	override def role = "pawn"
-	override def attacked_cells() : List[Pos] = {
-		var x = pos.x
-		var y = pos.y
-		var pos_move: List[Pos] = List()
-		var vecteur : Int = -1+2*player
-		
-		/* Mouvement de base */
-		if(in_board(x+vecteur,y+vecteur) && (game.cell_player(x+vecteur,y+vecteur) == 1-player)) {
-			pos_move = Pos(x+vecteur, y+vecteur)::pos_move
-		}
-		if(in_board(x-vecteur,y+vecteur) && (game.cell_player(x-vecteur,y+vecteur) == 1-player)) {
-			pos_move = Pos(x-vecteur, y+vecteur)::pos_move
-		}
-		return pos_move
-	}
-	override def possible_move() : List[Pos] = {
-		var x = pos.x
-		var y = pos.y
-		var pos_move: List[Pos] = List()
-		var vecteur : Int = -1+2*player
-
-		// Déplacement standart
-		if(in_board(x,y+vecteur) && game.empty_cell(x, y+vecteur)) {
-			pos_move = Pos(x, y+vecteur)::pos_move
-		}
-
-		// Déplacement double
-		if(in_board(x,y+2*vecteur) && game.empty_cell(x,y+2*vecteur) && game.empty_cell(x,y+vecteur)) {
-			pos_move = Pos(x, y+2*vecteur)::pos_move
-		}
-
-		return pos_move ++ attacked_cells
-	}
-}
-

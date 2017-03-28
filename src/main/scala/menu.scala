@@ -1,7 +1,7 @@
 import swing._
 
 class MenuWin extends MainFrame {
-	title = "test"
+	title = "Chess"
 	val menu = this
 
 	def create_game(joueur1 : String, joueur2 : String,

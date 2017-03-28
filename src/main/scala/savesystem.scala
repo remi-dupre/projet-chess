@@ -3,19 +3,27 @@ import java.io._
 
 case class Move(from: Pos, to: Pos) {
 	/** Représente un tour d'action pour un joueur */
-	var promote_to : String = null
+	var promote_to : String = null // S'il y a promotion, sa nature
+}
+
+class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
+	/** Une classe qui simule un joueur inactif
+	 * Elle sert surtout à stocker un promotion à effectuer pour un "move"
+	 */
+
+	override def get_promotion_type : String = {
+		return promotion_type
+	}
 }
 
 case class Save(var move: Move, var saveList: List[Save], var father: Save) {
 	/** Arbre de sauvegardes */
 
+	/** La game représentée par ce noeud de l'arbre */
 	var game_state : Game = null
-
-	def backward(save:Save) : Save = {
-		return save.father
-	}
 	
-	def apply_moves(game : Game) : Unit = {
+	/** Applique les moves successifs à la fame passée en argument */
+	def apply_moves(game : Game = new Game()) : Unit = {
 		if(!saveList.isEmpty) {
 			saveList.head.apply_moves(game)
 		}
@@ -31,6 +39,7 @@ case class Save(var move: Move, var saveList: List[Save], var father: Save) {
 		game.players = save_players
 	}
 
+	/** La liste des games vus dans le chemin depuis la racine */
 	def game_list(game : Game = new Game()) : List[Game] = {
 		if(game_state == null) {
 			val game_c = game.copy
@@ -48,37 +57,8 @@ case class Save(var move: Move, var saveList: List[Save], var father: Save) {
 	}
 }
 
-class FakePlayer(color : Int, game : Game, promotion_type : String) extends Player(color, game) {
-	/** Une classe qui simule un joueur inactif
-	 * Elle sert surtout à stocker un promotion à effectuer pour un "move"
-	 */
-
-	override def get_promotion_type : String = {
-		return promotion_type
-	}
-}
-
 object Backup {
 	/* Algebrique notation : n. (Z)z9 (Z)z9 */
-
-	def compteur(game:Game) : Int = {
-		var n = 0
-		for(i <- 0 to 7) {
-			for(j <- 0 to 7) {
-				if (game.board(i)(j) != null) {
-					n = n+1
-				}
-			}
-		}
-		return n
-	}
-
-	def isIdentique(game1:Game, game2:Game): Boolean = {
-/*		var res = game1.board == game2.board
-		res = res && game1.every_possible_move_nocheck(0) == game2.every_possible_move_nocheck(0)
-		res = res && game1.every_possible_move_nocheck(1) == game2.every_possible_move_nocheck(1)*/
-		return game1.is_copy_of(game2)
-	}
 
 	def hasPawnMoved(game1:Game, game2:Game): Boolean = {
 		for(i <- 0 to 7) {
@@ -94,7 +74,7 @@ object Backup {
 	}
 
 	def tripleRepetition(game:Game, save:Save): Boolean = {
-		val n = compteur(game)
+		val n = game.nb_pieces
 		var i = 0
 		val listGame = save.game_list().reverse
 		def count_repet(game:Game, listGame:List[Game]) : Boolean = {
@@ -103,9 +83,9 @@ object Backup {
 			}
 			else {
 				val hd_game = listGame.head
-				if(n != compteur(hd_game))
+				if(n != hd_game.nb_pieces)
 					return false
-				if(isIdentique(game, hd_game)) {
+				if(game.is_copy_of(hd_game)) {
 					i += 1
 					if(i == 3)
 						return true
@@ -117,7 +97,7 @@ object Backup {
 	}
 
 	def cinquanteCoup(game:Game, save:Save): Boolean = {
-		val n = compteur(game)
+		val n = game.nb_pieces
 		val listGame = save.game_list().reverse
 		def count_repet_bis(game:Game, listGame:List[Game], k:Int) : Boolean = {
 			if(k == 50) {
@@ -131,7 +111,7 @@ object Backup {
 				if(hasPawnMoved(game, game1)) {
 					return false
 				}
-				if(n != compteur(game1)) {
+				if(n != game1.nb_pieces) {
 					return false
 				}
 				return count_repet_bis(game, listGame.tail, k+1)

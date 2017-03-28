@@ -58,7 +58,7 @@ class Game() {
 		board(5)(7) = new Bishop(this, 0, Pos(5, 7))
 		board(2)(0) = new Bishop(this, 1, Pos(2, 0))
 		board(5)(0) = new Bishop(this, 1, Pos(5, 0))
-		turn_start = tools.timestamp
+		turn_start = Tools.timestamp
 	}
 
 	def start = {
@@ -68,7 +68,7 @@ class Game() {
 		players(playing).wait_play
 	}
 
-	init
+	init // Par défaut la fame est initialisée
 
 	/** Retourne l'id du joueur qui contrôle la piece en position (x, y), -1 s'il n'y en a pas */
 	def cell_player(x : Int, y : Int) : Int = {
@@ -102,7 +102,7 @@ class Game() {
 
 		if(possibleMoves.contains(pos)) {
 			if(timers != null) {
-				timers(playing).spend(tools.timestamp-turn_start)
+				timers(playing).spend(Tools.timestamp-turn_start)
 			}
 
 			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
@@ -136,40 +136,12 @@ class Game() {
 			changed()
 			
 			if(players(playing) != null && !over) {
-				turn_start = tools.timestamp
+				turn_start = Tools.timestamp
 				players(playing).wait_play
 			}
 			return true
 		}
 		return false
-	}
-
-	def triple_repetition : Boolean = {
-		if(save_root == null)
-			return false
-
-		val n =  nb_pieces
-		var i = 0
-		val listGame = save_root.game_list().reverse
-		def count_repet(listGame:List[Game]) : Boolean = {
-			if(listGame.isEmpty) {
-				return false
-			}
-			else {
-				val hd_game = listGame.head
-				if( n != hd_game.nb_pieces )
-					return false
-				if( is_copy_of(hd_game)
-				  && legal_moves(0) == hd_game.legal_moves(0)
-				  && legal_moves(1) == hd_game.legal_moves(1) ) {
-					i += 1
-					if(i == 3)
-						return true
-				}
-				return count_repet(listGame.tail)
-			}
-		}
-		return count_repet(listGame)
 	}
 
 	def over : Boolean = {
@@ -237,7 +209,7 @@ class Game() {
 		return pos_move
 	}
 
-	/** retourn la liste des positions où le jouer donné peut LEGALEMENT déplacer sa pièce **/
+	/** Retourne la liste des positions où le jouer donné peut LEGALEMENT déplacer sa pièce **/
 	def legal_moves(player : Int) : List[Pos] = { 
 		var pos_move : List[Pos] = List()
 		for(i <- 0 to 7) {
@@ -274,10 +246,12 @@ class Game() {
 		return board(i)(j)
 	}
 
+	/** Vérifie si la cellule peut être mangée par le joueur */
 	def isControlledCell(i : Int, j: Int, player : Int) : Boolean = {
 		return every_attacked_cells(1 - player).contains(Pos(i, j))
 	}
 
+	/** Vérifie si les deux games ont la même configuration */
 	def is_copy_of(game_c : Game) : Boolean = {
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
@@ -292,6 +266,7 @@ class Game() {
 		return true
 	}
 
+	/** Reproduit le plateau d'une autre game */
 	def copy_config_of(g : Game) = {
 		playing = g.playing
 		turn = g.turn
@@ -306,12 +281,43 @@ class Game() {
 		}
 	}
 
+	/** Créé une réplique de cette game */
 	def copy : Game = {
 		val g = new Game
 		g.copy_config_of(this)
 		return g
 	}
 
+	/** Vérifie si la même configuration a été atteinte 3 fois */
+	def triple_repetition : Boolean = {
+		if(save_root == null)
+			return false
+
+		val n =  nb_pieces
+		var i = 0
+		val listGame = save_root.game_list().reverse
+		def count_repet(listGame:List[Game]) : Boolean = {
+			if(listGame.isEmpty) {
+				return false
+			}
+			else {
+				val hd_game = listGame.head
+				if( n != hd_game.nb_pieces )
+					return false
+				if( is_copy_of(hd_game)
+				  && legal_moves(0) == hd_game.legal_moves(0)
+				  && legal_moves(1) == hd_game.legal_moves(1) ) {
+					i += 1
+					if(i == 3)
+						return true
+				}
+				return count_repet(listGame.tail)
+			}
+		}
+		return count_repet(listGame)
+	}
+
+	/** Détecte les configurations où il ne peut y avoir de mat */
 	def impossibilityOfCheckMate: Boolean = {
 		var white = 0
 		var black = 0
