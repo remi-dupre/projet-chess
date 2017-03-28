@@ -137,7 +137,12 @@ class ProtGame() extends Game() {
 				//Backup.addMoveToSave(Move(p, pos), save)
 			}
 
+		if(board(pos.x)(pos.y) != null) {
+			players(playing).points += board(pos.x)(pos.y).point
+		}
+
 		p.move_to(pos)
+
 		if(in_board(pos.x, pos.y-1) && board(pos.x)(pos.y-1) != null && board(pos.x)(pos.y-1).role == "queen") {
 			board(pos.x)(pos.y-1) = null
 		}
@@ -168,4 +173,16 @@ class ProtGame() extends Game() {
 	}
 
 	override def over = {false}
+
+	def winning() : Int = {
+		if(players(playing).points > players(1-playing).points) {
+			return playing
+		}
+		if(players(playing).points = players(1-playing).points) {
+			return -1
+		}
+		else {
+			return 1 - playing
+		}
+	}
 }
