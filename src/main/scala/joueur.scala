@@ -108,7 +108,7 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 	}
 }
 
-class IAProt(color : Int, game : ProtGame, speed : Int = 0) extends player(color, game) = {
+class IAProt(color : Int, game : ProtGame, speed : Int = 0) extends player(color, game) {
 	override def wait_play = {
 		var pos_move : List[(Piece, Pos)] = List()
 		var piece_list : List[Piece] = List()
