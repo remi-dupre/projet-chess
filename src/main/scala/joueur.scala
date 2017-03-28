@@ -108,3 +108,43 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 	}
 }
 
+class IAProt(color : Int, game : ProtGame, speed : Int = 0) extends player(color, game) = {
+	override def wait_play = {
+		var pos_move : List[(Piece, Pos)] = List()
+		var piece_list : List[Piece] = List()
+		for(i <- 0 to 7) {
+			for(j <- 0 to 7) {
+				val piece = game.board(i)(j)
+				if(piece != null && piece.player == color) {
+					piece_list = piece :: piece_list
+					for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
+						pos_move = (piece, pos) :: pos_move
+					}
+				}
+			}
+		}
+
+		Thread.sleep(speed)
+		val t = new Thread(new Runnable() {
+			def run() {
+				val (piece, dest) = Random.shuffle(pos_move).head
+				remove(piece, piece_list)
+				game.move(piece, dest)
+
+				val piece2 = Random.shuffle(list_piece).head
+				val x = piece2.pos.x
+				val y = piece2.pos.y
+				var direction = Random.shuffle(List(true, false)).head
+				if(piece2.role == "pyramid") {
+					direcion = true
+				}
+				if(piece2.role == "queen") {
+					direction = false
+				}
+				game.asInstanceOf[ProtGame].roll(Pos(x, y), direction)
+				Thread.currentThread().interrupt()
+			}
+		});
+		t.start
+	}
+}

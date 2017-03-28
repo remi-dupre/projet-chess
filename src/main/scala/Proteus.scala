@@ -164,7 +164,7 @@ class ProtGame() extends Game() {
 		first_phase && (every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1)
 	}
 
-	def winning() : Int = {
+	override def winner : Int = {
 		if(points(0) > points(1))
 			return 0
 		else if(points(1) > points(0))
