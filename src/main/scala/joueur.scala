@@ -16,6 +16,7 @@ abstract class Player(val color : Int, game : Game) {
  */
 class Human(color : Int, interface : GameWin, game : Game) extends Player(color, game) {
 	override def wait_play = {
+		println("dan")
 		interface.state = SelectPiece(this)
 	}
 

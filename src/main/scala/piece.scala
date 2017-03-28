@@ -223,7 +223,7 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 				pos_move = Pos(x-1, y+vecteur)::pos_move
 			}
 		}
-
+		
 		return pos_move
 	}
 	override def possible_move() : List[Pos] = {

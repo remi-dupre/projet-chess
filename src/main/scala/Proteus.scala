@@ -27,8 +27,47 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 	}*/
 
 	override def attacked_cells() : List[Pos] = {
-		return List()
+		val save_piece = this
+		val new_piece = Dice.seq_roles(i_role) match {
+			case "king" => new King(game, player, pos)
+			case "queen" => new Queen(game, player, pos)
+			case "rook" => new Rook(game, player, pos)
+			case "bishop" => new Bishop(game, player, pos)
+			case "knight" => new Knight(game, player, pos)
+			case "pawn" => new Pawn_proteus(game, player, pos)
+		}
+		new_piece.already_moved = already_moved
+		game.board(pos.x)(pos.y) = new_piece
+		val ret = new_piece.attacked_cells
+		game.board(pos.x)(pos.y) = save_piece
+		println(ret)
+		return ret
 	}
+	override def possible_move() : List[Pos] = {
+		val save_piece = this
+		val new_piece = Dice.seq_roles(i_role) match {
+			case "king" => new King(game, player, pos)
+			case "queen" => new Queen(game, player, pos)
+			case "rook" => new Rook(game, player, pos)
+			case "bishop" => new Bishop(game, player, pos)
+			case "knight" => new Knight(game, player, pos)
+			case "pawn" => new Pawn_proteus(game, player, pos)
+		}
+		new_piece.already_moved = already_moved
+		game.board(pos.x)(pos.y) = new_piece
+		val ret = new_piece.possible_move
+		game.board(pos.x)(pos.y) = save_piece
+		println(ret)
+		return ret
+	}
+	
+	override def inCheck(new_pos : Pos) : Boolean = {
+		return false
+	}
+
+	/*override def attacked_cells() : List[Pos] = {
+		return List()
+	}*/
 	def rotateUp = {
 		i_role = min(5, i_role + 1)
 	}
@@ -128,4 +167,5 @@ class ProtGame() extends Game() {
 		return false
 	}
 
+	override def over = {false}
 }

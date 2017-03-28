@@ -64,6 +64,7 @@ class Game() {
 		init
 		playing = 0
 		changed()
+		println("dan")
 		players(playing).wait_play
 	}
 
