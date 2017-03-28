@@ -12,7 +12,7 @@ case class Save(var move: Move, var saveList: List[Save], var father: Save) {
 	var game_state : Game = null
 
 	def backward(save:Save) : Save = {
-		save.father
+		return save.father
 	}
 	
 	def apply_moves(game : Game) : Unit = {
