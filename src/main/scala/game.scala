@@ -190,6 +190,16 @@ class Game() {
 		!defeat && !victory && over
 	}
 
+	def winner : Int = {
+		if(victory) {
+			return 1-playing
+		}
+		else if(defeat) {
+			return playing
+		}
+		else return -1
+	}
+
 	def nb_pieces : Int = {
 		var n = 0
 		for(i <- 0 to 7)

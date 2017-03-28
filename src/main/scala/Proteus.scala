@@ -8,6 +8,7 @@ object Dice {
 
 class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos) {
 	override def role = "dice"
+
 	var i_role : Int = 1
 
 	/** Supprime d'une liste les postions qui correspondent à une pyramide */
@@ -71,7 +72,7 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 		return false
 	}
 
-	def point : Int = {
+	def points : Int = {
 		if( i_role == 0 ) {
 			return 0
 		}
@@ -79,18 +80,21 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 			return (i_role + 1)
 		}
 	}
-
-	
 }
 
 class ProtGame() extends Game() {
+	var points : Array[Int] = Array(0, 0)
+	var first_phase : Boolean = true
+
 	override def init = {
 		for(i <- 0 to 3) {
 			board(2*i)(7) = new Dice(this, 0, Pos(2*i, 7))
-			board(2*i+1)(6) = new Dice(this, 0, Pos(2*i+1, 6))
-			board(2*i)(1) = new Dice(this, 1, Pos(2*i, 1))
+			//board(2*i+1)(6) = new Dice(this, 0, Pos(2*i+1, 6))
+			//board(2*i)(1) = new Dice(this, 1, Pos(2*i, 1))
 			board(2*i+1)(0) = new Dice(this, 1, Pos(2*i+1, 0))
 		}
+		points = Array(0, 0)
+		first_phase = true
 	}
 
 	def compteur_proteus(player:Int): Int = {
@@ -108,7 +112,7 @@ class ProtGame() extends Game() {
 	override def move(p:Piece, pos:Pos): Boolean = {
 		val possibleMoves : List[Pos] = p.possible_move()
 		if(possibleMoves.contains(pos)) {
-			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
+			if(save_root == null) {
 				save_root = Save(Move(p.pos, pos), List())
 				save_current = save_root
 			}
@@ -116,16 +120,16 @@ class ProtGame() extends Game() {
 				val new_save = Save(Move(p.pos, pos), List())
 				save_current.saveList = new_save :: save_current.saveList
 				save_current = new_save
-				//Backup.addMoveToSave(Move(p, pos), save)
 			}
 
 		if(board(pos.x)(pos.y) != null) {
-//			players(playing).points += board(pos.x)(pos.y).point
+			points(playing) += board(pos.x)(pos.y).asInstanceOf[Dice].points
 		}
 
 		p.move_to(pos)
+		first_phase = false
 
-		//!\\ Ca fera jamais rien, qu'est-ce qu'il est sucé se passer ?
+		// Prise des dames par derrière
 		val dir = 1 - (2*playing)
 		if(in_board(pos.x, pos.y+dir) && board(pos.x)(pos.y+dir) != null
 		  && board(pos.x)(pos.y+dir).asInstanceOf[Dice].i_role == 5) { ////D/QSODQSDHQS
@@ -146,28 +150,26 @@ class ProtGame() extends Game() {
 		board(pos.x)(pos.y).asInstanceOf[Dice].roll(up)
 		playing = 1 - playing
 		turn = 1 + turn
+		first_phase = true
 		changed()
 		players(playing).wait_play
 		return true
 	}
 
-	override def over = {false}
+	override def pat = {
+		over && points(0) == points(1)
+	}
+
+	override def over = {
+		first_phase && (every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1)
+	}
 
 	def winning() : Int = {
-/*		if(players(playing).points > players(1-playing).points) {
-			return playing
-		}
-		if(players(playing).points = players(1-playing).points) {
+		if(points(0) > points(1))
+			return 0
+		else if(points(1) > points(0))
+			return 1
+		else
 			return -1
-		}
-		else {
-			return 1 - playing
-		}
-*/
-		return -1
-	}
-	
-	def over_proteus() : Boolean = {
-		return every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1
 	}
 }

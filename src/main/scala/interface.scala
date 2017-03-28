@@ -114,13 +114,8 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 				mainWin.msg.text += "(Impossibilité de Mater) "
 			}
 		}
-		else if(game.victory) {
-			mainWin.msg.text = "Le " + (if(game.playing == 1) "blanc" else "noir")  + " a gagné "
-		}
-		else if(game.defeat) {
-			mainWin.msg.text = "Le " + (if(game.playing == 0) "blanc" else "noir")  + " a gagné "
-			if( game.time_defeat )
-				mainWin.msg.text += "(temps) "
+		else if(game.over) {
+			mainWin.msg.text = "Le " + (if(game.winner == 0) "blanc" else "noir")  + " a gagné "
 		}
 	}
 
