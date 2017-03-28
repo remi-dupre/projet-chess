@@ -151,14 +151,8 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 	action = Action("") {
 		mainWin.state match {
 			case Wait() => println("waiting ...")
-			case SelectPiece(p, excl) =>
-				if(!excl.contains(Pos(x, y)) && p.select(x, y)) {
-					var piece = game.getPiece(x, y)
-					if(piece.removeInCheckMoves(piece.possible_move()).isEmpty)
-						mainWin.state = SelectPiece(p)
-					else if(p.for_move)
-						mainWin.highlight_possible(game.getPiece(x, y))
-				}
+			case WaitRollDirection(p) =>
+				p.select(x, y)
 			case WaitDirection(p) =>
 				if(p.move(x, y)) {
 					game.changed()
@@ -170,9 +164,12 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 						mainWin.highlight_possible(game.getPiece(x, y))
 					}
 				}
-			case WaitRollDirection(p) =>
-				p.select(x, y)
-		}
+			case SelectPiece(p, excl) =>
+				if(!excl.contains(Pos(x, y)) && p.select(x, y)) {
+					var piece = game.getPiece(x, y)
+					if(p.for_move)
+						mainWin.highlight_possible(game.getPiece(x, y))
+				}		}
 	}
 	
 	def highlight = {
@@ -188,7 +185,6 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 			val player = if(piece.player == 0) "white" else "black"
 			if(piece.role == "dice") {
 				val role = Dice.seq_roles(piece.asInstanceOf[Dice].i_role)
-				println(role)
 				return "src/ressources/pieces/" + player + "/" + role + ".png"
 			}
 			else {
@@ -247,7 +243,7 @@ class RollBtn(a_interface : GameWin) extends GridPanel(1, 2) {
 		visible = false
 		interface.state match {
 			case WaitRollDirection(p) => p.get_roll_direction(up)
-			case _ => println("wtf")
+			case _ => println("wtf : " + interface.state)
 		}
 	}
 }

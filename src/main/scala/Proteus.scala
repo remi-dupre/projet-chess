@@ -13,9 +13,10 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 	/** Supprime d'une liste les postions qui correspondent à une pyramide */
 	def protect_pyramids(moves : List[Pos]) : List[Pos] = {
 		return moves.filter(
-			(pos : Pos) =>
-				   game.board(pos.x)(pos.y) == null
-				|| Dice.seq_roles(game.board(pos.x)(pos.y).asInstanceOf[Dice].i_role) != "pyramid"
+			((pos : Pos) => {
+				val piece = game.board(pos.x)(pos.y)
+				(piece == null) || (Dice.seq_roles(piece.asInstanceOf[Dice].i_role) != "pyramid")
+			})
 		)
 	}
 
@@ -58,23 +59,13 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 		return false
 	}
 
-	/*override def attacked_cells() : List[Pos] = {
-		return List()
-	}*/
-	def rotateUp = {
-		i_role = min(5, i_role + 1)
-	}
-	def rotateDown = {
-		i_role = max(0, i_role - 1)
-	}
-
 	def roll(up:Boolean) : Boolean = {
 		if(up && i_role <= 4) {
-			rotateUp
+			i_role = min(5, i_role + 1)
 			return true
 		}
 		else if (!up && i_role >= 1) {
-			rotateDown
+			i_role = max(0, i_role - 1)
 			return true
 		}
 		return false
@@ -113,9 +104,6 @@ class ProtGame() extends Game() {
 		}
 		return n
 	}
-	def over_proteus() : Boolean = {
-		return every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1
-	}
 
 	override def move(p:Piece, pos:Pos): Boolean = {
 		val possibleMoves : List[Pos] = p.possible_move()
@@ -138,9 +126,10 @@ class ProtGame() extends Game() {
 		p.move_to(pos)
 
 		//!\\ Ca fera jamais rien, qu'est-ce qu'il est sucé se passer ?
-		if(in_board(pos.x, pos.y-1) && board(pos.x)(pos.y-1) != null
-		  && board(pos.x)(pos.y-1).role == "queen") {
-			board(pos.x)(pos.y-1) = null
+		val dir = 1 - (2*playing)
+		if(in_board(pos.x, pos.y+dir) && board(pos.x)(pos.y+dir) != null
+		  && board(pos.x)(pos.y+dir).asInstanceOf[Dice].i_role == 5) { ////D/QSODQSDHQS
+			board(pos.x)(pos.y+dir) = null
 		}
 
 		changed()
@@ -176,5 +165,9 @@ class ProtGame() extends Game() {
 		}
 */
 		return -1
+	}
+	
+	def over_proteus() : Boolean = {
+		return every_possible_move(playing).isEmpty || compteur_proteus(playing) == 1
 	}
 }
