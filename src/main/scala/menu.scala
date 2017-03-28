@@ -10,11 +10,11 @@ class MenuWin extends MainFrame {
 		menu.visible = false
 		val fen = new GameWin()
 		fen.game.players(0) = joueur1 match {
-			case "human" => new Human(0, fen, fen.game)
+			case "human" => new Human(0, fen, fen.game, true)
 			case "ia"    => new IA(0, fen.game, ia_delay)
 		}
 		fen.game.players(1) = joueur2 match {
-			case "human" => new Human(1, fen, fen.game)
+			case "human" => new Human(1, fen, fen.game, true)
 			case "ia"    => new IA(1, fen.game, ia_delay)
 		}
 

@@ -227,8 +227,8 @@ class RollBtn(a_interface : GameWin) extends GridPanel(1, 2) {
 	val btn_group = this
 	val btn_up = new Button(Action(""){ btn_group.selected(true) })
 	val btn_down = new Button(Action(""){ btn_group.selected(false) })
-	contents += btn_up
 	contents += btn_down
+	contents += btn_up
 	visible = false
 
 	def select(i_role : Int) = {

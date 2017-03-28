@@ -16,7 +16,7 @@ abstract class Player(val color : Int, game : Game) {
  *  @param interface La fenêtre servant à interragir avec le joueur
  *  @param game La partie
  */
-class Human(color : Int, interface : GameWin, game : Game) extends Player(color, game) {
+class Human(color : Int, interface : GameWin, game : Game, save : Boolean = false) extends Player(color, game) {
 	var selected = (-1, -1) /** La pièce sélectionnée */
 	var points = 0 /* nombre de points dans la partie pour Proteus */
 
@@ -35,7 +35,6 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 	override def get_roll_direction(direction : Boolean) = {
 		val (x, y) = selected
 		game.asInstanceOf[ProtGame].roll(Pos(x, y), direction)
-		println("dan")
 	}
 
 	override def get_promotion_type : String = {
@@ -54,10 +53,6 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 			else return false
 		}
 		else {
-/*			if(game.cell_player(x, y) == color) {
-				return true
-			}
-			else return false*/
 			if(game.cell_player(x, y) == color) {
 				selected = (x, y)
 				interface.roll_btn.select(game.board(x)(y).asInstanceOf[Dice].i_role)
@@ -74,7 +69,7 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
 		val ret = game.move(piece, Pos(x, y))
-		if(game.save_root != null)
+		if(game.save_root != null && save)
 			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
 		return ret
 	}

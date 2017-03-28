@@ -2,29 +2,22 @@ import scala.math.min
 import scala.math.max
 
 object Dice {
+	/** Juste pour implémenter quelques trucs statiques */
 	val seq_roles = Array("pyramid", "pawn", "bishop", "knight", "rook", "queen")
 }
+
 class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos) {
 	override def role = "dice"
 	var i_role : Int = 1
-	/*if(i_role == 0) {
-		this.asInstanceOf[Pyramid]
+
+	/** Supprime d'une liste les postions qui correspondent à une pyramide */
+	def protect_pyramids(moves : List[Pos]) : List[Pos] = {
+		return moves.filter(
+			(pos : Pos) =>
+				   game.board(pos.x)(pos.y) == null
+				|| Dice.seq_roles(game.board(pos.x)(pos.y).asInstanceOf[Dice].i_role) != "pyramid"
+		)
 	}
-	if(i_role == 1) {
-		this.asInstanceOf[Pawn_proteus]
-	}
-	if(i_role == 2) {
-		this.asInstanceOf[Bishop]
-	}
-	if(i_role == 3) {
-		this.asInstanceOf[Knight]
-	}
-	if(i_role == 4) {
-		this.asInstanceOf[Rook]
-	}
-	if(i_role == 5) {
-		this.asInstanceOf[Queen]
-	}*/
 
 	override def attacked_cells() : List[Pos] = {
 		val save_piece = this
@@ -40,8 +33,7 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 		game.board(pos.x)(pos.y) = new_piece
 		val ret = new_piece.attacked_cells
 		game.board(pos.x)(pos.y) = save_piece
-		println(ret)
-		return ret
+		return protect_pyramids(ret)
 	}
 
 	override def possible_move() : List[Pos] = {
@@ -53,13 +45,13 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 			case "bishop" => new Bishop(game, player, pos)
 			case "knight" => new Knight(game, player, pos)
 			case "pawn" => new Pawn_proteus(game, player, pos)
+			case "pyramid" => new Pyramid(game, player, pos)
 		}
 		new_piece.already_moved = already_moved
 		game.board(pos.x)(pos.y) = new_piece
 		val ret = new_piece.possible_move
 		game.board(pos.x)(pos.y) = save_piece
-		println(ret)
-		return ret
+		return protect_pyramids(ret)
 	}
 	
 	override def inCheck(new_pos : Pos) : Boolean = {
