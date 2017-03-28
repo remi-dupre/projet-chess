@@ -4,8 +4,8 @@ import java.util.TimerTask
 
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
-	def wait_play : Unit
-	def wait_roll : Unit = {}
+	def wait_play : Unit = {}
+	def wait_roll(last_pos : Pos) : Unit = {}
 	def get_roll_direction(up : Boolean) : Unit = {}
 	def get_promotion_type : String
 }
@@ -27,9 +27,9 @@ class Human(color : Int, interface : GameWin, game : Game, save : Boolean = fals
 		interface.state = SelectPiece(this)
 	}
 
-	override def wait_roll = {
+	override def wait_roll(last_pos : Pos) = {
 		for_move = false
-		interface.state = SelectPiece(this)
+		interface.state = SelectPiece(this, List(last_pos))
 	}
 
 	override def get_roll_direction(direction : Boolean) = {

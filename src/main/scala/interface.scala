@@ -12,7 +12,7 @@ import scala.math._
  *  - Wait() : on sait pas trop ce qu'il se passe
  */
 class InterfaceState
-case class SelectPiece(p : Human) extends InterfaceState
+case class SelectPiece(p : Human, exclude : List[Pos] = List()) extends InterfaceState
 case class WaitDirection(p : Human) extends InterfaceState
 case class WaitRollDirection(p : Human) extends InterfaceState
 case class Wait() extends InterfaceState
@@ -151,8 +151,8 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 	action = Action("") {
 		mainWin.state match {
 			case Wait() => println("waiting ...")
-			case SelectPiece(p) =>
-				if(p.select(x, y)) {
+			case SelectPiece(p, excl) =>
+				if(!excl.contains(Pos(x, y)) && p.select(x, y)) {
 					var piece = game.getPiece(x, y)
 					if(piece.removeInCheckMoves(piece.possible_move()).isEmpty)
 						mainWin.state = SelectPiece(p)

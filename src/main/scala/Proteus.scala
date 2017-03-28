@@ -146,7 +146,7 @@ class ProtGame() extends Game() {
 		changed()
 
 		if(players(playing) != null && !over) {
-				players(playing).wait_roll
+				players(playing).wait_roll(pos)
 			}
 			return true
 		}
