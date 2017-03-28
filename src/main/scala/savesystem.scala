@@ -10,13 +10,10 @@ case class Save(var move: Move, var saveList: List[Save], var father: Save) {
 	/** Arbre de sauvegardes */
 
 	var game_state : Game = null
-<<<<<<< HEAD
-=======
 
 	def backward(save:Save) : Save = {
 		return save.father
 	}
->>>>>>> 554e6f38934483a0fc8f0f4c60867b3d26ab2ff3
 	
 	def apply_moves(game : Game) : Unit = {
 		if(!saveList.isEmpty) {
