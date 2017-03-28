@@ -129,11 +129,11 @@ class ProtGame() extends Game() {
 		val possibleMoves : List[Pos] = p.possible_move()
 		if(possibleMoves.contains(pos)) {
 			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
-				save_root = Save(Move(p.pos, pos), List())
+				save_root = Save(Move(p.pos, pos), List(), null)
 				save_current = save_root
 			}
 			else {
-				val new_save = Save(Move(p.pos, pos), List())
+				val new_save = Save(Move(p.pos, pos), List(), null)
 				save_current.saveList = new_save :: save_current.saveList
 				save_current = new_save
 				//Backup.addMoveToSave(Move(p, pos), save)

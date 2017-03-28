@@ -6,10 +6,14 @@ case class Move(from: Pos, to: Pos) {
 	var promote_to : String = null
 }
 
-case class Save(var move: Move, var saveList: List[Save]) {
+case class Save(var move: Move, var saveList: List[Save], var father: Save) {
 	/** Arbre de sauvegardes */
 
 	var game_state : Game = null
+
+	def backward(save:Save) : Save = {
+		save.father
+	}
 	
 	def apply_moves(game : Game) : Unit = {
 		if(!saveList.isEmpty) {
@@ -140,7 +144,7 @@ object Backup {
 
 	def addMoveToSave(move: Move, save: Save):Unit = {
 		if(save.saveList.isEmpty) {
-			save.saveList = List(Save(move, List()))
+			save.saveList = List(Save(move, List(), save))
 		}
 		else {
 			addMoveToSave(move, save.saveList.head)
@@ -204,10 +208,10 @@ object Backup {
 						move.promote_to = role
 
 						if(move_list == null) {
-							move_list = Save(move, List())
+							move_list = Save(move, List(), null)
 						}
 						else {
-							move_list = Save(move, List(move_list))
+							move_list = Save(move, List(move_list), move_list.saveList.head)
 						}
 						n = 0
 						i = -1
