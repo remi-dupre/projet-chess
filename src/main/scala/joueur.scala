@@ -4,8 +4,8 @@ import java.util.TimerTask
 
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
-	def wait_play : Unit
-	def wait_roll : Unit = {}
+	def wait_play : Unit = {}
+	def wait_roll(last_pos : Pos) : Unit = {}
 	def get_roll_direction(up : Boolean) : Unit = {}
 	def get_promotion_type : String
 }
@@ -16,7 +16,7 @@ abstract class Player(val color : Int, game : Game) {
  *  @param interface La fenêtre servant à interragir avec le joueur
  *  @param game La partie
  */
-class Human(color : Int, interface : GameWin, game : Game) extends Player(color, game) {
+class Human(color : Int, interface : GameWin, game : Game, save : Boolean = false) extends Player(color, game) {
 	var selected = (-1, -1) /** La pièce sélectionnée */
 	var points = 0 /* nombre de points dans la partie pour Proteus */
 
@@ -27,15 +27,14 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 		interface.state = SelectPiece(this)
 	}
 
-	override def wait_roll = {
+	override def wait_roll(last_pos : Pos) = {
 		for_move = false
-		interface.state = SelectPiece(this)
+		interface.state = SelectPiece(this, List(last_pos))
 	}
 
 	override def get_roll_direction(direction : Boolean) = {
 		val (x, y) = selected
 		game.asInstanceOf[ProtGame].roll(Pos(x, y), direction)
-		println("dan")
 	}
 
 	override def get_promotion_type : String = {
@@ -54,10 +53,6 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 			else return false
 		}
 		else {
-/*			if(game.cell_player(x, y) == color) {
-				return true
-			}
-			else return false*/
 			if(game.cell_player(x, y) == color) {
 				selected = (x, y)
 				interface.roll_btn.select(game.board(x)(y).asInstanceOf[Dice].i_role)
@@ -74,7 +69,7 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
 		val ret = game.move(piece, Pos(x, y))
-		if(game.save_root != null)
+		if(game.save_root != null && save)
 			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
 		return ret
 	}
