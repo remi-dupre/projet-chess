@@ -89,8 +89,8 @@ class ProtGame() extends Game() {
 	override def init = {
 		for(i <- 0 to 3) {
 			board(2*i)(7) = new Dice(this, 0, Pos(2*i, 7))
-			//board(2*i+1)(6) = new Dice(this, 0, Pos(2*i+1, 6))
-			//board(2*i)(1) = new Dice(this, 1, Pos(2*i, 1))
+			board(2*i+1)(6) = new Dice(this, 0, Pos(2*i+1, 6))
+			board(2*i)(1) = new Dice(this, 1, Pos(2*i, 1))
 			board(2*i+1)(0) = new Dice(this, 1, Pos(2*i+1, 0))
 		}
 		points = Array(0, 0)
@@ -112,6 +112,17 @@ class ProtGame() extends Game() {
 	override def move(p:Piece, pos:Pos): Boolean = {
 		val possibleMoves : List[Pos] = p.possible_move()
 		if(possibleMoves.contains(pos)) {
+
+			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
+				save_root = Save(Move(p.pos, pos), List(), null)
+				save_current = save_root
+			}
+			else {
+				val new_save = Save(Move(p.pos, pos), List(), save_current)
+				save_current.saveList = new_save :: save_current.saveList
+				save_current = new_save
+			}
+
 			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
 				save_root = Save(Move(p.pos, pos), List(), null)
 				save_current = save_root
@@ -122,23 +133,23 @@ class ProtGame() extends Game() {
 				save_current = new_save
 			}
 
-		if(board(pos.x)(pos.y) != null) {
-			points(playing) += board(pos.x)(pos.y).asInstanceOf[Dice].points
-		}
+			if(board(pos.x)(pos.y) != null) {
+				points(playing) += board(pos.x)(pos.y).asInstanceOf[Dice].points
+			}
 
-		p.move_to(pos)
-		first_phase = false
+			p.move_to(pos)
+			first_phase = false
 
-		// Prise des dames par derrière
-		val dir = 1 - (2*playing)
-		if(in_board(pos.x, pos.y+dir) && board(pos.x)(pos.y+dir) != null
-		  && board(pos.x)(pos.y+dir).asInstanceOf[Dice].i_role == 5) { ////D/QSODQSDHQS
-			board(pos.x)(pos.y+dir) = null
-		}
+			// Prise des dames par derrière
+			val dir = 1 - (2*playing)
+			if(in_board(pos.x, pos.y+dir) && board(pos.x)(pos.y+dir) != null
+			  && board(pos.x)(pos.y+dir).asInstanceOf[Dice].i_role == 5) { ////D/QSODQSDHQS
+				board(pos.x)(pos.y+dir) = null
+			}
 
-		changed()
+			changed()
 
-		if(players(playing) != null && !over) {
+			if(players(playing) != null && !over) {
 				players(playing).wait_roll(pos)
 			}
 			return true

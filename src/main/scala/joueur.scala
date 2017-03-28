@@ -138,6 +138,5 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 			}
 		});
 		t.start
-		t.start
 	}
 }
