@@ -1,11 +1,13 @@
 import scala.math.min
 import scala.math.max
 
+object Dice {
+	val seq_roles = Array("pyramid", "pawn", "bishop", "knight", "rook", "queen")
+}
 class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos) {
 	override def role = "dice"
-	val seq_roles = Array("pyramid", "pawn", "bishop", "knight", "rook", "queen")
 	var i_role : Int = 1
-	if(i_role == 0) {
+	/*if(i_role == 0) {
 		this.asInstanceOf[Pyramid]
 	}
 	if(i_role == 1) {
@@ -22,7 +24,7 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 	}
 	if(i_role == 5) {
 		this.asInstanceOf[Queen]
-	}
+	}*/
 
 	override def attacked_cells() : List[Pos] = {
 		return List()
@@ -47,7 +49,7 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 }
 
 class ProtGame() extends Game() {
-	def init_proteus = {
+	override def init = {
 		for(i <- 0 to 3) {
 			board(2*i)(6) = new Dice(this, 0, Pos(2*i, 6))
 			board(2*i+1)(7) = new Dice(this, 0, Pos(2*i+1, 7))
@@ -56,12 +58,12 @@ class ProtGame() extends Game() {
 		}
 	}
 
-	def start_proteus = {
+	/* override def start = {
 		init_proteus
 		playing = 0
 		changed()
 		players(playing).wait_play
-	}
+	}*/
 
 	def compteur_proteus(player:Int): Int = {
 		var n = 0
@@ -127,29 +129,3 @@ class ProtGame() extends Game() {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

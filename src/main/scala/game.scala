@@ -1,5 +1,9 @@
 import scala.math.abs
 
+object GameType extends Enumeration {
+	val Normal, Proteus = Value
+}
+
 case class Pos(x : Int, y : Int)
 
 /**

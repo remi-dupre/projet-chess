@@ -21,7 +21,7 @@ case class Wait() extends InterfaceState
  * Une fenêtre qui sert d'affichage de la partie et d'interface pour les éventuels joueurs
  * (au passage elle génère une partie dans sont constructeur)
  */
-class GameWin() extends MainFrame {
+class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 	preferredSize = new Dimension(600, 630)
 	minimumSize = new Dimension(500, 530)
 	/* Caractéristiques de la fenêtre */
@@ -29,7 +29,11 @@ class GameWin() extends MainFrame {
 	title = "Chess"
 
 	/** La partie associée */
-	var game = new Game()
+	val game = game_type match {
+		case GameType.Normal => new Game()
+		case GameType.Proteus => new ProtGame()
+	}
+
 	game.changed = () => {
 		mainWin.refresh
 	}
@@ -173,15 +177,21 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 
 	/** Met à jours l'affichage de la case */
 	def refresh = {
+		def piece_icon(piece : Piece) : String = {
+			if(piece == null) return ""
+			val player = if(piece.player == 0) "white" else "black"
+			if(piece.role == "dice") {
+				val role = Dice.seq_roles(piece.asInstanceOf[Dice].i_role)
+				println(role)
+				return "src/ressources/pieces/" + player + "/" + role + ".png"
+			}
+			else {
+				return "src/ressources/pieces/" + player + "/" + piece.role + ".png"
+			}
+		}
+
 		background = if((x+y) % 2 == 0) Color.white else Color.darkGray
-		val player = if(game.cell_player(x, y) == 0) "white" else "black"
-		val role = game.cell_role(x, y)
-		if(role == "empty") {
-			icon = null
-		}
-		else {
-			icon = new ImageIcon("src/ressources/pieces/" + player + "/" + role + ".png") ; disabledIcon = icon
-		}
+		icon = new ImageIcon(piece_icon(game.board(x)(y))) ; disabledIcon = icon
 		enabled = !game.over
 	}
 }
