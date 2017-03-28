@@ -5,6 +5,7 @@ class MenuWin extends MainFrame {
 	val menu = this
 
 	def create_game(joueur1 : String, joueur2 : String,
+	  timer : Array[Cadency],
 	  get_save : Boolean = false,
 	  ia0_delay : Int = 0, ia1_delay : Int = 0,
 	  mode : GameType.Value = GameType.Normal) = {
@@ -20,6 +21,7 @@ class MenuWin extends MainFrame {
 		}
 
 		fen.visible = true
+		fen.game.timers = timer
 
 		if(get_save) {
 			val save = Backup.createSaveFromPGN("save.pgn")
@@ -34,6 +36,9 @@ class MenuWin extends MainFrame {
 
 	contents = new GridPanel(5, 1) {
 		val use_save = new CheckBox("Récupérer la sauvegarde")
+
+		// Sélection du timer
+		val select_time = new SelectTimer()
 
 		// Boutons de selection des joueurs
 		val select_white = new SelectPlayer()
@@ -61,7 +66,7 @@ class MenuWin extends MainFrame {
 			if(select_black.i == 2)
 				ia1_delay = 500
 
-			create_game(j0_type, j1_type, use_save.selected, ia0_delay, ia1_delay)
+			create_game(j0_type, j1_type, select_time.get, use_save.selected, ia0_delay, ia1_delay)
 		})
 
 		contents += new Button(Action("Proteus") {
@@ -82,11 +87,11 @@ class MenuWin extends MainFrame {
 			if(select_black.i == 2)
 				ia1_delay = 500
 
-			create_game(j0_type, j1_type, false, ia0_delay, ia1_delay, GameType.Proteus)
+			create_game(j0_type, j1_type, select_time.get, false, ia0_delay, ia1_delay, GameType.Proteus)
 		})
-		contents += new GridPanel(1, 2) {
-			new SelectPlayer()
-		}
+
+		contents += select_time
+
 		contents += use_save
 	}
 	centerOnScreen()
@@ -106,5 +111,35 @@ class SelectPlayer() extends Button {
 			case 2 => "IA (lent)"
 		}
 	}
+	refresh
+}
+
+class SelectTimer() extends Button {
+	var i = 0
+	val types = Array("Délais : Sans", "Délais : Retard", "Délais : Classique")
+
+	action = Action("") {
+		i = (i + 1) % 3
+		refresh
+	}
+
+	def refresh = {
+		action.title = types(i)
+	}
+
+	def get : Array[Cadency] = {
+		i match {
+			case 0 => null
+			case 1 => Array(
+				new Cadency(List(Period(50, 5), Period(20, 3))),
+				new Cadency(List(Period(50, 5), Period(20, 3)))
+			)
+			case 2 => Array(
+				new Cadency(List(Period(60*60, 15))),
+				new Cadency(List(Period(60*60, 15)))
+			)
+		}
+	}
+
 	refresh
 }
