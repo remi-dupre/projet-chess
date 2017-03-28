@@ -14,6 +14,7 @@ import scala.math._
 class InterfaceState
 case class SelectPiece(p : Human) extends InterfaceState
 case class WaitDirection(p : Human) extends InterfaceState
+case class WaitRollDirection(p : Human) extends InterfaceState
 case class Wait() extends InterfaceState
 
 
@@ -52,7 +53,7 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 		close()
 		Main.menu.visible = true
 	})
-	val roll_btn = new RollBtn()
+	val roll_btn = new RollBtn(this)
 	var label_timer = new TimeCounter(game)
 
 	/** L'ensemble des cases de la partie */
@@ -169,6 +170,8 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 						mainWin.highlight_possible(game.getPiece(x, y))
 					}
 				}
+			case WaitRollDirection(p) =>
+				p.select(x, y)
 		}
 	}
 	
@@ -219,9 +222,11 @@ class PromoBtn() extends Button {
 }
 
 /** Un choix de pièce vers laquelle roll */
-class RollBtn() extends GridPanel(1, 2) {
-	val btn_up = new Button(Action(""){})
-	val btn_down = new Button(Action(""){})
+class RollBtn(a_interface : GameWin) extends GridPanel(1, 2) {
+	val interface = a_interface
+	val btn_group = this
+	val btn_up = new Button(Action(""){ btn_group.selected(true) })
+	val btn_down = new Button(Action(""){ btn_group.selected(false) })
 	contents += btn_up
 	contents += btn_down
 	visible = false
@@ -236,5 +241,13 @@ class RollBtn() extends GridPanel(1, 2) {
 		var role_up = Dice.seq_roles(min(5, i_role+1))
 		btn_up.enabled = (i_role < 5)
 		btn_up.icon = tools.icon_resized("src/ressources/pieces/white/" + role_up + ".png", 30, 30)
+	}
+
+	def selected(up : Boolean) = {
+		visible = false
+		interface.state match {
+			case WaitRollDirection(p) => p.get_roll_direction(up)
+			case _ => println("wtf")
+		}
 	}
 }

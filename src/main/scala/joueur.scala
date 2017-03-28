@@ -6,7 +6,7 @@ abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
 	def wait_play : Unit
 	def wait_roll : Unit = {}
-	def get_roll_direction : Unit = {}
+	def get_roll_direction(up : Boolean) : Unit = {}
 	def get_promotion_type : String
 }
 
@@ -17,6 +17,9 @@ abstract class Player(val color : Int, game : Game) {
  *  @param game La partie
  */
 class Human(color : Int, interface : GameWin, game : Game) extends Player(color, game) {
+	var selected = (-1, -1) /** La pièce sélectionnée */
+	var points = 0 /* nombre de points dans la partie pour Proteus */
+
 	var for_move = true
 
 	override def wait_play = {
@@ -29,16 +32,16 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 		interface.state = SelectPiece(this)
 	}
 
-	override def get_roll_direction = {
-
+	override def get_roll_direction(direction : Boolean) = {
+		val (x, y) = selected
+		game.asInstanceOf[ProtGame].roll(Pos(x, y), direction)
+		println("dan")
 	}
 
 	override def get_promotion_type : String = {
 		return interface.promo_btn.role
 	}
 
-	var selected = (-1, -1) /** La pièce sélectionnée */
-	var points = 0 /* nombre de points dans la partie pour Proteus */
 	/** Sélectonne un pièce si possible
 	 * Retourne false si ca échoue */
 	def select(x : Int, y : Int) : Boolean = {
@@ -52,14 +55,13 @@ class Human(color : Int, interface : GameWin, game : Game) extends Player(color,
 		}
 		else {
 /*			if(game.cell_player(x, y) == color) {
-				selected = (x, y)
-				game.asInstanceOf[ProtGame].roll(Pos(x, y))
 				return true
 			}
 			else return false*/
 			if(game.cell_player(x, y) == color) {
 				selected = (x, y)
 				interface.roll_btn.select(game.board(x)(y).asInstanceOf[Dice].i_role)
+				interface.state = WaitRollDirection(this)
 				return true
 			}
 		}
