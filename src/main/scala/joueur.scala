@@ -106,10 +106,8 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 	override def get_promotion_type : String =  {
 		"queen"
 	}
-}
 
-class IAProt(color : Int, game : ProtGame, speed : Int = 0) extends player(color, game) {
-	override def wait_play = {
+	override def wait_roll(last_pos : Pos) = {
 		var pos_move : List[(Piece, Pos)] = List()
 		var piece_list : List[Piece] = List()
 		for(i <- 0 to 7) {
@@ -124,25 +122,19 @@ class IAProt(color : Int, game : ProtGame, speed : Int = 0) extends player(color
 			}
 		}
 
+		val piece = Random.shuffle(piece_list).head
+		var direction = Random.shuffle(List(true, false)).head
+		if(piece.role == "pyramid") {
+			direction = true
+		}
+		if(piece.role == "queen") {
+			direction = false
+		}
+
 		Thread.sleep(speed)
 		val t = new Thread(new Runnable() {
 			def run() {
-				val (piece, dest) = Random.shuffle(pos_move).head
-				remove(piece, piece_list)
-				game.move(piece, dest)
-
-				val piece2 = Random.shuffle(list_piece).head
-				val x = piece2.pos.x
-				val y = piece2.pos.y
-				var direction = Random.shuffle(List(true, false)).head
-				if(piece2.role == "pyramid") {
-					direcion = true
-				}
-				if(piece2.role == "queen") {
-					direction = false
-				}
-				game.asInstanceOf[ProtGame].roll(Pos(x, y), direction)
-				Thread.currentThread().interrupt()
+				game.asInstanceOf[ProtGame].roll(piece.pos, direction)
 			}
 		});
 		t.start

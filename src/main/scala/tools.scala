@@ -12,6 +12,6 @@ object tools {
 
 	def timestamp : Long = {
 		val stamp = new Timestamp(System.currentTimeMillis())
-		return stamp.getTime
+		return stamp.getTime / 1000
 	}
 }

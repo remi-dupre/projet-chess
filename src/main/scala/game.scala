@@ -21,8 +21,8 @@ class Game() {
 	var timers : Array[Cadency] = Array(timer.copy, timer.copy)
 	var turn_start : Long = -1 // le timestamp du début du tour
 
-	/** L'indice dans 'players' du joueur qui doit jouer */
-	/** 0 = blanc, 1 = noir **/
+	/** L'indice dans 'players' du joueur qui doit jouer
+	 *  0 = blanc, 1 = noir */
 	var playing = 0
 
 	/** Une fonction qui est appelée quand le jeu est modifié */
@@ -34,6 +34,7 @@ class Game() {
 	/** Système de sauvegarde **/
 	var save_root: Save = null
 	var save_current : Save = null
+	var save_hist : Save = null
 
 	/** Initialise le plateau de jeu et lance la partie */
 	def init = {
@@ -103,6 +104,7 @@ class Game() {
 			if(timers != null) {
 				timers(playing).spend(tools.timestamp-turn_start)
 			}
+
 			if(save_root == null) { // Un nouvel arbre de sauvegardes est nécessaire
 				save_root = Save(Move(p.pos, pos), List(), null)
 				save_current = save_root
@@ -290,21 +292,23 @@ class Game() {
 		return true
 	}
 
-	def copy : Game = {
-		val g = new Game
-		// g.players = players //!\\ Checker la stabilité de cette ligne si elle a un interêt un jours 
-		g.playing = playing
-		g.turn = turn
-		// g.changed -> ne semble pas pertinent
-		g.board = Array.ofDim(8, 8)
+	def copy_config_of(g : Game) = {
+		playing = g.playing
+		turn = g.turn
+		board = Array.ofDim(8, 8)
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
-				val c = board(i)(j)
+				val c = g.board(i)(j)
 				if( c != null) {
-					g.board(i)(j) = c.copy_for(g)
+					board(i)(j) = c.copy_for(this)
 				}
 			}
 		}
+	}
+
+	def copy : Game = {
+		val g = new Game
+		g.copy_config_of(this)
 		return g
 	}
 

@@ -11,7 +11,7 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 			case "queen" => new Queen(new_game, player, pos)
 			case "rook" => new Rook(new_game, player, pos)
 			case "bishop" => new Bishop(new_game, player, pos)
-			case "knight" => new Knight(new_game, player, pos)
+			case "knight" => new Knight(new_game, player, pos
 			case "pawn" => new Pawn(new_game, player, pos)
 		}
 		ret.already_moved = already_moved
