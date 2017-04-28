@@ -55,6 +55,14 @@ case class Save(var move: Move, var saveList: List[Save], var father: Save) {
 		else
 			return game_state :: saveList.head.game_list(game_state)
 	}
+
+	/** La liste des moves successifs */
+	def move_list : List[Move] = {
+		if( saveList.isEmpty )
+			return List(move)
+		else
+			return move :: saveList.head.move_list
+	}
 }
 
 object Backup {
