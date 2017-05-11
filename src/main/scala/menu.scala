@@ -12,11 +12,11 @@ class MenuWin extends MainFrame {
 		menu.visible = false
 		val fen = new GameWin(mode)
 		fen.game.players(0) = joueur1 match {
-			case "human" => new GnuChess(0, fen.game, 0)//new Human(0, fen, fen.game, true)
+			case "human" => new CECP_player(new GnuChess(), 0, fen.game)//new Human(0, fen, fen.game, true)
 			case "ia"	 => new IA(0, fen.game, ia0_delay)
 		}
 		fen.game.players(1) = joueur2 match {
-			case "human" => new GnuChess(1, fen.game, 0)//new Human(1, fen, fen.game, true)
+			case "human" => new CECP_player(new GnuChess(), 1, fen.game)//new Human(1, fen, fen.game, true)
 			case "ia"	 => new IA(1, fen.game, ia1_delay)
 		}
 
