@@ -21,19 +21,9 @@ class GnuChess extends CECP_engine {
 		override def run() {
 			for(line <- Source.fromInputStream(proc.getInputStream).getLines) {
 				println("#" + line)
-				val msg = line.split(" ").last
-				if(msg.length == 4) {
-					val f_x = rows.indexOf( msg(0) )
-					val f_y = cols.indexOf( msg(1) )
-					val t_x = rows.indexOf( msg(2) )
-					val t_y = cols.indexOf( msg(3) )
-
-					if(line.substring(0, 7) == "My move") {
-						if(f_x >= 0 && f_y >= 0 && t_x >= 0 && t_y >= 0) {
-							// On suppose que ça suffit à caractériser un move
-							listeners.foreach((f) => f(msg))
-						}
-					}
+				line match {
+					case CECP_msg.gc_move(desc) => listeners.foreach((f) => f(desc))
+					case _ => ()
 				}
 			}
 		}
