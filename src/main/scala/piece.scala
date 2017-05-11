@@ -4,6 +4,7 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	var already_moved : Int = -1
 	var pawn_rules : Boolean = false
 	def role : String
+	def value : Int = 0
 
 	def copy_for(new_game : Game) : Piece = {
 		val ret = role match {
@@ -79,6 +80,7 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 
 class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "king"
+	override def value = 20000
 
 	// les mouvements standarts
 	override def attacked_cells() : List[Pos] = {
@@ -138,6 +140,7 @@ class King(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 
 class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "queen"
+	override def value = 900
 	override def attacked_cells() : List[Pos] = {
 		var pos_move: List[Pos] = List()
 		for(i <- 0 to 2) {
@@ -153,11 +156,13 @@ class Queen(game : Game, player : Int, pos : Pos) extends Piece(game, player, po
 
 class Rook(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "rook"
+	override def value = 500
 	override def attacked_cells() : List[Pos] = annexe_possible_move(1,0) ++ annexe_possible_move(0,1) ++ annexe_possible_move(-1,0) ++ annexe_possible_move(0,-1)
 }
 
 class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, pos) {
 	override def role = "bishop"
+	override def value = 350
 	override def attacked_cells : List[Pos] =
 		annexe_possible_move((1,1)) ++
 		annexe_possible_move((-1,1)) ++
@@ -167,6 +172,7 @@ class Bishop(game : Game, player : Int, pos : Pos) extends Piece(game, player, p
 
 class Knight(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "knight"
+	override def value = 325
 	override def attacked_cells() : List[Pos] = {
 		var x = pos.x
 		var y = pos.y
@@ -184,6 +190,7 @@ class Knight(game : Game, player : Int, m_pos : Pos) extends Piece(game, player,
 
 class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m_pos) {
 	override def role = "pawn"
+	override def value = 100
 
 	override def attacked_cells() : List[Pos] = {
 		var x = pos.x
