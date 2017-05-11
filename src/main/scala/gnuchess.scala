@@ -3,13 +3,14 @@ import scala.io._
 
 /* TODO
  *  - utiliser des regex
+ *  - gérer les "resign"
  */
 
 class GnuChess extends CECP_engine {
 	val rows = Array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
 	val cols = Array('8', '7', '6', '5', '4', '3', '2', '1')
 
-	val command = "gnuchess --easy --xboard"	// Command to start the xboard engine
+	val command = "gnuchess --xboard"	// Command to start the xboard engine
 
 	/* The process runing the engine */
 	val proc = Runtime.getRuntime.exec(command)
@@ -40,6 +41,7 @@ class GnuChess extends CECP_engine {
 
 	def send(msg : String) : Unit = {
 		out.println(msg)
+		println("(sent) ---> " + msg)
 		out.flush()
 	}
 }

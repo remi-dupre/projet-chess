@@ -30,10 +30,23 @@ class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player
 	engine.listeners = (apply_cecp_instruction(_ : String)) :: engine.listeners
 
 	override def wait_play = {
+		// send time information to the CECP engine
+		if(game.timers != null) {
+			val timer = game.timers(game.playing)
+			val moves = timer.period_moves + game.turn
+			val secs = timer.free_time.toFloat
+			engine.send("time " + secs*100)
+			//engine.send("level " + moves + " " + minutes + " 1")
+
+			val otimer = game.timers(1-game.playing)
+			val omoves = otimer.period_moves + game.turn
+			val osecs = otimer.free_time.toFloat
+			engine.send("otim " + osecs*100)
+		}
+
 		// trys to apply last move
 		if(game.save_root != null) {
 			val move = game.save_root.move_list.last
-			println("---> " + rows(move.from.x) + cols(move.from.y) + rows(move.to.x) + cols(move.to.y) )
 			engine.send( "" + rows(move.from.x) + cols(move.from.y) + rows(move.to.x) + cols(move.to.y) )
 		}
 
@@ -46,5 +59,4 @@ class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player
 	override def get_promotion_type : String =  {
 		"queen"
 	}
-
 }
