@@ -11,4 +11,4 @@
  - [x] séparer la gestion cecp
  - [x] utiliser des regex
  - [ ] gérer les temps
- - [ ] gérer les abandons
+ - [x] ~~gérer les abandons~~

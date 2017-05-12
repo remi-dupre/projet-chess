@@ -12,8 +12,9 @@ object CECP_msg {
 	val rows = Array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
 	val cols = Array('8', '7', '6', '5', '4', '3', '2', '1')
 
-	val gc_move = """My move is : ([a-h][1-8][a-h][1-8])""".r
-	val move = """([a-h][1-8][a-h][1-8])""".r
+	val forfait = "resign".r
+	val gc_move = "My move is : ([a-h][1-8][a-h][1-8])".r
+	val move = "([a-h][1-8][a-h][1-8])".r
 }
 
 class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player(color, game) {
@@ -38,6 +39,7 @@ class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player
 					game.move(piece, dest)
 					plays = false
 				}
+				case forfait => println("""/!\ GNU Chess a abandonné""")
 			}
 		}
 	}
