@@ -145,7 +145,8 @@ class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, g
 	val depth = 5
 	override def wait_play = {
 
-		val (piece, dest) = IATools.alphabeta(color, -50000, 50000, depth, game, true)._2
+		val (points, (piece, dest)) = IATools.alphabeta(color, -500000, 500000, depth, game, true)
+		println(points)
 		println("motherfuck")
 
 		Thread.sleep(speed)
