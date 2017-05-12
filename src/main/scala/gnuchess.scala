@@ -2,7 +2,6 @@ import java.io._
 import scala.io._
 
 /* TODO
- *  - utiliser des regex
  *  - gérer les "resign"
  */
 

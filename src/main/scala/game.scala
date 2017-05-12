@@ -130,7 +130,6 @@ class Game() {
 					save_current.move.promote_to = board(pos.x)(pos.y).role
 				}
 			}
-			p.already_moved = turn
 			playing = 1 - playing
 			turn = turn + 1
 			changed()

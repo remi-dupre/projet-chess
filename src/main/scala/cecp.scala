@@ -26,17 +26,14 @@ class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player
 		if(plays) {
 			msg match {
 				case CECP_msg.move(desc) => {
-					println("BIIIIIIIIIIITE")
-					println(desc)
 					val f_x = CECP_msg.rows.indexOf( desc(0) )
 					val f_y = CECP_msg.cols.indexOf( desc(1) )
 					val t_x = CECP_msg.rows.indexOf( desc(2) )
 					val t_y = CECP_msg.cols.indexOf( desc(3) )
-	println(f_x)
-	println(f_y)
+
 					val piece = game.board(f_x)(f_y)
 					val dest = Pos(t_x, t_y)
-	println(piece)
+
 					println("Moving " + piece.role + " to " + dest)
 					game.move(piece, dest)
 					plays = false

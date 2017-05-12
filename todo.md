@@ -1,5 +1,5 @@
 # Jeu classique
- - [ ] prise en passant
+ - [x] prise en passant
  - [ ] format pgn
  - [ ] Paramètrer les timers
 
