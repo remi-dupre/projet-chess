@@ -44,20 +44,25 @@ class Game() {
 		}
 		board(4)(7) = new King(this, 0, Pos(4, 7))
 		board(4)(0) = new King(this, 1, Pos(4, 0))
+
 		board(3)(7) = new Queen(this, 0, Pos(3, 7))
 		board(3)(0) = new Queen(this, 1, Pos(3, 0))
+
 		board(0)(7) = new Rook(this, 0, Pos(0, 7))
 		board(7)(7) = new Rook(this, 0, Pos(7, 7))
 		board(0)(0) = new Rook(this, 1, Pos(0, 0))
 		board(7)(0) = new Rook(this, 1, Pos(7, 0))
+
 		board(1)(7) = new Knight(this, 0, Pos(1, 7))
 		board(6)(7) = new Knight(this, 0, Pos(6, 7))
 		board(1)(0) = new Knight(this, 1, Pos(1, 0))
 		board(6)(0) = new Knight(this, 1, Pos(6, 0))
+
 		board(2)(7) = new Bishop(this, 0, Pos(2, 7))
 		board(5)(7) = new Bishop(this, 0, Pos(5, 7))
 		board(2)(0) = new Bishop(this, 1, Pos(2, 0))
 		board(5)(0) = new Bishop(this, 1, Pos(5, 0))
+
 		turn_start = Tools.timestamp
 	}
 
@@ -114,7 +119,6 @@ class Game() {
 				save_current.saveList = new_save :: save_current.saveList
 				save_current = new_save
 			}
-
 			p.move_to(pos)
 
 			if(p.role == "pawn") {
@@ -269,6 +273,7 @@ class Game() {
 	def copy_config_of(g : Game) = {
 		playing = g.playing
 		turn = g.turn
+
 		board = Array.ofDim(8, 8)
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
