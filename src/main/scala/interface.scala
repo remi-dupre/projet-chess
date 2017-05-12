@@ -183,9 +183,12 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 					var piece = game.getPiece(x, y)
 					if(p.for_move)
 						mainWin.highlight_possible(game.getPiece(x, y))
-				}		}
+				}
+		}
 	}
 	
+	tooltip = "x: " + x + ", y: " + y
+
 	def highlight = {
 		val light_ok = new Color(120, 220, 130)
 		val dark_ok = new Color(75, 150, 85)

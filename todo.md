@@ -11,4 +11,7 @@
  - [x] séparer la gestion cecp
  - [x] utiliser des regex
  - [ ] gérer les temps
- - [ ] gérer les abandons
+ - [x] ~~gérer les abandons~~
+
+# IAs
+ - [ ] tuer tous les processus quand une partie est terminée
