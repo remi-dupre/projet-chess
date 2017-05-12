@@ -140,3 +140,28 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 		t.start
 	}
 }
+
+class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, game) {
+	val depth = 5
+	override def wait_play = {
+
+		val (piece, dest) = IATools.alphabeta(color, -50000, 50000, depth, game, true)._2
+		println("motherfuck")
+
+		Thread.sleep(speed)
+		val t = new Thread(new Runnable() {
+		 	def run() {
+		 		if(piece != null && dest != null) {
+					game.move(piece, dest)
+				}
+				Thread.currentThread().interrupt()
+			}
+		})
+		t.start()
+	}
+	override def get_promotion_type : String = {
+		return "queen"
+	}
+}
+
+
