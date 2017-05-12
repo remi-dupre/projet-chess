@@ -39,9 +39,11 @@ class Cadency(a_periods : List[Period]) {
 			periods = List()
 		}
 		else if(periods.head.moves == 1) { // On a joué tous les coups de la période
-			periods = periods.tail
 			if( repeat_last && periods.tail.isEmpty ) {
 				periods = periods.head :: periods
+			}
+			else {
+				periods = periods.tail
 			}
 		}
 		else {

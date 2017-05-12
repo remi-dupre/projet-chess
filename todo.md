@@ -12,3 +12,6 @@
  - [x] utiliser des regex
  - [ ] gérer les temps
  - [x] ~~gérer les abandons~~
+
+# IAs
+ - [ ] tuer tous les processus quand une partie est terminée
