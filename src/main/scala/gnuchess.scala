@@ -32,7 +32,7 @@ class GnuChess extends CECP_engine {
 
 	def send(msg : String) : Unit = {
 		out.println(msg)
-		//println("(sent) ---> " + msg)
+		println("(sent) ---> " + msg)
 		out.flush()
 	}
 }

@@ -132,8 +132,8 @@ class SelectTimer() extends Button {
 		i match {
 			case 0 => null
 			case 1 => Array(
-				new Cadency(List(Period(5, 5))),
-				new Cadency(List(Period(5, 5)))
+				new Cadency(List(Period(1, 5))),
+				new Cadency(List(Period(1, 5)))
 			)
 			case 2 => Array(
 				new Cadency(List(Period(60*60, 15))),

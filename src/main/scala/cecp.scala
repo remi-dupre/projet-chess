@@ -44,10 +44,11 @@ class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player
 
 				val piece = game.board(f_x)(f_y)
 				val dest = Pos(t_x, t_y)
-if(piece == null)
-	{println("pouet"+ (f_x,f_y))
-	println(dest)
-	return}
+				if(piece == null) {
+					println("""/!\ Le cecp semble avoir beguaillé""")
+					return
+				}
+
 				val success = game.move(piece, dest)
 				println("(j" + color +  ") Moving " + piece.role + " to " + dest + " : " + success)
 			}
@@ -68,7 +69,16 @@ if(piece == null)
 		// trys to apply last move
 		if(game.save_root != null) {
 			val move = game.save_root.move_list.last
-			engine.send( "" + rows(move.from.x) + cols(move.from.y) + rows(move.to.x) + cols(move.to.y) )
+			var move_txt = "" + rows(move.from.x) + cols(move.from.y) + rows(move.to.x) + cols(move.to.y)
+			move_txt += (move.promote_to match {
+				case null => ""
+				case "queen" => "q"
+				case "rook" => "r"
+				case "bishop" => "b"
+				case "knight" => "n"
+				case _ => println("Promotion invalide dans cecp.scala:wait_play")
+			})
+			engine.send(move_txt)
 		}
 
 		// waits for next move
