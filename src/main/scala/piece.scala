@@ -26,6 +26,9 @@ abstract case class Piece(game : Game, player : Int, var pos : Pos) {
 	}
 
 	def move_to(new_pos : Pos) {
+		if(already_moved == -1)
+			already_moved = game.turn
+			
 		game.board(new_pos.x)(new_pos.y) = this
 		game.board(pos.x)(pos.y) = null
 		pos = new_pos
@@ -224,6 +227,7 @@ class Pawn(game : Game, player : Int, m_pos : Pos) extends Piece(game, player, m
 		
 		return pos_move
 	}
+
 	override def possible_move() : List[Pos] = {
 		var x = pos.x
 		var y = pos.y
