@@ -14,11 +14,21 @@ object IATools {
 
 	/* les matrices qui reconsidère les points des pièces selon leurs positions sur le board */
 	def hash(s : String) : Int = {
-		if( s == "king" ) return 0
-		else if ( s == "queen" ) return 1
-		else if ( s == "rook" ) return 2
-		else if ( s == "knight" ) return 3
-		else if ( s == "bishop" ) return 4
+		if( s == "king" ) {
+			return 0
+		}
+		if ( s == "queen" ) {
+			return 1
+		}
+		if ( s == "rook" ) {
+			return 2
+		}
+		if ( s == "knight" ) {
+			return 3
+		}
+		if ( s == "bishop" ) {
+			return 4
+		}
 		return 5
 	}
 	var pointPositionning = Array.ofDim[Int](2, 6, 8, 8) /* 0 = king, 1 = queen, 2 = rook, 3 = knight, 4 = bishop, 5 = pawn */
@@ -96,7 +106,7 @@ object IATools {
 	Array(10, 10, 20, 30, 30, 20, 10, 10),
 	Array( 5,  5, 10, 25, 25, 10,  5,  5),
 	Array( 0,  0,  0, 20, 20,  0,  0,  0),
-	Array( 5, -5,-10,  9999999,  0,-10, -5,  5),
+	Array( 5, -5,-10,  0,  0,-10, -5,  5),
 	Array( 5, 10, 10,-20,-20, 10, 10,  5),
 	Array( 0,  0,  0,  0,  0,  0,  0,  0)
 	)
@@ -278,7 +288,7 @@ object IATools {
 					for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
 						val x = pos.x
 						val y = pos.y
-						if((game.board(x)(y) != null)) {
+						if((game.board(x)(y) != null) && (game.board(x)(y).player == 1-player)) {
 							pos_move = (piece, pos) :: pos_move
 						}
 					}
@@ -449,38 +459,7 @@ object IATools {
 		return (a, bestmove)
 	}
 */
-	def quiesce(player: Int, alpha : Int, beta : Int, game : Game) : (Int, (Piece, Pos)) = {
-		var a = alpha
-		var b = beta
-		val points = evaluate(game)
-		val standPat = points(player)
-		var bestmove : (Piece, Pos) = null
-		if( standPat >= b ) {
-			return (b, bestmove)
-		}
-		if(alpha < standPat) {
-			a = standPat
-		}
-		val captureMoves = everyCaptureMoves(player, game)
-		for(move <- captureMoves) {
-			var piece0 = move._1
-			val pos = move._2
-			val copygame = copyGame(game)
-			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
-			val movebis = (piece, pos)
-			piece.move_to(pos)
-
-			val score = -quiesce(1-player, -b, -a, copygame)._1
-			if( score >= b ) {
-				return (b, bestmove)
-			}
-			if ( score > a) {
-				a = score
-				bestmove = move
-			}
-		}
-		return (a, bestmove)
-	}
+	
 /*
 	def alphaBeta(points: Array[Int], bonusesPenalties: Array[Array[Boolean]], player: Int, alpha : Int, beta : Int, depth: Int, game:Game, bestscorebis: Int = 0, bestmovebis : (Piece, Pos) ) : (Int, (Piece, Pos), Int, Int) = {
 		var bestscore = bestscorebis
@@ -529,14 +508,146 @@ object IATools {
 		return (bestscore, bestmove, a, b)
 	}
 */
-	def alphabeta(player : Int, alpha : Int, beta : Int, depth : Int, game : Game, first : Boolean) : (Int, (Piece, Pos)) = {
+	def quiesce(player: Int, alpha : Int, beta : Int, game : Game) : Int = {
 		var a = alpha
 		var b = beta
-		var bestscore = -50000
-		var bestmove : (Piece, Pos) = null
-		if(depth == 0) {
-			return quiesce(player, a, b, game)
+		val points = evaluate(game)
+		val standPat = points(player) - points(1-player)
+		if( standPat >= b ) {
+			return b
 		}
+		if(a < standPat) {
+			a = standPat
+		}
+		val captureMoves = everyCaptureMoves(player, game)
+		for(move <- captureMoves) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
+
+			val v = -quiesce(1-player, -b, -a, copygame)
+			if( v >= b ) {
+				return b
+			}
+			if ( v > a) {
+				a = v
+			}
+		}
+		return a
+	}
+
+	def playab(player: Int, alpha : Int, beta : Int, game : Game, depth : Int) : (Piece, Pos) = {
+		var max_val = -70000
+		var a = alpha
+		var b = beta
+		val pos_move = everyPossibleMoves(player, game)
+		var best_move : (Piece, Pos) = (null, null)
+		for(move <- pos_move) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
+
+			val value = ab(copygame, depth, a, b, 1-player, false)
+			if( value > max_val) {
+				max_val = value
+				best_move = (piece0, pos)
+			}
+		}
+		return best_move
+	}
+
+	def ab(game : Game, depth : Int, alpha : Int, beta : Int, player : Int, maximizingPlayer : Boolean) : Int = {
+		if(depth == 0) {
+			val points = evaluate(game)
+			return quiesce(player, alpha, beta, game)
+		}
+		var a = alpha
+		var b = beta
+		val pos_move = everyPossibleMoves(player, game)
+		var best_move :(Piece, Pos) = (null, null)
+		if(maximizingPlayer) {
+			var v = -70000
+			for(move <- pos_move) {
+				var piece0 = move._1
+				val pos = move._2
+				val copygame = copyGame(game)
+				val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+				val movebis = (piece, pos)
+				piece.move_to(pos)
+
+				val value = ab(copygame, depth - 1, a, b, 1-player, false)
+				if( value > v) {
+					v = value
+				}
+				if( a < v) {
+					a = v
+				}
+				if( b <= a) {
+					return v
+				}
+			}
+			return v
+		}
+		else {
+			var v = 70000
+			for(move <- pos_move) {
+				var piece0 = move._1
+				val pos = move._2
+				val copygame = copyGame(game)
+				val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+				val movebis = (piece, pos)
+				piece.move_to(pos)
+
+				val value = ab(copygame, depth - 1, a, b, 1-player, true)
+				if( v > value) {
+					v = value
+				}
+				if( b > v) {
+					b = value
+				}
+				if(b <= a) {
+					return v
+				}
+			}
+			return v
+		}
+	}
+
+
+	def play(player : Int, game : Game, depth : Int) : (Piece, Pos) = {
+		var max_val = -70000
+		val pos_move = everyPossibleMoves(player, game)
+		val hd = pos_move.head
+		var best_move = (hd._1, hd._2)
+		for(move <- pos_move) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
+
+			val value = min(1-player, copygame, depth)
+			if( value > max_val) {
+				max_val = value
+				best_move = (piece0, pos)
+			}
+		}
+		return best_move
+	}
+
+	def min(player : Int, game : Game, depth : Int) : Int = {
+		if(depth == 0) {
+			val points = evaluate(game)
+			return points(player) - points(1-player)
+		}
+		var min_val = 70000
 		val pos_move = everyPossibleMoves(player, game)
 		for(move <- pos_move) {
 			var piece0 = move._1
@@ -544,25 +655,38 @@ object IATools {
 			val copygame = copyGame(game)
 			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
 			val movebis = (piece, pos)
-			val score = - alphabeta(1-player, -b, -a, depth -1, copygame, false)._1
-			if(score >= b) {
-				return (score, bestmove)
-			}
-			if(score > bestscore) {
-				bestscore = score
-				if(first) {
-					bestmove = move
-				}
-				if( score > alpha) {
-					a = score
-				}
-			}
+			piece.move_to(pos)
 
+			val value = max(1-player, copygame, depth-1)
+			if(value < min_val) {
+				min_val = value
+			}
 		}
-		return (bestscore, bestmove)
+		return min_val
 	}
 
+	def max(player : Int, game : Game, depth : Int) : Int = {
+		if(depth == 0) {
+			val points = evaluate(game)
+			return points(player) - points(1-player)
+		}
+		var max_val = -70000
+		val pos_move = everyPossibleMoves(player, game)
+		for(move <- pos_move) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
 
+			val value = min(1-player, copygame, depth-1)
+			if(value > max_val) {
+				max_val = value
+			}
+		}
+		return max_val
+	}
 }
 
 
