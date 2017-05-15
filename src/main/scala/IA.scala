@@ -11,14 +11,25 @@ object IATools {
 
 	val bonusBishopPoints = 50
 	val penaltyNoPawnPoints = -50
+	val facteurRookPossibleMove = 1
 
 	/* les matrices qui reconsidère les points des pièces selon leurs positions sur le board */
 	def hash(s : String) : Int = {
-		if( s == "king" ) return 0
-		else if ( s == "queen" ) return 1
-		else if ( s == "rook" ) return 2
-		else if ( s == "knight" ) return 3
-		else if ( s == "bishop" ) return 4
+		if( s == "king" ) {
+			return 0
+		}
+		if ( s == "queen" ) {
+			return 1
+		}
+		if ( s == "rook" ) {
+			return 2
+		}
+		if ( s == "knight" ) {
+			return 3
+		}
+		if ( s == "bishop" ) {
+			return 4
+		}
 		return 5
 	}
 	var pointPositionning = Array.ofDim[Int](2, 6, 8, 8) /* 0 = king, 1 = queen, 2 = rook, 3 = knight, 4 = bishop, 5 = pawn */
@@ -96,7 +107,7 @@ object IATools {
 	Array(10, 10, 20, 30, 30, 20, 10, 10),
 	Array( 5,  5, 10, 25, 25, 10,  5,  5),
 	Array( 0,  0,  0, 20, 20,  0,  0,  0),
-	Array( 5, -5,-10,  9999999,  0,-10, -5,  5),
+	Array( 5, -5,-10,  0,  0,-10, -5,  5),
 	Array( 5, 10, 10,-20,-20, 10, 10,  5),
 	Array( 0,  0,  0,  0,  0,  0,  0,  0)
 	)
@@ -126,7 +137,12 @@ object IATools {
 	bonusesPenalties(1)(2) = false
 	bonusesPenalties(1)(3) = false
 	bonusesPenalties(1)(4) = false
-	/* 
+	/*
+
+
+
+
+	 																			TO DO LIST  
 	Le tableau sert à gagner de la complexité temporelle sur les calculs des bonus / pénalités suivantes
 
 	bonus bishop pair /* done */     /* 0 */ /* 50 points */
@@ -135,10 +151,15 @@ object IATools {
 	trade down bonus /* ~ done ~ */  /* 3 */ /* */
 	penalty no pawn /* ~ done ~ */   /* 4 */ /* -50 points */
 	Elephantiasis effect             /* 5 */ /* pas encore pris en compte dans le tableau au dessus car dur à programmer */
+
+																			
+
+
+																				test
 	*/
 
 	/******************/
-	def bonusBishopPair(player: Int, game: Game) : Boolean = { /* worth 50 points */
+/*	def bonusBishopPair(player: Int, game: Game) : Boolean = { /* worth 50 points */
 		var res = 0
 		for(i <- 0 to 7) {
 			for (j <- 0 to 7) {
@@ -229,7 +250,7 @@ object IATools {
 		}
 		return res
 	}
-
+*/
 
 	def copyGame(game: Game) : Game = {
 		val g = new Game
@@ -237,7 +258,7 @@ object IATools {
 		return g
 	}
 
-	def copyPoints(p : Array[Int]) : Array[Int] = {
+/*	def copyPoints(p : Array[Int]) : Array[Int] = {
 		val resPoint = Array.ofDim[Int](2)
 		resPoint(0) = points(0)
 		resPoint(1) = points(1)
@@ -253,7 +274,7 @@ object IATools {
 		}
 		return resBonuses
 	}
-
+*/
 	def everyPossibleMoves(player: Int, game: Game) : List[(Piece, Pos)] = {
 		var pos_move : List[(Piece, Pos)] = List()
 		for(i <- 0 to 7) {
@@ -278,7 +299,7 @@ object IATools {
 					for(pos <- piece.removeInCheckMoves(piece.possible_move)) {
 						val x = pos.x
 						val y = pos.y
-						if((game.board(x)(y) != null)) {
+						if((game.board(x)(y) != null) && (game.board(x)(y).player == 1-player)) {
 							pos_move = (piece, pos) :: pos_move
 						}
 					}
@@ -288,7 +309,7 @@ object IATools {
 		return pos_move
 	}
 
-	def maximum(list : List[(Piece, Pos, Int)]) : (Piece, Pos) = {
+/*	def maximum(list : List[(Piece, Pos, Int)]) : (Piece, Pos) = {
 		var maxi = list.head._3
 		var piece = list.head._1
 		var pos = list.head._2
@@ -301,7 +322,7 @@ object IATools {
 		}
 		return (piece, pos)
 	}
-
+*/
 	def reverseArray(position: Array[Array[Int]]) : Array[Array[Int]] = {
 		val newArray = Array.ofDim[Int](8, 8)
 		for(i <- 0 to 7) {
@@ -312,30 +333,84 @@ object IATools {
 		return newArray
 	}
 
+	def equalPos(x:Pos, y:Pos) : Boolean = {
+		return (x.x==y.x)&&(x.y==y.y)
+	}
+	def supElem(list:List[Pos], x:Pos):List[Pos] = {
+		if(list.isEmpty) {
+			return List()
+		}
+		val hd = list.head
+		if(equalPos(hd, x)) {
+			return supElem(list.tail, x)
+		}
+		else {
+			return hd::supElem(list.tail, x)
+		}
 
+	}
+	def supDoublon(list:List[Pos]) : List[Pos] = {
+		if(list.isEmpty) {
+			return List()
+		}
+		val hd = list.head
+		return hd::supDoublon(supElem(list, hd))
+
+	}
 
 	/* Fonctions essentiels */
 
-	def evaluate(game: Game) : Array[Int] = {
-		val points = Array.ofDim[Int](2)
-		val bonusBishopPair = Array.ofDim[Int](2)
-		val penaltyNoPawn = Array.ofDim[Int](2)
-		bonusBishopPair(0) = 0
-		bonusBishopPair(1) = 0
-		points(0) = 0
-		points(1) = 0
+	def evaluateComplex(game: Game) : Array[Int] = {
+		val points = Array(0, 0)
+		val bonusBishopPair = Array(0, 0)
+		val penaltyNoPawn = Array(0, 0)
+		var possibleRookmoves : Array[List[Pos]] = Array(List(), List())
 		for(i <- 0 to 7) {
 			for (j <- 0 to 7) {
 				val piece = game.board(i)(j)
 				if( piece != null ) {
 					val player = piece.player
-					points(player) += piece.value
-					points(player) += pointPositionning(player)(hash(piece.role))(i)(j)
+					points(player) += piece.value /* matériel sur l'échiquier' */
+					points(player) += pointPositionning(player)(hash(piece.role))(i)(j) /* positionnement des pièces sur l'échiquier */
 					if( piece.role == "bishop") {
-						bonusBishopPair(player) += 1
+						bonusBishopPair(player) += 1 /* pair de fou, vaut mieux que 2 fou indépendant : Bonus Bishop pair */
 					}
 					if( piece.role == "pawn") {
-						penaltyNoPawn(player) += 1
+						penaltyNoPawn(player) += 1 /* Malus si plus aucun points -> mauvais pour la fin de partie */
+					}
+					if(piece.role == "rook") { /* plus les tours ont de choix de moves, plus c'est intéressant !*/ 
+						possibleRookmoves(player) = piece.removeInCheckMoves(piece.possible_move) ++ possibleRookmoves(player) 
+					}
+				}
+			}
+		}
+		for(i <- 0 to 1) {
+			if(bonusBishopPair(i) == 2) {
+				points(i) += bonusBishopPoints 
+			}
+			if( penaltyNoPawn(i) == 0) {
+				points(i) -= penaltyNoPawnPoints 
+			}
+			points(i) += supDoublon(possibleRookmoves(i)).length * facteurRookPossibleMove 
+		}
+		return points
+	}
+	def evaluate(game: Game) : Array[Int] = {
+		val points = Array(0, 0)
+		val bonusBishopPair = Array(0, 0)
+		val penaltyNoPawn = Array(0, 0)
+		for(i <- 0 to 7) {
+			for (j <- 0 to 7) {
+				val piece = game.board(i)(j)
+				if( piece != null ) {
+					val player = piece.player
+					points(player) += piece.value /* matériel sur l'échiquier' */
+					points(player) += pointPositionning(player)(hash(piece.role))(i)(j) /* positionnement des pièces sur l'échiquier */
+					if( piece.role == "bishop") { /* pair de fou, vaut mieux que 2 fou indépendant : Bonus Bishop pair */
+						bonusBishopPair(player) += 1
+					}
+					if( piece.role == "pawn") { /* Malus si plus aucun points -> mauvais pour la fin de partie */
+						penaltyNoPawn(player) += 1 
 					}
 				}
 			}
@@ -449,38 +524,7 @@ object IATools {
 		return (a, bestmove)
 	}
 */
-	def quiesce(player: Int, alpha : Int, beta : Int, game : Game) : (Int, (Piece, Pos)) = {
-		var a = alpha
-		var b = beta
-		val points = evaluate(game)
-		val standPat = points(player)
-		var bestmove : (Piece, Pos) = null
-		if( standPat >= b ) {
-			return (b, bestmove)
-		}
-		if(alpha < standPat) {
-			a = standPat
-		}
-		val captureMoves = everyCaptureMoves(player, game)
-		for(move <- captureMoves) {
-			var piece0 = move._1
-			val pos = move._2
-			val copygame = copyGame(game)
-			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
-			val movebis = (piece, pos)
-			piece.move_to(pos)
-
-			val score = -quiesce(1-player, -b, -a, copygame)._1
-			if( score >= b ) {
-				return (b, bestmove)
-			}
-			if ( score > a) {
-				a = score
-				bestmove = move
-			}
-		}
-		return (a, bestmove)
-	}
+	
 /*
 	def alphaBeta(points: Array[Int], bonusesPenalties: Array[Array[Boolean]], player: Int, alpha : Int, beta : Int, depth: Int, game:Game, bestscorebis: Int = 0, bestmovebis : (Piece, Pos) ) : (Int, (Piece, Pos), Int, Int) = {
 		var bestscore = bestscorebis
@@ -529,14 +573,146 @@ object IATools {
 		return (bestscore, bestmove, a, b)
 	}
 */
-	def alphabeta(player : Int, alpha : Int, beta : Int, depth : Int, game : Game, first : Boolean) : (Int, (Piece, Pos)) = {
+	def quiesce(player: Int, alpha : Int, beta : Int, game : Game) : Int = {
 		var a = alpha
 		var b = beta
-		var bestscore = -50000
-		var bestmove : (Piece, Pos) = null
-		if(depth == 0) {
-			return quiesce(player, a, b, game)
+		val points = evaluate(game)
+		val standPat = points(player) - points(1-player)
+		if( standPat >= b ) {
+			return b
 		}
+		if(a < standPat) {
+			a = standPat
+		}
+		val captureMoves = everyCaptureMoves(player, game)
+		for(move <- captureMoves) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
+
+			val v = -quiesce(1-player, -b, -a, copygame)
+			if( v >= b ) {
+				return b
+			}
+			if ( v > a) {
+				a = v
+			}
+		}
+		return a
+	}
+
+	def playab(player: Int, alpha : Int, beta : Int, game : Game, depth : Int) : (Piece, Pos) = {
+		var max_val = -70000
+		var a = alpha
+		var b = beta
+		val pos_move = everyPossibleMoves(player, game)
+		var best_move : (Piece, Pos) = (null, null)
+		for(move <- pos_move) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
+
+			val value = ab(copygame, depth, a, b, 1-player, false)
+			if( value > max_val) {
+				max_val = value
+				best_move = (piece0, pos)
+			}
+		}
+		return best_move
+	}
+
+	def ab(game : Game, depth : Int, alpha : Int, beta : Int, player : Int, maximizingPlayer : Boolean) : Int = {
+		if(depth == 0) {
+			val points = evaluate(game)
+			return quiesce(player, alpha, beta, game)
+		}
+		var a = alpha
+		var b = beta
+		val pos_move = everyPossibleMoves(player, game)
+		var best_move :(Piece, Pos) = (null, null)
+		if(maximizingPlayer) {
+			var v = -70000
+			for(move <- pos_move) {
+				var piece0 = move._1
+				val pos = move._2
+				val copygame = copyGame(game)
+				val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+				val movebis = (piece, pos)
+				piece.move_to(pos)
+
+				val value = ab(copygame, depth - 1, a, b, 1-player, false)
+				if( value > v) {
+					v = value
+				}
+				if( a < v) {
+					a = v
+				}
+				if( b <= a) {
+					return v
+				}
+			}
+			return v
+		}
+		else {
+			var v = 70000
+			for(move <- pos_move) {
+				var piece0 = move._1
+				val pos = move._2
+				val copygame = copyGame(game)
+				val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+				val movebis = (piece, pos)
+				piece.move_to(pos)
+
+				val value = ab(copygame, depth - 1, a, b, 1-player, true)
+				if( v > value) {
+					v = value
+				}
+				if( b > v) {
+					b = value
+				}
+				if(b <= a) {
+					return v
+				}
+			}
+			return v
+		}
+	}
+/*
+
+	def play(player : Int, game : Game, depth : Int) : (Piece, Pos) = {
+		var max_val = -70000
+		val pos_move = everyPossibleMoves(player, game)
+		val hd = pos_move.head
+		var best_move = (hd._1, hd._2)
+		for(move <- pos_move) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
+
+			val value = min(1-player, copygame, depth)
+			if( value > max_val) {
+				max_val = value
+				best_move = (piece0, pos)
+			}
+		}
+		return best_move
+	}
+
+	def min(player : Int, game : Game, depth : Int) : Int = {
+		if(depth == 0) {
+			val points = evaluate(game)
+			return points(player) - points(1-player)
+		}
+		var min_val = 70000
 		val pos_move = everyPossibleMoves(player, game)
 		for(move <- pos_move) {
 			var piece0 = move._1
@@ -544,25 +720,39 @@ object IATools {
 			val copygame = copyGame(game)
 			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
 			val movebis = (piece, pos)
-			val score = - alphabeta(1-player, -b, -a, depth -1, copygame, false)._1
-			if(score >= b) {
-				return (score, bestmove)
-			}
-			if(score > bestscore) {
-				bestscore = score
-				if(first) {
-					bestmove = move
-				}
-				if( score > alpha) {
-					a = score
-				}
-			}
+			piece.move_to(pos)
 
+			val value = max(1-player, copygame, depth-1)
+			if(value < min_val) {
+				min_val = value
+			}
 		}
-		return (bestscore, bestmove)
+		return min_val
 	}
 
+	def max(player : Int, game : Game, depth : Int) : Int = {
+		if(depth == 0) {
+			val points = evaluate(game)
+			return points(player) - points(1-player)
+		}
+		var max_val = -70000
+		val pos_move = everyPossibleMoves(player, game)
+		for(move <- pos_move) {
+			var piece0 = move._1
+			val pos = move._2
+			val copygame = copyGame(game)
+			val piece = copygame.board(piece0.pos.x)(piece0.pos.y)
+			val movebis = (piece, pos)
+			piece.move_to(pos)
 
+			val value = min(1-player, copygame, depth-1)
+			if(value > max_val) {
+				max_val = value
+			}
+		}
+		return max_val
+	}
+*/
 }
 
 
