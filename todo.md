@@ -13,9 +13,10 @@
  - [x] utiliser des regex
  - [x] gérer les temps
  - [x] ~~gérer les abandons~~
- - [ ] ajouter au menu
+ - [x] ajouter au menu
  - [x] récupérer la partie en cours
 
 # IAs
  - [ ] tuer tous les processus quand une partie est terminée
  - [ ] bug quand on appuye sur un bouton
+ - [ ] bug quand on clique sur le plateau pendant le tour de l'ia

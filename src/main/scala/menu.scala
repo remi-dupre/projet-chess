@@ -11,14 +11,18 @@ class MenuWin extends MainFrame {
 	  mode : GameType.Value = GameType.Normal) = {
 		menu.visible = false
 		val fen = new GameWin(mode)
+		println(joueur1)
 		fen.game.players(0) = joueur1 match {
-
-			case "human" => new Human(0, fen, fen.game, true)//new CECP_player(new GnuChess(), 0, fen.game)
-			case "ia"	 => new IAadvanced(0, fen.game, ia0_delay)
+			case "human"		=> new Human(0, fen, fen.game, true)
+			case "ia"			=> new IA(0, fen.game, ia0_delay)
+			case "ia_advanced"	=> new IAadvanced(0, fen.game, ia0_delay)
+			case "gnuchess"		=> new CECP_player(new GnuChess(), 0, fen.game)
 		}
 		fen.game.players(1) = joueur2 match {
-			case "human" => new CECP_player(new GnuChess(), 1, fen.game)//new Human(1, fen, fen.game, true)
-			case "ia"	 => new IAadvanced(1, fen.game, ia1_delay)
+			case "human"		=> new Human(1, fen, fen.game, true)
+			case "ia"			=> new IA(1, fen.game, ia1_delay)
+			case "ia_advanced"	=> new IAadvanced(1, fen.game, ia1_delay)
+			case "gnuchess"		=> new CECP_player(new GnuChess(), 1, fen.game)
 		}
 
 		fen.visible = true
@@ -53,19 +57,15 @@ class MenuWin extends MainFrame {
 			var ia0_delay = 0
 			var ia1_delay = 0
 
-			var j0_type : String = select_white.i match {
-				case 0 => "human"
-				case _ => "ia"
+			var j0_type : String = select_white.t match {
+				case "ia_fast" => "ia"
+				case _ => select_white.t
 			}
-			if(select_white.i == 2)
-				ia0_delay = 500
 
-			var j1_type : String = select_black.i match {
-				case 0 => "human"
-				case _ => "ia"
+			var j1_type : String = select_black.t match {
+				case "ia_fast" => "ia"
+				case _ => select_black.t
 			}
-			if(select_black.i == 2)
-				ia1_delay = 500
 
 			create_game(j0_type, j1_type, select_time.get, use_save.selected, ia0_delay, ia1_delay)
 		})
@@ -100,16 +100,19 @@ class MenuWin extends MainFrame {
 
 class SelectPlayer() extends Button {
 	var i = 0
-	val types = Array("human", "ia_fast", "ia_slow")
+	val types = Array("human", "ia_advanced", "gnuchess", "ia_fast")
+	def t = types(i)
+
 	action = Action("") {
-		i = (i + 1) % 3
+		i = (i + 1) % types.length
 		refresh
 	}
 	def refresh = {
 		action.title = i match {
 			case 0 => "Joueur"
-			case 1 => "IA (rapide)"
-			case 2 => "IA (lent)"
+			case 1 => "IA"
+			case 2 => "GNU Chess"
+			case 3 => "IA random"
 		}
 	}
 	refresh
@@ -120,7 +123,7 @@ class SelectTimer() extends Button {
 	val types = Array("Délais : Sans", "Délais : Retard", "Délais : Classique")
 
 	action = Action("") {
-		i = (i + 1) % 3
+		i = (i + 1) % types.length
 		refresh
 	}
 
@@ -132,8 +135,8 @@ class SelectTimer() extends Button {
 		i match {
 			case 0 => null
 			case 1 => Array(
-				new Cadency(List(Period(1, 5))),
-				new Cadency(List(Period(1, 5)))
+				new Cadency(List(Period(50, 5))),
+				new Cadency(List(Period(50, 5)))
 			)
 			case 2 => Array(
 				new Cadency(List(Period(60*60, 15))),
