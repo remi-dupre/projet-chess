@@ -52,7 +52,7 @@ class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player
 				}
 
 				val success = game.move(piece, dest)
-				//println("(j" + color +  ") Moving " + piece.role + " to " + dest + " : " + success)
+				println("(j" + color +  ") Moving " + piece.role + " to " + dest + " : " + success)
 			}
 			case forfait => println("""/!\ GNU Chess a abandonné""")
 		}
@@ -83,10 +83,11 @@ class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player
 
 		// loads the game
 		if(!already_played && game.save_root != null) {
+			println("-> Loading a new game to the CECP")
 			for(move <- game.save_root.move_list) {
 				engine.send(move_txt(move))
 			}
-			Thread.sleep(1000)
+			Thread.sleep(100)
 		}
 		// trys to apply last move
 		else if(game.save_root != null) {
