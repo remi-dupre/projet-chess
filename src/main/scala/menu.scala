@@ -13,7 +13,7 @@ class MenuWin extends MainFrame {
 		val fen = new GameWin(mode)
 		fen.game.players(0) = joueur1 match {
 
-			case "human" => new CECP_player(new GnuChess(), 0, fen.game)//new Human(0, fen, fen.game, true)
+			case "human" => new Human(0, fen, fen.game, true)//new CECP_player(new GnuChess(), 0, fen.game)
 			case "ia"	 => new IAadvanced(0, fen.game, ia0_delay)
 		}
 		fen.game.players(1) = joueur2 match {
@@ -132,8 +132,8 @@ class SelectTimer() extends Button {
 		i match {
 			case 0 => null
 			case 1 => Array(
-				new Cadency(List(Period(5, 5))),
-				new Cadency(List(Period(5, 5)))
+				new Cadency(List(Period(1, 5))),
+				new Cadency(List(Period(1, 5)))
 			)
 			case 2 => Array(
 				new Cadency(List(Period(60*60, 15))),

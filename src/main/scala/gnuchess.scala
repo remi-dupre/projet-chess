@@ -9,7 +9,7 @@ class GnuChess extends CECP_engine {
 	val rows = Array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
 	val cols = Array('8', '7', '6', '5', '4', '3', '2', '1')
 
-	val command = "gnuchess --xboard"	// Command to start the gnuchess engine
+	val command = "gnuchess --xboard --manual"	// Command to start the gnuchess engine
 
 	/* The process runing the engine */
 	val proc = Runtime.getRuntime.exec(command)
@@ -19,7 +19,7 @@ class GnuChess extends CECP_engine {
 	val reader = new Thread("stderr reader for : " + command) {
 		override def run() {
 			for(line <- Source.fromInputStream(proc.getInputStream).getLines) {
-				println("#" + line)
+				//println("#" + line)
 				line match {
 					case CECP_msg.gc_move(desc) => listeners.foreach((f) => f(desc))
 					case CECP_msg.forfait() => listeners.foreach((f) => f(line))
@@ -32,7 +32,7 @@ class GnuChess extends CECP_engine {
 
 	def send(msg : String) : Unit = {
 		out.println(msg)
-		//println("(sent) ---> " + msg)
+		println("(sent) ---> " + msg)
 		out.flush()
 	}
 }
