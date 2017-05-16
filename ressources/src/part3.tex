@@ -1,0 +1,111 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Projet chess Part 3}
+\author{Rémi Dupré et Pierre Jobic }
+\date{Mai 2017}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+ 
+\urlstyle{same}
+ 
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+le but de cette partie était d'implementer une IA et de faire un peu de communication grâce au protocole CECP.
+
+
+\section{Apperçu du code}
+Il y avait deux parties complètement indépendantes. Rémi a fait la partie sur le réseau, tandis que Pierre a fait la partie sur l'IA.
+Nous avons régler quelques petits problème par ci, par là dans les anciens fichiers, mais rien de très nouveau à été fait dans ces fichiers là. On s'intéressera donc juste aux deux parties ( IA + GnuChess ).
+
+\subsection{Remarques générales}
+
+Pour ma part ( Pierre ), J'ai eu un peu de mal à bien implémenter les fonctions (alphabeta + la fonction qui retourne le mouvement considé par alphabeta). En revanche, j'ai bien aimé faire la partie sur la fonction d'évaluation, les articles sont assez intéressant à lire ( sachant que j'aime beaucoup les jeux à informations complètes et que les concepts intuitifs énoncés dans les articles sont assez intéressant ).
+
+\subsection{Structure du projet}
+
+Il y a 15 fichiers scala dans notre projet ( dont 3 nouveaux ):
+\begin{itemize}
+    \item Game : une partie d'échec, juste la gestion des règles
+    \item Piece : représentation et calculs sur une pièce
+    \item Interface : l'affichage, et le choix des mouvements
+    \item Joueur : le comportement des deux types de joueurs
+    \item Menu : pour choisir le type de partie
+    \item Main : juste là par habitude
+    \item savesystem : gestion de la sauvegarde ( format PGN )
+    \item Proteus piece : variante de notre jeu d'échec ( gestion des pièces )
+    \item Proteus game : variante de notre jeu d'échec ( gestion de la partie )
+    \item Timer : Une gestion du rythme de jeu imposé
+    \item tools : fonctions utiles qui n'ont pas leur place ailleurs.
+    \item (new) IA : fonction d'évaluation + alphabeta
+    \item (new) CECP :  Communication via la convention CECP
+    \item (new) GnuChess : Définition du moteur CECP utilisant GNUChess
+    \item (new) Settings : Paramètre le timer et l'IA
+    
+\end{itemize}
+
+\subsection{IA}
+Je vais donc parler à peu près séparement de la fonction d'évaluation et de l'algorithme alpha beta.
+
+\subsubsection{algorithme Alpha Beta}
+Le but ici était de coder au minimum l'algorithme simple alpha beta qui est donc un minmax amélioré car on coupe certaine branche dans l'exploration de l'arbre du jeu grâce aux valeurs alpha et beta qui représente respectivement le minimum du score que le jouer à maximiser peut espérer, et le maximum du score que l'autre jouer à minimiser peut avoir.
+Dans cette algorithme, on suppose donc que le joueur à minimiser joue toujours les meilleurs coups possibles. \\
+
+Pour ma part ( Pierre ), J'ai fais l'algorithme alpha beta avec une amélioration: on évalue en plus les "quiet moves" qui sont les déplacements qui mangent les pièces.
+Cette amélioration est principalement là pour éviter le problème suivant: puisque l'on va voir à une profondeur déterminer, il se peut que le dernier mouvement observé se finit sur la capture d'une pièce adversaire ( ce qui vaut beaucoup de points ) et donc va être un mouvement avec un bon score. Or l'adversaire a peut-être la possibilité de capturer notre pièce en retour ( ce qui n'est pas évalué par l'algorithme alpha-beta ). Et donc la fonction quiesce est là pour regarder toutes les captures possibles, et voir si notre dernier mouvement était donc rentable. Ce qui résulte en une très bonne amélioration de notre algorithme car ça évite le suicide de nos pièces. Et Cela n'augmente pas énormement la complexité de notre algorithme car on regarde toutes les captures possibles de pièces et il y en a peu en général.
+
+\subsubsection{fonction d'évaluation}
+Le but de cette fonction est d'évaluer le score des deux joueurs sur une position donnée.
+Bien sûr, cette fonction n'est que heuristique car elle se base uniquement sur l'expérience des joueurs humains. On n'a donc qu'une approximation d'un éventuel score d'une position.
+La complexité de cette fonction influence beaucoup la complexité de l'algorithme alpha beta, car pour chaque position finale atteinte, il faudra évaluer la position.
+Il faut donc certes obtenir le score le plus précis possible, mais avec une bonne complexité. Ce que je veux dire c'est que on peut baisser la complexité de la fonction d'évaluation pour pouvoir aller chercher plus profondément dans l'algorithme alpha beta. Il faut donc trouver un juste milieu. \\
+J'aurais ( Pierre ) bien voulu de mettre un peu d'apprentisage dans notre fonction d'évaluation. \\
+
+Pour cette fonction d'évaluation j'y ai fait plusieurs choses:
+\begin{itemize}
+    \item Prise en compte du matériel disponible
+    \item Prise en compte de la position des pièces sur l'échiquier
+    \item Bonus Bishop pair : la pair de fou vaut plus que simplement la somme de deux fou ( car on couvre les cases blanches et les cases noires )
+    \item Penalty no Pawn : Malus de points si on n'a plus de pions !
+    \item Bonus rook : une tour est plus utile si elle "contrôle" un grand nombre de case ( ceci est généralisable à toute les pièces, mais je pense que c'est plus vrai pour la tour, il faut essayer de la sortir )
+\end{itemize}
+
+Je pense que le dernier point ajoute une complexité non négligeable qui n'est pas forcément décisif dans l'évaluation de la position ( ce bonus est déjà pris en compte dans la prise en compte de la position des pièces sur l'échiquier )
+
+\subsection{GnuChess}
+
+\subsubsection{Moteur CECP}
+Pour généraliser l'implémentation de GNUChess, j'ai créé une classe abstraite représentant un moteur CECP, qui doit implémenter une méthode pour envoyer et une pour recevoir des instructions CECP. Une autre classe "CECPPlayer" prend en argument un moteur CECP et simule le joueur à travers les instructions échangées par ce protocole.
+
+\subsubsection{GnuChess}
+L'implémentation de GnuChess se fait de façon assez basique, on récupère le processus puis on utilise des regex dans ton les sens.
+La plus grosse difficulté était de comprendre le comportement de GnuChess, ce logiciel étant hyper mal documenté, et n'étant (il me semble) même pas compatible avec sa propre documentation.
+
+\subsection{Concernant la partie précédente}
+
+\begin{itemize}
+    \item Paramètrage d'un timer "custom"
+    \item Proteus : les pyramides ne peuvent plus être mangées
+    \item Proteus : n'essaye plus d'enregistrer la partie, ce qui créait des null pointer exceptions
+    \item Fix de la prise en passant
+    \item Correction d'autres bugs
+\end{itemize}
+
+\section{Remarques post-développement / Conclusions}
+\begin{itemize}
+    \item (Pierre) Cette partie était plus intéressante d'un point de vue théorique sur comment faire une IA qui sait jouer correctement ! ( J'ai lu pas mal d'article sur le net, et je m'intéresse aussi un peu à l'IA sur le jeu de go, et j'ai trouvé ça assez enrichissant ! )
+    \item (Rémi) Le reste était un peu moins profond, mais j'en ai profité pour ne pas produire du code in-exrtemis et essayer de fournir un code propre.
+
+\end{itemize}
+
+\end{document}
