@@ -10,18 +10,25 @@ class MenuWin extends MainFrame {
 	  get_save : Boolean = false,
 	  ia0_delay : Int = 0, ia1_delay : Int = 0,
 	  mode : GameType.Value = GameType.Normal) = {
+
+		IATools.matos		= settings.ia_material.selected
+		IATools.position	= settings.ia_positioning.selected
+		IATools.bishop		= settings.ia_bishop.selected
+		IATools.nopawn		= settings.ia_nopawn.selected
+		IATools.rookies		= settings.ia_rook_moves.selected
+
 		menu.visible = false
 		val fen = new GameWin(mode)
 		fen.game.players(0) = joueur1 match {
 			case "human"		=> new Human(0, fen, fen.game, true)
 			case "ia"			=> new IA(0, fen.game, ia0_delay)
-			case "ia_advanced"	=> new IAadvanced(0, fen.game, ia0_delay)
+			case "ia_advanced"	=> new IAadvanced(0, fen.game, ia0_delay) { depth = settings.ia_depth.text.toInt }
 			case "gnuchess"		=> new CECP_player(new GnuChess(), 0, fen.game)
 		}
 		fen.game.players(1) = joueur2 match {
 			case "human"		=> new Human(1, fen, fen.game, true)
 			case "ia"			=> new IA(1, fen.game, ia1_delay)
-			case "ia_advanced"	=> new IAadvanced(1, fen.game, ia1_delay)
+			case "ia_advanced"	=> new IAadvanced(1, fen.game, ia1_delay) { depth = settings.ia_depth.text.toInt }
 			case "gnuchess"		=> new CECP_player(new GnuChess(), 1, fen.game)
 		}
 

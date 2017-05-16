@@ -69,21 +69,14 @@ class Human(color : Int, interface : GameWin, game : Game, save : Boolean = fals
 	def move(x : Int, y : Int) : Boolean = {
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
-<<<<<<< HEAD
-		val ret = game.move(piece, Pos(x, y))
-		if(game.save_root != null && save && !game.isProteus)
-			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
-		return ret
-=======
 		val success = game.move(piece, Pos(x, y))
 		if(success) {
 			interface.state = Wait()
-			if(game.save_root != null && save) {
+			if(game.save_root != null && save && !game.isProteus) {
 				Backup.CreatePGNfromSave(game.save_root, "save.pgn")
 			}
 		}
 		return success
->>>>>>> 02e68e527747c2dd86e5ea7eb98ac8c207def20d
 	}
 }
 
@@ -167,7 +160,7 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 }
 
 class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, game) {
-	val depth = 3 /* depth impair sinon ça marche pas bien */ /* niveau 1 = depth 1, niveau 2 = depth 3, niveau 3 = depth 5 après ça prend trop de temps à jouer */
+	var depth = 3 /* depth impair sinon ça marche pas bien */ /* niveau 1 = depth 1, niveau 2 = depth 3, niveau 3 = depth 5 après ça prend trop de temps à jouer */
 	var stopped = false // true si l'IA a été interrompue
 
 	// L'IA ne s'interrompera qu'après avoir joué

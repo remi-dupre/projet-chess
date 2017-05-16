@@ -7,7 +7,7 @@ class SettingsWin extends Dialog {
 	val timer_moves_input = new TextField("5")
 	val timer_count_input = new TextField("120")
 
-	val ia_depth = new TextField("2")
+	val ia_depth = new TextField("3")
 	val ia_material = new CheckBox()	{ selected = true }
 	val ia_positioning = new CheckBox()	{ selected = true }
 	val ia_bishop = new CheckBox()		{ selected = true }
