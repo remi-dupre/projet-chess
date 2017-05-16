@@ -3,6 +3,7 @@ import swing._
 class MenuWin extends MainFrame {
 	title = "Chess"
 	val menu = this
+	val settings = new SettingsWin()
 
 	def create_game(joueur1 : String, joueur2 : String,
 	  timer : Array[Cadency],
@@ -38,7 +39,7 @@ class MenuWin extends MainFrame {
 		}
 	}
 
-	contents = new GridPanel(5, 1) {
+	contents = new GridPanel(7, 1) {
 		val use_save = new CheckBox("Récupérer la sauvegarde")
 
 		// Sélection du timer
@@ -90,8 +91,13 @@ class MenuWin extends MainFrame {
 			create_game(j0_type, j1_type, select_time.get, false, ia0_delay, ia1_delay, GameType.Proteus)
 		})
 
-		contents += select_time
+		/* *************** Paramètres *************** */
+		contents += new Separator()
 
+		contents += select_time
+		contents += new Button(Action("Paramètres") {
+			settings.open()
+		})
 		contents += use_save
 	}
 	centerOnScreen()

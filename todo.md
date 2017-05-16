@@ -19,3 +19,4 @@
 # IAs
  - [x] tuer tous les processus quand une partie est terminée
  - [x] bug quand on clique sur le plateau pendant le tour de l'ia
+ - [ ] paramètrer l'IA
