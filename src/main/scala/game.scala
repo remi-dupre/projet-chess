@@ -12,6 +12,7 @@ case class Pos(x : Int, y : Int)
 class Game() {
 	/** Plateau de jeu */
 	var board = Array.ofDim[Piece](8, 8)
+	val isProteus = false
 
 	/** Les deux joueurs */
 	var players : Array[Player] = Array(null, null)

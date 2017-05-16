@@ -1,6 +1,7 @@
 class ProtGame() extends Game() {
 	var points : Array[Int] = Array(0, 0)
 	var first_phase : Boolean = true
+	override val isProteus = true
 
 	override def init = {
 		for(i <- 0 to 3) {
@@ -25,6 +26,7 @@ class ProtGame() extends Game() {
 		}
 		return n
 	}
+
 
 	override def move(p:Piece, pos:Pos): Boolean = {
 		val possibleMoves : List[Pos] = p.possible_move()

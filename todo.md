@@ -6,7 +6,7 @@
 
 # Proteus
  - [ ] exceptions
- - [ ] mangeage de pyramides
+ - [x] mangeage de pyramides
 
 # Gnuchess
  - [x] séparer la gestion cecp
