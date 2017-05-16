@@ -172,14 +172,11 @@ class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, g
 		if(stopped)
 			return
 
-/*		val (points, piece, dest, a, b) = IATools.alphabeta(color, -60000, 60000, depth, game, true) */
-/*		val (piece, dest) = IATools.play(color, game, depth) */
 		val (piece, dest) = IATools.playab(color, -70000, 70000, game, depth)
 		Thread.sleep(speed)
 		val t = new Thread(new Runnable() {
 		 	def run() {
 		 		if(piece != null && dest != null) {
-		 			println("yes")
 					game.move(piece, dest)
 				}
 				Thread.currentThread().interrupt()
