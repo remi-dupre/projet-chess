@@ -20,7 +20,7 @@ class GnuChess extends CECP_engine {
 	val proc = Runtime.getRuntime.exec(command, env_co)
 	val out = new PrintWriter(proc.getOutputStream)
 
-
+	/* A process reading GNUChess outputs */
 	val reader = new Thread("stderr reader for : " + command) {
 		override def run() {
 			for(line <- Source.fromInputStream(proc.getInputStream).getLines) {
@@ -35,9 +35,15 @@ class GnuChess extends CECP_engine {
 		}
 	}.start()
 
+	/* Sends text to GNUChess */
 	def send(msg : String) : Unit = {
 		out.println(msg)
 		println("(sent) ---> " + msg)
 		out.flush()
+	}
+
+	override def leave = {
+		println("(killing gnuchess)")
+		proc.destroy() // Kills GNUChess
 	}
 }

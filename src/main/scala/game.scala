@@ -73,6 +73,15 @@ class Game() {
 		players(playing).wait_play
 	}
 
+	/** Doit être exécuté quand la partie est quittée */
+	def leave = {
+		for(p <- players) {
+			if(p != null) {
+				p.leave
+			}
+		}
+	}
+
 	init // Par défaut la fame est initialisée
 
 	/** Retourne l'id du joueur qui contrôle la piece en position (x, y), -1 s'il n'y en a pas */

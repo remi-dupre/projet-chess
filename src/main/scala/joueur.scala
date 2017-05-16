@@ -4,6 +4,7 @@ import java.util.TimerTask
 
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
+	def leave = {} // Doit être exécuté quand la partie est quittée
 	def wait_play : Unit = {}
 	def wait_roll(last_pos : Pos) : Unit = {}
 	def get_roll_direction(up : Boolean) : Unit = {}

@@ -63,6 +63,7 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 	back_btn.visible = false
 
 	val leave_btn = new Button(Action("Menu") {
+		game.leave
 		close()
 		Main.menu.visible = true
 	})

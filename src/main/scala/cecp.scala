@@ -1,10 +1,13 @@
 import scala.util.matching
 
 abstract class CECP_engine {
-	// Une liste de fonctions qui seront appelées lorsqu'un message est émis par le moteur
+	/** À executer quand le moteur n'est plus utilisé */
+	def leave = {}
+
+	/** Une liste de fonctions qui seront appelées lorsqu'un message est émis par le moteur */
 	var listeners : List[String => Unit] = List()
 
-	// Permet d'envoyer un message au moteur CECP
+	/** Permet d'envoyer un message au moteur CECP */
 	def send(msg : String) : Unit
 }
 
@@ -22,6 +25,10 @@ object CECP_msg {
 class CECP_player(engine : CECP_engine, color : Int, game : Game) extends Player(color, game) {
 	val rows = Array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
 	val cols = Array('8', '7', '6', '5', '4', '3', '2', '1')
+
+	override def leave = {
+		engine.leave
+	}
 
 	var already_played = false // Si l'ia n'a pas encore joué, elle a besoins de récupérer la position du jeu
 
