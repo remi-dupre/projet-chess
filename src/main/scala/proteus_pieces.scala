@@ -14,13 +14,27 @@ class Dice(game: Game, player: Int, m_pos:Pos) extends Piece(game, player, m_pos
 	var i_role : Int = 1
 
 	/** Supprime d'une liste les postions qui correspondent à une pyramide */
-	def protect_pyramids(moves : List[Pos]) : List[Pos] = {
+/*	def protect_pyramids(moves : List[Pos]) : List[Pos] = {
 		return moves.filter(
 			((pos : Pos) => {
 				val piece = game.board(pos.x)(pos.y)
 				(piece == null) || (piece.role != "pyramid" ) || (piece.role == "dice" && Dice.seq_roles(piece.asInstanceOf[Dice].i_role) != "pyramid")
 			})
 		)
+	}*/
+
+	def protect_pyramids(moves : List[Pos]) : List[Pos] = {
+		if(moves == List()) {
+			return List()
+		}
+		else {
+			if(game.board(moves.head.x)(moves.head.y) != null && game.board(moves.head.x)(moves.head.y).role == "dice" && Dice.seq_roles(game.board(moves.head.x)(moves.head.y).asInstanceOf[Dice].i_role) == "pyramid") {
+				return protect_pyramids(moves.tail)
+			}
+			else {
+				moves.head :: (protect_pyramids(moves.tail))
+			}
+		}
 	}
 
 	/** Par défaut on copie les déplacements des pièces classiques */
@@ -106,7 +120,19 @@ class Pyramid(game: Game, player: Int, m_pos: Pos) extends Piece(game, player, m
 
 class Pawn_proteus(game:Game, player:Int, m_pos:Pos) extends Piece(game, player, m_pos) {
 	/** Dans proteus, le pion peut toujours se déplacer de deux */
-
+	def protect_pyramids(moves : List[Pos]) : List[Pos] = {
+		if(moves == List()) {
+			return List()
+		}
+		else {
+			if(game.board(moves.head.x)(moves.head.y) != null && game.board(moves.head.x)(moves.head.y).role == "dice" && Dice.seq_roles(game.board(moves.head.x)(moves.head.y).asInstanceOf[Dice].i_role) == "pyramid") {
+				return protect_pyramids(moves.tail)
+			}
+			else {
+				moves.head :: (protect_pyramids(moves.tail))
+			}
+		}
+	}
 	override def role = "pawn"
 	override def attacked_cells() : List[Pos] = {
 		var x = pos.x
@@ -121,7 +147,7 @@ class Pawn_proteus(game:Game, player:Int, m_pos:Pos) extends Piece(game, player,
 		if(in_board(x-vecteur,y+vecteur) && (game.cell_player(x-vecteur,y+vecteur) == 1-player)) {
 			pos_move = Pos(x-vecteur, y+vecteur)::pos_move
 		}
-		return pos_move
+		return protect_pyramids(pos_move)
 	}
 
 	override def possible_move() : List[Pos] = {
@@ -140,6 +166,6 @@ class Pawn_proteus(game:Game, player:Int, m_pos:Pos) extends Piece(game, player,
 			pos_move = Pos(x, y+2*vecteur)::pos_move
 		}
 
-		return pos_move ++ attacked_cells
+		return protect_pyramids(pos_move ++ attacked_cells)
 	}
 }

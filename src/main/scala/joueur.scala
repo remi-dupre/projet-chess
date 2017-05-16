@@ -69,7 +69,7 @@ class Human(color : Int, interface : GameWin, game : Game, save : Boolean = fals
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
 		val ret = game.move(piece, Pos(x, y))
-		if(game.save_root != null && save)
+		if(game.save_root != null && save && !game.isProteus)
 			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
 		return ret
 	}
@@ -142,7 +142,7 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 }
 
 class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, game) {
-	val depth = 3
+	val depth = 3 /* depth impair sinon ça marche pas bien */ /* niveau 1 = depth 1, niveau 2 = depth 3, niveau 3 = depth 5 après ça prend trop de temps à jouer */
 	override def wait_play = {
 
 /*		val (points, piece, dest, a, b) = IATools.alphabeta(color, -60000, 60000, depth, game, true) */

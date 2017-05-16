@@ -12,8 +12,12 @@ object IATools {
 	val bonusBishopPoints = 50
 	val penaltyNoPawnPoints = -50
 	val facteurRookPossibleMove = 1
-
-	/* les matrices qui reconsidère les points des pièces selon leurs positions sur le board */
+	var matos = true
+	var position = true
+	var bishop = true
+	var nopawn = true
+	var rookies = false
+	
 	def hash(s : String) : Int = {
 		if( s == "king" ) {
 			return 0
@@ -32,6 +36,7 @@ object IATools {
 		}
 		return 5
 	}
+	/* les matrices qui reconsidère les points des pièces selon leurs positions sur le board */
 	var pointPositionning = Array.ofDim[Int](2, 6, 8, 8) /* 0 = king, 1 = queen, 2 = rook, 3 = knight, 4 = bishop, 5 = pawn */
 
 	/* king early game */
@@ -360,7 +365,8 @@ object IATools {
 
 	/* Fonctions essentiels */
 
-	def evaluateComplex(game: Game) : Array[Int] = {
+	def evaluate(game: Game) : Array[Int] = {
+		/* voir en début de fichier pour matos, position, bishop, nopawn, rookies */
 		val points = Array(0, 0)
 		val bonusBishopPair = Array(0, 0)
 		val penaltyNoPawn = Array(0, 0)
@@ -370,32 +376,44 @@ object IATools {
 				val piece = game.board(i)(j)
 				if( piece != null ) {
 					val player = piece.player
-					points(player) += piece.value /* matériel sur l'échiquier' */
-					points(player) += pointPositionning(player)(hash(piece.role))(i)(j) /* positionnement des pièces sur l'échiquier */
-					if( piece.role == "bishop") {
-						bonusBishopPair(player) += 1 /* pair de fou, vaut mieux que 2 fou indépendant : Bonus Bishop pair */
+					if(matos) {
+						points(player) += piece.value /* matériel sur l'échiquier' */
 					}
-					if( piece.role == "pawn") {
-						penaltyNoPawn(player) += 1 /* Malus si plus aucun points -> mauvais pour la fin de partie */
+					if(position) {
+						points(player) += pointPositionning(player)(hash(piece.role))(i)(j) /* positionnement des pièces sur l'échiquier */
 					}
-					if(piece.role == "rook") { /* plus les tours ont de choix de moves, plus c'est intéressant !*/ 
-						possibleRookmoves(player) = piece.removeInCheckMoves(piece.possible_move) ++ possibleRookmoves(player) 
+					if(bishop) {
+						if( piece.role == "bishop") {
+							bonusBishopPair(player) += 1 /* pair de fou, vaut mieux que 2 fou indépendant : Bonus Bishop pair */
+						}
+					}
+					if(nopawn) {
+						if( piece.role == "pawn") {
+							penaltyNoPawn(player) += 1 /* Malus si plus aucun pions -> mauvais pour la fin de partie */
+						}
+					}
+					if(rookies) {
+						if(piece.role == "rook") { /* plus les tours ont de choix de moves, plus c'est intéressant !*/
+							possibleRookmoves(player) = piece.removeInCheckMoves(piece.possible_move) ++ possibleRookmoves(player) 
+						}
 					}
 				}
 			}
 		}
 		for(i <- 0 to 1) {
-			if(bonusBishopPair(i) == 2) {
+			if(bishop && bonusBishopPair(i) == 2) {
 				points(i) += bonusBishopPoints 
 			}
-			if( penaltyNoPawn(i) == 0) {
+			if(nopawn && penaltyNoPawn(i) == 0) {
 				points(i) -= penaltyNoPawnPoints 
 			}
-			points(i) += supDoublon(possibleRookmoves(i)).length * facteurRookPossibleMove 
+			if(rookies) {
+				points(i) += supDoublon(possibleRookmoves(i)).length * facteurRookPossibleMove 
+			}
 		}
 		return points
 	}
-	def evaluate(game: Game) : Array[Int] = {
+/*	def evaluate(game: Game) : Array[Int] = {
 		val points = Array(0, 0)
 		val bonusBishopPair = Array(0, 0)
 		val penaltyNoPawn = Array(0, 0)
@@ -425,7 +443,7 @@ object IATools {
 		}
 		return points
 	}
-
+*/
 /*	def refreshPointPlayer(points: Array[Int], bonusesPenalties: Array[Array[Boolean]], player: Int, game: Game, move: (Piece, Pos)) : (Array[Int], Array[Array[Boolean]]) = {
 		val resPoints = copyPoints(points)
 		val resBonuses = copyBonuses(bonusesPenalties)
