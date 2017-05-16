@@ -11,7 +11,6 @@ class MenuWin extends MainFrame {
 	  mode : GameType.Value = GameType.Normal) = {
 		menu.visible = false
 		val fen = new GameWin(mode)
-		println(joueur1)
 		fen.game.players(0) = joueur1 match {
 			case "human"		=> new Human(0, fen, fen.game, true)
 			case "ia"			=> new IA(0, fen.game, ia0_delay)

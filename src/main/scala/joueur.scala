@@ -68,10 +68,14 @@ class Human(color : Int, interface : GameWin, game : Game, save : Boolean = fals
 	def move(x : Int, y : Int) : Boolean = {
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
-		val ret = game.move(piece, Pos(x, y))
-		if(game.save_root != null && save)
-			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
-		return ret
+		val success = game.move(piece, Pos(x, y))
+		if(success) {
+			interface.state = Wait()
+			if(game.save_root != null && save) {
+				Backup.CreatePGNfromSave(game.save_root, "save.pgn")
+			}
+		}
+		return success
 	}
 }
 

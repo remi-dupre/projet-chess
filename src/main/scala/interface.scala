@@ -164,7 +164,7 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 
 	action = Action("") {
 		mainWin.state match {
-			case Wait() => println("waiting ...")
+			case Wait() => () //println("waiting ...")
 			case WaitRollDirection(p) =>
 				p.select(x, y)
 			case WaitDirection(p) =>
