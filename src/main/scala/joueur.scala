@@ -84,7 +84,17 @@ class Human(color : Int, interface : GameWin, game : Game, save : Boolean = fals
  * Représente un IA
  * Par défault elle fait des movements aléatoires */
 class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) {
-	override def wait_play = {
+	var stopped = false // true si l'IA a été interrompue
+
+	// L'IA ne s'interrompera qu'après avoir joué
+	override def leave = {
+		stopped = true
+	}
+
+	override def wait_play : Unit = {
+		if(stopped)
+			return
+
 		var pos_move : List[(Piece, Pos)] = List()
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
@@ -112,7 +122,10 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 		"queen"
 	}
 
-	override def wait_roll(last_pos : Pos) = {
+	override def wait_roll(last_pos : Pos) : Unit = {
+		if(stopped)
+			return
+
 		var pos_move : List[(Piece, Pos)] = List()
 		var piece_list : List[Piece] = List()
 		for(i <- 0 to 7) {
@@ -148,7 +161,16 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 
 class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, game) {
 	val depth = 3
-	override def wait_play = {
+	var stopped = false // true si l'IA a été interrompue
+
+	// L'IA ne s'interrompera qu'après avoir joué
+	override def leave = {
+		stopped = true
+	}
+
+	override def wait_play : Unit  = {
+		if(stopped)
+			return
 
 /*		val (points, piece, dest, a, b) = IATools.alphabeta(color, -60000, 60000, depth, game, true) */
 /*		val (piece, dest) = IATools.play(color, game, depth) */
@@ -165,6 +187,7 @@ class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, g
 		})
 		t.start()
 	}
+
 	override def get_promotion_type : String = {
 		return "queen"
 	}

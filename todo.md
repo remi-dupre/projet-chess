@@ -17,5 +17,5 @@
  - [x] récupérer la partie en cours
 
 # IAs
- - [ ] tuer tous les processus quand une partie est terminée
+ - [x] tuer tous les processus quand une partie est terminée
  - [x] bug quand on clique sur le plateau pendant le tour de l'ia
