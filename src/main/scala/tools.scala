@@ -19,8 +19,8 @@ object Tools {
 	/** Formate le temps sous la form %h %min %s */
 	def time_to_string(time : Long) : String = {
 		val sec = time % 60
-		val min = ((time - 60) / 60) % 60
-		val h = (time - 60*min - sec) / (60 * 60)
+		val min = (time / 60) % 60
+		val h = time / (60 * 60)
 
 		if(h > 0)
 			return h + "h " + min + "min " + sec + "s"
@@ -28,5 +28,11 @@ object Tools {
 			return min + "min " + sec + "s"
 		else(sec > 0)
 			return sec + "s "
+	}
+
+	/** Convertis une chaine de caractère ou un null en entier */
+	def of_str(s : String) : Int = s match {
+		case null => 0
+		case str  => str.toInt
 	}
 }

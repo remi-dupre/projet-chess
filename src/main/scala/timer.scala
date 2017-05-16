@@ -3,14 +3,13 @@ import swing._
 
 case class Period(var duration : Long, var moves : Int)
 
-class Cadency(a_periods : List[Period]) {
+class Cadency(a_periods : List[Period], repeat_last : Boolean) {
 	/** Défini une séries de périodes, à savoir :
 	 *   - pour chaque période un nombre de coup à jouer
 	 *   - le temps pour les jouer
 	 *   - la dernière période se répète indéfiniment
 	 */
 
-	var repeat_last = true
 	var periods = a_periods
 
 	/** Le nombre de moves sur la période actuelle */
@@ -57,7 +56,7 @@ class Cadency(a_periods : List[Period]) {
 		return new Cadency(
 			periods.map(
 				(p : Period) => new Period(p.duration, p.moves)
-			)
+			), repeat_last
 		)
 	}
 }

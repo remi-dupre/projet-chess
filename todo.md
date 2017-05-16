@@ -1,8 +1,8 @@
 # Jeu classique
  - [x] prise en passant
  - [ ] format pgn
- - [ ] Paramètrer les timers
- - [ ] Gestion plus standart des timers
+ - [x] Paramètrer les timers
+ - [x] Gestion plus standart des timers
 
 # Proteus
  - [ ] exceptions

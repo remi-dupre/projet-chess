@@ -43,7 +43,7 @@ class MenuWin extends MainFrame {
 		val use_save = new CheckBox("Récupérer la sauvegarde")
 
 		// Sélection du timer
-		val select_time = new SelectTimer()
+		val select_time = new SelectTimer(settings)
 
 		// Boutons de selection des joueurs
 		val select_white = new SelectPlayer()
@@ -123,9 +123,9 @@ class SelectPlayer() extends Button {
 	refresh
 }
 
-class SelectTimer() extends Button {
+class SelectTimer(param : SettingsWin) extends Button {
 	var i = 0
-	val types = Array("Délais : Sans", "Délais : Retard", "Délais : Classique")
+	val types = Array("Délais : Sans", "Délais : Retard", "Délais : Classique", "Délais : Custom")
 
 	action = Action("") {
 		i = (i + 1) % types.length
@@ -140,12 +140,16 @@ class SelectTimer() extends Button {
 		i match {
 			case 0 => null
 			case 1 => Array(
-				new Cadency(List(Period(50, 5))),
-				new Cadency(List(Period(50, 5)))
+				new Cadency(List(Period(50, 5)), true),
+				new Cadency(List(Period(50, 5)), true)
 			)
 			case 2 => Array(
-				new Cadency(List(Period(60*60, 15))),
-				new Cadency(List(Period(60*60, 15)))
+				new Cadency(List(Period(60*60, 15)), true),
+				new Cadency(List(Period(60*60, 15)), true)
+			)
+			case 3 => Array(
+				param.get_timer,
+				param.get_timer
 			)
 		}
 	}

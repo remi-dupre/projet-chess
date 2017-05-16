@@ -15,10 +15,7 @@ class Game() {
 
 	/** Les deux joueurs */
 	var players : Array[Player] = Array(null, null)
-	val timer = new Cadency(List(
-		Period(60, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(50, 3), Period(10, 1)
-	))
-	var timers : Array[Cadency] = Array(timer.copy, timer.copy)
+	var timers : Array[Cadency] = null
 	var turn_start : Long = -1 // le timestamp du début du tour
 
 	/** L'indice dans 'players' du joueur qui doit jouer
