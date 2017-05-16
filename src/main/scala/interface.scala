@@ -63,6 +63,7 @@ class GameWin(game_type : GameType.Value = GameType.Normal) extends MainFrame {
 	back_btn.visible = false
 
 	val leave_btn = new Button(Action("Menu") {
+		game.leave
 		close()
 		Main.menu.visible = true
 	})
@@ -164,7 +165,7 @@ class CellBtn(x : Int, y : Int, game : Game, mainWin : GameWin) extends Button {
 
 	action = Action("") {
 		mainWin.state match {
-			case Wait() => println("waiting ...")
+			case Wait() => () //println("waiting ...")
 			case WaitRollDirection(p) =>
 				p.select(x, y)
 			case WaitDirection(p) =>

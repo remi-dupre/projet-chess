@@ -4,6 +4,7 @@ import java.util.TimerTask
 
 abstract class Player(val color : Int, game : Game) {
 	/** Spécifie que la partie attend une action du joueur */
+	def leave = {} // Doit être exécuté quand la partie est quittée
 	def wait_play : Unit = {}
 	def wait_roll(last_pos : Pos) : Unit = {}
 	def get_roll_direction(up : Boolean) : Unit = {}
@@ -68,10 +69,21 @@ class Human(color : Int, interface : GameWin, game : Game, save : Boolean = fals
 	def move(x : Int, y : Int) : Boolean = {
 		var (i, j) = selected
 		val piece = game.getPiece(i, j)
+<<<<<<< HEAD
 		val ret = game.move(piece, Pos(x, y))
 		if(game.save_root != null && save && !game.isProteus)
 			Backup.CreatePGNfromSave(game.save_root, "save.pgn")
 		return ret
+=======
+		val success = game.move(piece, Pos(x, y))
+		if(success) {
+			interface.state = Wait()
+			if(game.save_root != null && save) {
+				Backup.CreatePGNfromSave(game.save_root, "save.pgn")
+			}
+		}
+		return success
+>>>>>>> 02e68e527747c2dd86e5ea7eb98ac8c207def20d
 	}
 }
 
@@ -79,7 +91,17 @@ class Human(color : Int, interface : GameWin, game : Game, save : Boolean = fals
  * Représente un IA
  * Par défault elle fait des movements aléatoires */
 class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) {
-	override def wait_play = {
+	var stopped = false // true si l'IA a été interrompue
+
+	// L'IA ne s'interrompera qu'après avoir joué
+	override def leave = {
+		stopped = true
+	}
+
+	override def wait_play : Unit = {
+		if(stopped)
+			return
+
 		var pos_move : List[(Piece, Pos)] = List()
 		for(i <- 0 to 7) {
 			for(j <- 0 to 7) {
@@ -107,7 +129,10 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 		"queen"
 	}
 
-	override def wait_roll(last_pos : Pos) = {
+	override def wait_roll(last_pos : Pos) : Unit = {
+		if(stopped)
+			return
+
 		var pos_move : List[(Piece, Pos)] = List()
 		var piece_list : List[Piece] = List()
 		for(i <- 0 to 7) {
@@ -143,7 +168,16 @@ class IA(color : Int, game : Game, speed : Int = 0) extends Player(color, game) 
 
 class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, game) {
 	val depth = 3 /* depth impair sinon ça marche pas bien */ /* niveau 1 = depth 1, niveau 2 = depth 3, niveau 3 = depth 5 après ça prend trop de temps à jouer */
-	override def wait_play = {
+	var stopped = false // true si l'IA a été interrompue
+
+	// L'IA ne s'interrompera qu'après avoir joué
+	override def leave = {
+		stopped = true
+	}
+
+	override def wait_play : Unit  = {
+		if(stopped)
+			return
 
 /*		val (points, piece, dest, a, b) = IATools.alphabeta(color, -60000, 60000, depth, game, true) */
 /*		val (piece, dest) = IATools.play(color, game, depth) */
@@ -160,6 +194,7 @@ class IAadvanced(color: Int, game: Game, speed: Int = 0) extends Player(color, g
 		})
 		t.start()
 	}
+
 	override def get_promotion_type : String = {
 		return "queen"
 	}
